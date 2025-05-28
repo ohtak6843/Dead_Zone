@@ -6,11 +6,9 @@
 #include "Scene.h"
 #include "SceneManager.h"
 
-#include "EnginePch.h"
 #include "Input.h"
 #include "MuzzleFlashParticle.h"
 #include "GameObject.h"
-#include "EnginePch.h"
 #include "Timer.h"
 #include "TestCameraScript.h"
 

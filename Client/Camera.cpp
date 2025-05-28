@@ -40,7 +40,6 @@ void Camera::FinalUpdate()
 	Camera::S_MatView = _matView;
 	Camera::S_MatProjection = _matProjection;
 
-	//_frustum.FinalUpdate();
 	BoundingFrustum frustum;
 	BoundingFrustum::CreateFromMatrix(frustum, Camera::S_MatProjection);
 	Matrix viewInv = Camera::S_MatView.Invert();

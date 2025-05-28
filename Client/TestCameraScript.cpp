@@ -9,7 +9,7 @@
 #include "SceneManager.h"
 #include "MultiPlayer.h" 
 #include "Scene.h"
-#include "protocol.h"
+#include "../echoserver/protocol.h"
 
 #include "Scene.h"
 #include "ParticleSystem.h"

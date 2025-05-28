@@ -13,24 +13,20 @@
 #include "TestCameraScript.h"
 #include "Resources.h"
 #include "ParticleSystem.h"
-#include "Terrain.h"
 #include "BaseCollider.h"
 #include "SphereCollider.h"
 #include "OrientedBoxCollider.h"
 #include "MeshData.h"
-#include "TestDragon.h"
 
 #include "Zombie.h"
 #include "M4A1.h"
 #include "AK47.h"
 
 
-#include "Container.h"
 
 // TODO: 나중에 삭제
 #include "Timer.h"
 #include <sstream>
-#include "TestObjectScript.h"
 
 void SceneManager::Update()
 {

@@ -2,7 +2,7 @@
 #include "framework.h"
 #include "Client.h"
 #include "Game.h"
-#include "protocol.h"     
+#include "../echoserver/protocol.h"     
 #include <iostream>
 #include <memory>
 #include <thread>

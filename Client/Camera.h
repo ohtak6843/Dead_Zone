@@ -1,6 +1,5 @@
 #pragma once
 #include "Component.h"
-#include "Frustum.h"
 
 enum class PROJECTION_TYPE
 {
