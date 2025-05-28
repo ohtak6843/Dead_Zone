@@ -1,15 +1,64 @@
-﻿// header.h: 표준 시스템 포함 파일
-// 또는 프로젝트 특정 포함 파일이 들어 있는 포함 파일입니다.
-//
-
 #pragma once
+#include "Device.h"
+#include "CommandQueue.h"
+#include "SwapChain.h"
+#include "RootSignature.h"
+#include "Mesh.h"
+#include "Shader.h"
+#include "ConstantBuffer.h"
+#include "TableDescriptorHeap.h"
+#include "Texture.h"
+#include "RenderTargetGroup.h"
+#include "D3D11On12Device.h"
 
-#include "targetver.h"
-#define WIN32_LEAN_AND_MEAN             // 거의 사용되지 않는 내용을 Windows 헤더에서 제외합니다.
-// Windows 헤더 파일
-#include <windows.h>
-// C 런타임 헤더 파일입니다.
-#include <stdlib.h>
-#include <malloc.h>
-#include <memory.h>
-#include <tchar.h>
+class Framework
+{
+public:
+	void Init(const WindowInfo& info);
+	void Update();
+
+public:
+	const WindowInfo& GetWindow() { return _window; }
+	shared_ptr<Device> GetDevice() { return _device; }
+	shared_ptr<GraphicsCommandQueue> GetGraphicsCmdQueue() { return _graphicsCmdQueue; }
+	shared_ptr<ComputeCommandQueue> GetComputeCmdQueue() { return _computeCmdQueue; }
+	shared_ptr<SwapChain> GetSwapChain() { return _swapChain; }
+	shared_ptr<RootSignature> GetRootSignature() { return _rootSignature; }
+	shared_ptr<GraphicsDescriptorHeap>	GetGraphicsDescHeap() { return _graphicsDescHeap; }
+	shared_ptr<ComputeDescriptorHeap>	GetComputeDescHeap() { return _computeDescHeap; }
+	shared_ptr<D3D11On12Device> GetD3D11on12Device() { return _d3d11on12Device; }
+
+	shared_ptr<ConstantBuffer> GetConstantBuffer(CONSTANT_BUFFER_TYPE type) { return _constantBuffers[static_cast<uint8>(type)]; }
+	shared_ptr<RenderTargetGroup> GetRTGroup(RENDER_TARGET_GROUP_TYPE type) { return _rtGroups[static_cast<uint8>(type)]; }
+
+public:
+	void Render();
+	void RenderBegin();
+	void RenderEnd();
+
+	void ResizeWindow(int32 widht, int32 height);
+
+private:
+	void ShowFps();
+	void CreateConstantBuffer(CBV_REGISTER reg, uint32 bufferSize, uint32 count);
+	void CreateRenderTargetGroups();
+
+private:
+	// �׷��� ȭ�� ũ�� ����
+	WindowInfo		_window;
+	D3D12_VIEWPORT	_viewport = {};
+	D3D12_RECT		_scissorRect = {};
+
+	shared_ptr<Device>			_device = make_shared<Device>();
+	shared_ptr<GraphicsCommandQueue>	_graphicsCmdQueue = make_shared<GraphicsCommandQueue>();
+	shared_ptr<ComputeCommandQueue>	_computeCmdQueue = make_shared<ComputeCommandQueue>();
+	shared_ptr<SwapChain>		_swapChain = make_shared<SwapChain>();
+	shared_ptr<RootSignature>	_rootSignature = make_shared<RootSignature>();
+	shared_ptr<GraphicsDescriptorHeap>	_graphicsDescHeap = make_shared<GraphicsDescriptorHeap>();
+	shared_ptr<ComputeDescriptorHeap>	_computeDescHeap = make_shared<ComputeDescriptorHeap>();
+	shared_ptr<D3D11On12Device>	_d3d11on12Device = make_shared<D3D11On12Device>();
+	
+	vector<shared_ptr<ConstantBuffer>> _constantBuffers;
+	array<shared_ptr<RenderTargetGroup>, RENDER_TARGET_GROUP_COUNT> _rtGroups;
+};
+

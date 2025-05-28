@@ -2,7 +2,7 @@
 #include "SceneManager.h"
 #include "Scene.h"
 
-#include "Engine.h"
+#include "Framework.h"
 #include "Material.h"
 #include "GameObject.h"
 #include "MeshRenderer.h"
@@ -47,8 +47,8 @@ void SceneManager::Render()
 
 void SceneManager::RenderUI()
 {
-	uint8 backbufferindex = GEngine->GetSwapChain()->GetBackBufferIndex();
-	shared_ptr<D3D11On12Device> device = GEngine->GetD3D11on12Device();
+	uint8 backbufferindex = gameFramework->GetSwapChain()->GetBackBufferIndex();
+	shared_ptr<D3D11On12Device> device = gameFramework->GetD3D11on12Device();
 	D2D1_SIZE_F rtSize = device->GetD3D11On12RT(backbufferindex)->GetSize();
 	//D2D1_RECT_F textRect = D2D1::RectF(0, 0, rtSize.width, rtSize.height);
 
@@ -70,8 +70,8 @@ void SceneManager::RenderUI()
 	{
 		// 총알 UI
 		Vec2 pivot = {
-			static_cast<float>(GEngine->GetWindow().width - 100),
-			static_cast<float>(GEngine->GetWindow().height - 50) };
+			static_cast<float>(gameFramework->GetWindow().width - 100),
+			static_cast<float>(gameFramework->GetWindow().height - 50) };
 		D2D1_RECT_F textRect = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
 		int32 currentAmmo = 0;
 		
@@ -108,7 +108,7 @@ void SceneManager::RenderUI()
 			device->GetSolidColorBrush().Get());*/
 
 		// 체력 UI
-		pivot = { 100.f, static_cast<float>(GEngine->GetWindow().height - 50) };
+		pivot = { 100.f, static_cast<float>(gameFramework->GetWindow().height - 50) };
 		D2D1_RECT_F textRect3 = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
 
 		wstring text3 = L"HP : 100";
@@ -190,8 +190,8 @@ shared_ptr<GameObject> SceneManager::Pick(int32 screenX, int32 screenY)
 {
 	shared_ptr<Camera> camera = GetActiveScene()->GetMainCamera();
 
-	float width = static_cast<float>(GEngine->GetWindow().width);
-	float height = static_cast<float>(GEngine->GetWindow().height);
+	float width = static_cast<float>(gameFramework->GetWindow().width);
+	float height = static_cast<float>(gameFramework->GetWindow().height);
 
 	Matrix projectionMatrix = camera->GetProjectionMatrix();
 
@@ -256,8 +256,8 @@ shared_ptr<class GameObject> SceneManager::PickZombie(int32 screenX, int32 scree
 {
 	shared_ptr<Camera> camera = GetActiveScene()->GetMainCamera();
 
-	float width = static_cast<float>(GEngine->GetWindow().width);
-	float height = static_cast<float>(GEngine->GetWindow().height);
+	float width = static_cast<float>(gameFramework->GetWindow().width);
+	float height = static_cast<float>(gameFramework->GetWindow().height);
 
 	Matrix projectionMatrix = camera->GetProjectionMatrix();
 
@@ -344,7 +344,7 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 		shared_ptr<Material> material = GET_SINGLE(Resources)->Get<Material>(L"ComputeShader");
 		material->SetShader(shader);
 		material->SetInt(0, 1);
-		GEngine->GetComputeDescHeap()->SetUAV(texture->GetUAVHandle(), UAV_REGISTER::u0);
+		gameFramework->GetComputeDescHeap()->SetUAV(texture->GetUAVHandle(), UAV_REGISTER::u0);
 
 		// 쓰레드 그룹 (1 * 1024 * 1)
 		material->Dispatch(1, 1024, 1);

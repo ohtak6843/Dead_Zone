@@ -5,7 +5,7 @@
 #include "SceneManager.h"
 #include "GameObject.h"
 #include "MeshRenderer.h"
-#include "Engine.h"
+#include "Framework.h"
 #include "Material.h"
 #include "Shader.h"
 #include "ParticleSystem.h"
@@ -20,8 +20,8 @@ Matrix Camera::S_MatProjection;
 
 Camera::Camera() : Component(COMPONENT_TYPE::CAMERA)
 {
-	_width = static_cast<float>(GEngine->GetWindow().width);
-	_height = static_cast<float>(GEngine->GetWindow().height);
+	_width = static_cast<float>(gameFramework->GetWindow().width);
+	_height = static_cast<float>(gameFramework->GetWindow().height);
 }
 
 Camera::~Camera()

@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "Engine.h"
+#include "Framework.h"
 
-unique_ptr<Engine> GEngine = make_unique<Engine>();
+unique_ptr<Framework> gameFramework = make_unique<Framework>();
 
 wstring s2ws(const string& s)
 {

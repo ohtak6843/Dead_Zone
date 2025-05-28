@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 #include "framework.h"
 #include "Client.h"
-#include "Game.h"
 #include "../echoserver/protocol.h"     
 #include <iostream>
 #include <memory>
@@ -262,8 +261,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     GWindowInfo.windowed = true;
     GWindowInfo.sock = g_clientSocket;
 
-    std::unique_ptr<Game> game = std::make_unique<Game>();
-    game->Init(GWindowInfo);
+    // 게임 프레임워크 초기화
+    gameFramework->Init(GWindowInfo);
+    GET_SINGLE(SceneManager)->LoadScene(L"TestScene");
 
     std::thread recvThread(ReceiverThread, g_clientSocket);
     // 자동 로그인: cs_packet_login 패킷 전송
@@ -292,7 +292,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 DispatchMessage(&msg);
             }
         }
-        game->Update();
+        gameFramework->Update();
     }
 
     closesocket(g_clientSocket);

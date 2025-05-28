@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "ConstantBuffer.h"
-#include "Engine.h"
+#include "Framework.h"
 
 ConstantBuffer::ConstantBuffer()
 {
@@ -47,8 +47,6 @@ void ConstantBuffer::CreateBuffer()
 		IID_PPV_ARGS(&_cbvBuffer));
 
 	_cbvBuffer->Map(0, nullptr, reinterpret_cast<void**>(&_mappedBuffer));
-	// We do not need to unmap until we are done with the resource.  However, we must not write to
-	// the resource while it is in use by the GPU (so we must use synchronization techniques).
 }
 
 void ConstantBuffer::CreateView()
@@ -68,7 +66,7 @@ void ConstantBuffer::CreateView()
 
 		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
 		cbvDesc.BufferLocation = _cbvBuffer->GetGPUVirtualAddress() + static_cast<uint64>(_elementSize) * i;
-		cbvDesc.SizeInBytes = _elementSize;   // CB size is required to be 256-byte aligned.
+		cbvDesc.SizeInBytes = _elementSize;
 
 		DEVICE->CreateConstantBufferView(&cbvDesc, cbvHandle);
 	}
@@ -87,7 +85,7 @@ void ConstantBuffer::PushGraphicsData(void* buffer, uint32 size)
 	::memcpy(&_mappedBuffer[_currentIndex * _elementSize], buffer, size);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = GetCpuHandle(_currentIndex);
-	GEngine->GetGraphicsDescHeap()->SetCBV(cpuHandle, _reg);
+	gameFramework->GetGraphicsDescHeap()->SetCBV(cpuHandle, _reg);
 
 	_currentIndex++;
 }
@@ -107,7 +105,7 @@ void ConstantBuffer::PushComputeData(void* buffer, uint32 size)
 	::memcpy(&_mappedBuffer[_currentIndex * _elementSize], buffer, size);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = GetCpuHandle(_currentIndex);
-	GEngine->GetComputeDescHeap()->SetCBV(cpuHandle, _reg);
+	gameFramework->GetComputeDescHeap()->SetCBV(cpuHandle, _reg);
 
 	_currentIndex++;
 }

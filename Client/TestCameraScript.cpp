@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "TestCameraScript.h"
-#include "Engine.h"
+#include "Framework.h"
 #include "Transform.h"
 #include "Camera.h"
 #include "GameObject.h"
@@ -77,7 +77,7 @@ void TestCameraScript::LateUpdate()
 		pkt.look.y = GetTransform()->GetLook().y;
 		pkt.look.z = GetTransform()->GetLook().z;
 
-		send(GEngine->GetWindow().sock,
+		send(gameFramework->GetWindow().sock,
 			reinterpret_cast<char*>(&pkt),
 			sizeof(pkt), 0);
 	}
@@ -93,7 +93,7 @@ void TestCameraScript::LateUpdate()
 		stopPkt.look.y = GetTransform()->GetLook().y;
 		stopPkt.look.z = GetTransform()->GetLook().z;
 		
-		send(GEngine->GetWindow().sock,
+		send(gameFramework->GetWindow().sock,
 			reinterpret_cast<char*>(&stopPkt),
 			sizeof(stopPkt), 0);
 	}
@@ -107,7 +107,7 @@ void TestCameraScript::LateUpdate()
 		pkt.size = sizeof(cs_packet_jump);
 		pkt.type = C2S_P_JUMP;
 		pkt.initVelocity = jumpSpeed;
-		send(GEngine->GetWindow().sock,
+		send(gameFramework->GetWindow().sock,
 			reinterpret_cast<char*>(&pkt),
 			sizeof(pkt),
 			0);
@@ -164,7 +164,7 @@ void TestCameraScript::LateUpdate()
 		stPkt.type = C2S_P_STATE;
 		stPkt.state = newState;
 
-		send(GEngine->GetWindow().sock,
+		send(gameFramework->GetWindow().sock,
 			reinterpret_cast<char*>(&stPkt),
 			stPkt.size, 0);
 
@@ -235,14 +235,14 @@ void TestCameraScript::ProcessMouseInput()
 {
 	if (INPUT->GetButton(MOUSE_TYPE::LBUTTON))
 	{
-		shared_ptr<GameObject> obj = GET_SINGLE(SceneManager)->PickZombie(GEngine->GetWindow().width / 2, GEngine->GetWindow().height / 2);
+		shared_ptr<GameObject> obj = GET_SINGLE(SceneManager)->PickZombie(gameFramework->GetWindow().width / 2, gameFramework->GetWindow().height / 2);
 
 		if (obj) {
 			cs_packet_attack atkPkt{};
 			atkPkt.size = sizeof(atkPkt);
 			atkPkt.type = C2S_P_ATTACK;
 			atkPkt.zombieId = obj ? static_cast<long long>(obj->GetID()) : -1;
-			send(GEngine->GetWindow().sock,
+			send(gameFramework->GetWindow().sock,
 				reinterpret_cast<char*>(&atkPkt),
 				sizeof(atkPkt),
 				0);

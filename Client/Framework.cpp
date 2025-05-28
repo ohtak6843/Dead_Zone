@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Engine.h"
+#include "Framework.h"
 #include "Material.h"
 #include "Transform.h"
 #include "Input.h"
@@ -10,7 +10,7 @@
 #include "InstancingManager.h"
 #include "GameInfo.h"
 
-void Engine::Init(const WindowInfo& info)
+void Framework::Init(const WindowInfo& info)
 {
 	_window = info;
 
@@ -46,7 +46,7 @@ void Engine::Init(const WindowInfo& info)
 	GET_SINGLE(GameInfo)->Init();
 }
 
-void Engine::Update()
+void Framework::Update()
 {
 	GET_SINGLE(Input)->Update();
 	GET_SINGLE(Timer)->Update();
@@ -58,7 +58,7 @@ void Engine::Update()
 	ShowFps();
 }
 
-void Engine::Render()
+void Framework::Render()
 {
 	RenderBegin();
 
@@ -67,12 +67,12 @@ void Engine::Render()
 	RenderEnd();
 }
 
-void Engine::RenderBegin()
+void Framework::RenderBegin()
 {
 	_graphicsCmdQueue->RenderBegin();
 }
 
-void Engine::RenderEnd()
+void Framework::RenderEnd()
 {
 	_graphicsCmdQueue->RenderEnd();
 
@@ -85,7 +85,7 @@ void Engine::RenderEnd()
 	_swapChain->SwapIndex();
 }
 
-void Engine::ResizeWindow(int32 width, int32 height)
+void Framework::ResizeWindow(int32 width, int32 height)
 {
 	_window.width = width;
 	_window.height = height;
@@ -95,7 +95,7 @@ void Engine::ResizeWindow(int32 width, int32 height)
 	::SetWindowPos(_window.hwnd, 0, 100, 100, width, height, 0);
 }
 
-void Engine::ShowFps()
+void Framework::ShowFps()
 {
 	uint32 fps = GET_SINGLE(Timer)->GetFps();
 
@@ -105,7 +105,7 @@ void Engine::ShowFps()
 	::SetWindowText(_window.hwnd, text);
 }
 
-void Engine::CreateConstantBuffer(CBV_REGISTER reg, uint32 bufferSize, uint32 count)
+void Framework::CreateConstantBuffer(CBV_REGISTER reg, uint32 bufferSize, uint32 count)
 {
 	uint8 typeInt = static_cast<uint8>(reg);
 	assert(_constantBuffers.size() == typeInt);
@@ -115,7 +115,7 @@ void Engine::CreateConstantBuffer(CBV_REGISTER reg, uint32 bufferSize, uint32 co
 	_constantBuffers.push_back(buffer);
 }
 
-void Engine::CreateRenderTargetGroups()
+void Framework::CreateRenderTargetGroups()
 {
 	// DepthStencil
 	shared_ptr<Texture> dsTexture = GET_SINGLE(Resources)->CreateTexture(L"DepthStencil",

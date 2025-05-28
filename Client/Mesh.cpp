@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Mesh.h"
-#include "Engine.h"
+#include "Framework.h"
 #include "Material.h"
 #include "InstancingBuffer.h"
 #include "FBXLoader.h"
@@ -27,7 +27,7 @@ void Mesh::Render(uint32 instanceCount, uint32 idx)
 	GRAPHICS_CMD_LIST->IASetVertexBuffers(0, 1, &_vertexBufferView); // Slot: (0~15)
 	GRAPHICS_CMD_LIST->IASetIndexBuffer(&_vecIndexInfo[idx].bufferView);
 
-	GEngine->GetGraphicsDescHeap()->CommitTable();
+	gameFramework->GetGraphicsDescHeap()->CommitTable();
 
 	GRAPHICS_CMD_LIST->DrawIndexedInstanced(_vecIndexInfo[idx].count, instanceCount, 0, 0, 0);
 }
@@ -38,7 +38,7 @@ void Mesh::Render(shared_ptr<InstancingBuffer>& buffer, uint32 idx)
 	GRAPHICS_CMD_LIST->IASetVertexBuffers(0, 2, bufferViews);
 	GRAPHICS_CMD_LIST->IASetIndexBuffer(&_vecIndexInfo[idx].bufferView);
 
-	GEngine->GetGraphicsDescHeap()->CommitTable();
+	gameFramework->GetGraphicsDescHeap()->CommitTable();
 
 	GRAPHICS_CMD_LIST->DrawIndexedInstanced(_vecIndexInfo[idx].count, buffer->GetCount(), 0, 0, 0);
 }

@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include "GameObject.h"
 #include "Camera.h"
-#include "Engine.h"
+#include "Framework.h"
 #include "ConstantBuffer.h"
 #include "Light.h"
 #include "Resources.h"
@@ -127,19 +127,19 @@ void Scene::RenderUI()
 void Scene::ClearRTV()
 {
 	// SwapChain Group 초기화
-	int8 backIndex = GEngine->GetSwapChain()->GetBackBufferIndex();
-	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)->ClearRenderTargetView(backIndex);
+	int8 backIndex = gameFramework->GetSwapChain()->GetBackBufferIndex();
+	gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)->ClearRenderTargetView(backIndex);
 	// Shadow Group 초기화
-	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SHADOW)->ClearRenderTargetView();
+	gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SHADOW)->ClearRenderTargetView();
 	// Deferred Group 초기화
-	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::G_BUFFER)->ClearRenderTargetView();
+	gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::G_BUFFER)->ClearRenderTargetView();
 	// Lighting Group 초기화
-	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::LIGHTING)->ClearRenderTargetView();
+	gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::LIGHTING)->ClearRenderTargetView();
 }
 
 void Scene::RenderShadow()
 {
-	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SHADOW)->OMSetRenderTargets();
+	gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SHADOW)->OMSetRenderTargets();
 
 	for (auto& light : _lights)
 	{
@@ -149,19 +149,19 @@ void Scene::RenderShadow()
 		light->RenderShadow();
 	}
 
-	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SHADOW)->WaitTargetToResource();
+	gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SHADOW)->WaitTargetToResource();
 }
 
 void Scene::RenderDeferred()
 {
 	// Deferred OMSet
-	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::G_BUFFER)->OMSetRenderTargets();
+	gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::G_BUFFER)->OMSetRenderTargets();
 
 	shared_ptr<Camera> mainCamera = _cameras[0];
 	mainCamera->SortGameObject();
 	mainCamera->Render_Deferred();
 
-	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::G_BUFFER)->WaitTargetToResource();
+	gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::G_BUFFER)->WaitTargetToResource();
 }
 
 void Scene::RenderLights()
@@ -170,7 +170,7 @@ void Scene::RenderLights()
 	Camera::S_MatView = mainCamera->GetViewMatrix();
 	Camera::S_MatProjection = mainCamera->GetProjectionMatrix();
 
-	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::LIGHTING)->OMSetRenderTargets();
+	gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::LIGHTING)->OMSetRenderTargets();
 
 	// 광원을 그린다.
 	for (auto& light : _lights)
@@ -178,14 +178,14 @@ void Scene::RenderLights()
 		light->Render();
 	}
 
-	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::LIGHTING)->WaitTargetToResource();
+	gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::LIGHTING)->WaitTargetToResource();
 }
 
 void Scene::RenderFinal()
 {
 	// Swapchain OMSet
-	int8 backIndex = GEngine->GetSwapChain()->GetBackBufferIndex();
-	GEngine->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)->OMSetRenderTargets(1, backIndex);
+	int8 backIndex = gameFramework->GetSwapChain()->GetBackBufferIndex();
+	gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)->OMSetRenderTargets(1, backIndex);
 
 	GET_SINGLE(Resources)->Get<Material>(L"Final")->PushGraphicsData();
 	GET_SINGLE(Resources)->Get<Mesh>(L"Rectangle")->Render();
@@ -411,7 +411,7 @@ void Scene::ApplySnapshot(sc_packet_snapshot* packet)
 		auto& e = packet->entries[i];
 		uint32_t id = static_cast<uint32_t>(e.playerId);
 
-		if (id == GEngine->GetWindow().local) {
+		if (id == gameFramework->GetWindow().local) {
 			auto cam = GetMainCamera();
 			auto camGO = cam->GetGameObject();
 			auto camTrans = camGO->GetTransform();

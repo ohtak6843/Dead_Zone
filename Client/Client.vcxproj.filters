@@ -15,9 +15,6 @@
     <Filter Include="Game\Utils">
       <UniqueIdentifier>{362ae41a-f0d8-4eee-9f36-31fd773826af}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Game">
-      <UniqueIdentifier>{52763fce-573a-4248-8880-da327c06ee96}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\Framework">
       <UniqueIdentifier>{0f46118c-04fe-47ff-bb3c-62300feb6f60}</UniqueIdentifier>
     </Filter>
@@ -54,9 +51,6 @@
     <Filter Include="Game\Shader">
       <UniqueIdentifier>{74f7da78-fbbc-42cc-922e-8223e35b185b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Client">
-      <UniqueIdentifier>{534e838b-bc59-41be-8ea0-c109bcc6a8c1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\Utils\SimpleMath">
       <UniqueIdentifier>{0018461c-747c-41fc-b670-fce027d95414}</UniqueIdentifier>
     </Filter>
@@ -74,12 +68,6 @@
     <ClInclude Include="pch.h">
       <Filter>Game\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Game.h">
-      <Filter>Game\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\echoserver\protocol.h">
-      <Filter>Game\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="TableDescriptorHeap.h">
       <Filter>Game\Framework</Filter>
     </ClInclude>
@@ -92,7 +80,7 @@
     <ClInclude Include="Device.h">
       <Filter>Game\Framework</Filter>
     </ClInclude>
-    <ClInclude Include="Engine.h">
+    <ClInclude Include="Framework.h">
       <Filter>Game\Framework</Filter>
     </ClInclude>
     <ClInclude Include="InstancingBuffer.h">
@@ -248,9 +236,6 @@
     <ClCompile Include="pch.cpp">
       <Filter>Game\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Game.cpp">
-      <Filter>Game\Game</Filter>
-    </ClCompile>
     <ClCompile Include="TableDescriptorHeap.cpp">
       <Filter>Game\Framework</Filter>
     </ClCompile>
@@ -263,7 +248,7 @@
     <ClCompile Include="Device.cpp">
       <Filter>Game\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="Engine.cpp">
+    <ClCompile Include="Framework.cpp">
       <Filter>Game\Framework</Filter>
     </ClCompile>
     <ClCompile Include="InstancingBuffer.cpp">

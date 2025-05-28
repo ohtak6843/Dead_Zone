@@ -73,6 +73,9 @@ using namespace Microsoft::WRL;
 #pragma comment(lib, "FBX\\release\\zlib-md.lib")
 #endif
 
+// 콘솔 출력을 위한 설정
+#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+
 // 각종 typedef
 using int8 = __int8;
 using int16 = __int16;
@@ -175,13 +178,13 @@ public:								\
 
 #define GET_SINGLE(type)	type::GetInstance()
 
-#define DEVICE				GEngine->GetDevice()->GetDevice()
-#define GRAPHICS_CMD_LIST	GEngine->GetGraphicsCmdQueue()->GetGraphicsCmdList()
-#define RESOURCE_CMD_LIST	GEngine->GetGraphicsCmdQueue()->GetResourceCmdList()
-#define COMPUTE_CMD_LIST	GEngine->GetComputeCmdQueue()->GetComputeCmdList()
+#define DEVICE				gameFramework->GetDevice()->GetDevice()
+#define GRAPHICS_CMD_LIST	gameFramework->GetGraphicsCmdQueue()->GetGraphicsCmdList()
+#define RESOURCE_CMD_LIST	gameFramework->GetGraphicsCmdQueue()->GetResourceCmdList()
+#define COMPUTE_CMD_LIST	gameFramework->GetComputeCmdQueue()->GetComputeCmdList()
 
-#define GRAPHICS_ROOT_SIGNATURE		GEngine->GetRootSignature()->GetGraphicsRootSignature()
-#define COMPUTE_ROOT_SIGNATURE		GEngine->GetRootSignature()->GetComputeRootSignature()
+#define GRAPHICS_ROOT_SIGNATURE		gameFramework->GetRootSignature()->GetGraphicsRootSignature()
+#define COMPUTE_ROOT_SIGNATURE		gameFramework->GetRootSignature()->GetComputeRootSignature()
 
 #define INPUT					GET_SINGLE(Input)
 #define DELTA_TIME				GET_SINGLE(Timer)->GetDeltaTime()
@@ -189,7 +192,7 @@ public:								\
 #define DEBUG_MODE				GET_SINGLE(SceneManager)->IsDebugMode()
 #define SET_DEBUG_MODE(mode)	GET_SINGLE(SceneManager)->SetDebugMode(mode)
 
-#define CONST_BUFFER(type)	GEngine->GetConstantBuffer(type)
+#define CONST_BUFFER(type)	gameFramework->GetConstantBuffer(type)
 
 struct TransformParams
 {
@@ -208,7 +211,7 @@ struct AnimFrameParams
 	Vec4	translation;
 };
 
-extern unique_ptr<class Engine> GEngine;
+extern unique_ptr<class Framework> gameFramework;
 
 // Utils
 wstring s2ws(const string& s);

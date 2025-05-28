@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Input.h"
-#include "Engine.h"
+#include "Framework.h"
 
 void Input::Init(HWND hwnd)
 {
@@ -8,7 +8,7 @@ void Input::Init(HWND hwnd)
 	_hInst = (HINSTANCE)::GetWindowLongPtr(_hwnd, GWLP_HINSTANCE);
 	_mouseStates.resize(3, KEY_STATE::NONE);
 	_keyStates.resize(KEY_TYPE_COUNT, KEY_STATE::NONE);
-	_centerScreenPos = { GEngine->GetWindow().width / 2, GEngine->GetWindow().height / 2 };
+	_centerScreenPos = { gameFramework->GetWindow().width / 2, gameFramework->GetWindow().height / 2 };
 
 	LockCursor(true);
 

@@ -161,7 +161,6 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\echoserver\protocol.h" />
     <ClInclude Include="AK47.h" />
     <ClInclude Include="Animator.h" />
     <ClInclude Include="BaseCollider.h" />
@@ -174,9 +173,8 @@
     <ClInclude Include="D3D11On12Device.h" />
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="Device.h" />
-    <ClInclude Include="Engine.h" />
+    <ClInclude Include="Framework.h" />
     <ClInclude Include="FBXLoader.h" />
-    <ClInclude Include="Game.h" />
     <ClInclude Include="GameInfo.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Gun.h" />
@@ -229,9 +227,8 @@
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="D3D11On12Device.cpp" />
     <ClCompile Include="Device.cpp" />
-    <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="Framework.cpp" />
     <ClCompile Include="FBXLoader.cpp" />
-    <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameInfo.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Gun.cpp" />
