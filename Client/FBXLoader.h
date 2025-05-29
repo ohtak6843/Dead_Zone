@@ -100,9 +100,6 @@ private:
 	void LoadMeshNotWithAnimation(FbxMesh* mesh);
 	void LoadMaterial(FbxSurfaceMaterial* surfaceMaterial);
 
-	void		GetNormal(FbxMesh* mesh, FbxMeshInfo* container, int32 idx, int32 vertexCounter);
-	void		GetTangent(FbxMesh* mesh, FbxMeshInfo* container, int32 idx, int32 vertexCounter);
-	void		GetUV(FbxMesh* mesh, FbxMeshInfo* container, int32 idx, int32 vertexCounter);
 	Vec4		GetMaterialData(FbxSurfaceMaterial* surface, const char* materialName, const char* factorName);
 	wstring		GetTextureRelativeName(FbxSurfaceMaterial* surface, const char* materialProperty);
 

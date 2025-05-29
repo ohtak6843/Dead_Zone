@@ -74,7 +74,7 @@ using namespace Microsoft::WRL;
 #endif
 
 // 콘솔 출력을 위한 설정
-#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+//#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
 
 // 각종 typedef
 using int8 = __int8;
@@ -181,7 +181,7 @@ public:								\
 #define DEVICE				gameFramework->GetDevice()->GetDevice()
 #define GRAPHICS_CMD_LIST	gameFramework->GetGraphicsCmdQueue()->GetGraphicsCmdList()
 #define RESOURCE_CMD_LIST	gameFramework->GetGraphicsCmdQueue()->GetResourceCmdList()
-#define COMPUTE_CMD_LIST	gameFramework->GetComputeCmdQueue()->GetComputeCmdList()
+#define COMPUTE_CMD_LIST	gameFramework->GetComputeCmdQueue()->GetCmdList()
 
 #define GRAPHICS_ROOT_SIGNATURE		gameFramework->GetRootSignature()->GetGraphicsRootSignature()
 #define COMPUTE_ROOT_SIGNATURE		gameFramework->GetRootSignature()->GetComputeRootSignature()

@@ -20,34 +20,26 @@ FBXLoader::~FBXLoader()
 
 void FBXLoader::LoadFbx(const wstring& path)
 {
-	// 파일 데이터 로드
 	Import(path);
 
-	// Animation	
 	LoadBones(_scene->GetRootNode());
 	LoadAnimationInfo();
 
-	// 로드된 데이터 파싱 (Mesh/Material/Skin)
 	ParseNode(_scene->GetRootNode());
 
-	// 우리 구조에 맞게 Texture / Material 생성
 	CreateTextures();
 	CreateMaterials();
 }
 
 void FBXLoader::Import(const wstring& path)
 {
-	// FBX SDK 관리자 객체 생성
 	_manager = FbxManager::Create();
 
-	// IOSettings 객체 생성 및 설정
 	FbxIOSettings* settings = FbxIOSettings::Create(_manager, IOSROOT);
 	_manager->SetIOSettings(settings);
 
-	// FbxImporter 객체 생성
 	_scene = FbxScene::Create(_manager, "");
 
-	// 나중에 Texture 경로 계산할 때 쓸 것
 	_resourceDirectory = fs::path(path).parent_path().wstring() + L"\\" + fs::path(path).filename().stem().wstring() + L".fbm";
 
 	_importer = FbxImporter::Create(_manager, "");
@@ -59,7 +51,6 @@ void FBXLoader::Import(const wstring& path)
 
 	_scene->GetGlobalSettings().SetAxisSystem(FbxAxisSystem::DirectX);
 
-	// 씬 내에서 삼각형화 할 수 있는 모든 노드를 삼각형화 시킨다.
 	FbxGeometryConverter geometryConverter(_manager);
 	geometryConverter.Triangulate(_scene, true);
 
@@ -75,12 +66,9 @@ void FBXLoader::ParseNode(FbxNode* node)
 		switch (attribute->GetAttributeType())
 		{
 		case FbxNodeAttribute::eMesh:
-			if (_animClips.empty())
-				LoadMeshNotWithAnimation(node->GetMesh());
-			else
-				LoadMesh(node->GetMesh());;
 
-			//LoadMesh(node->GetMesh());
+			LoadMesh(node->GetMesh());
+
 			FbxNode* current = node;
 			FbxAMatrix matFromNode = FbxAMatrix();
 
@@ -117,7 +105,6 @@ void FBXLoader::ParseNode(FbxNode* node)
 		}
 	}
 
-	// Material 로드
 	const uint32 materialCount = node->GetMaterialCount();
 	for (uint32 i = 0; i < materialCount; ++i)
 	{
@@ -125,7 +112,6 @@ void FBXLoader::ParseNode(FbxNode* node)
 		LoadMaterial(surfaceMaterial);
 	}
 
-	// Tree 구조 재귀 호출
 	const int32 childCount = node->GetChildCount();
 	for (int32 i = 0; i < childCount; ++i)
 		ParseNode(node->GetChild(i));
@@ -142,63 +128,6 @@ void FBXLoader::LoadMesh(FbxMesh* mesh)
 	meshInfo.vertices.resize(vertexCount);
 	meshInfo.boneWeights.resize(vertexCount);
 
-	// Position
-	FbxVector4* controlPoints = mesh->GetControlPoints();
-	for (int32 i = 0; i < vertexCount; ++i)
-	{
-		meshInfo.vertices[i].pos.x = static_cast<float>(controlPoints[i].mData[0]);
-		meshInfo.vertices[i].pos.y = static_cast<float>(controlPoints[i].mData[2]);
-		meshInfo.vertices[i].pos.z = static_cast<float>(controlPoints[i].mData[1]);
-	}
-
-	const int32 materialCount = mesh->GetNode()->GetMaterialCount();
-	meshInfo.indices.resize(materialCount);
-
-	FbxGeometryElementMaterial* geometryElementMaterial = mesh->GetElementMaterial();
-
-	const int32 polygonSize = mesh->GetPolygonSize(0);
-	assert(polygonSize == 3);
-
-	uint32 arrIdx[3];
-	uint32 vertexCounter = 0; // 정점의 개수
-
-	const int32 triCount = mesh->GetPolygonCount(); // 메쉬의 삼각형 개수를 가져온다
-	for (int32 i = 0; i < triCount; i++) // 삼각형의 개수
-	{
-		for (int32 j = 0; j < 3; j++) // 삼각형은 세 개의 정점으로 구성
-		{
-			int32 controlPointIndex = mesh->GetPolygonVertex(i, j); // 제어점의 인덱스 추출
-			arrIdx[j] = controlPointIndex;
-
-			GetNormal(mesh, &meshInfo, controlPointIndex, vertexCounter);
-			GetTangent(mesh, &meshInfo, controlPointIndex, vertexCounter);
-			GetUV(mesh, &meshInfo, controlPointIndex, mesh->GetTextureUVIndex(i, j));
-
-			vertexCounter++;
-		}
-
-		const uint32 subsetIdx = geometryElementMaterial->GetIndexArray().GetAt(i);
-		meshInfo.indices[subsetIdx].push_back(arrIdx[0]);
-		meshInfo.indices[subsetIdx].push_back(arrIdx[2]);
-		meshInfo.indices[subsetIdx].push_back(arrIdx[1]);
-	}
-
-	// Animation
-	LoadAnimationData(mesh, &meshInfo);
-}
-
-void FBXLoader::LoadMeshNotWithAnimation(FbxMesh* mesh)
-{
-	_meshes.push_back(FbxMeshInfo());
-	FbxMeshInfo& meshInfo = _meshes.back();
-
-	meshInfo.name = s2ws(mesh->GetName());
-
-	const int32 vertexCount = mesh->GetControlPointsCount();
-	meshInfo.vertices.resize(vertexCount);
-	meshInfo.boneWeights.resize(vertexCount);
-
-	// Position
 	FbxVector4* controlPoints = mesh->GetControlPoints();
 
 	const int32 materialCount = mesh->GetNode()->GetMaterialCount();
@@ -210,17 +139,17 @@ void FBXLoader::LoadMeshNotWithAnimation(FbxMesh* mesh)
 	assert(polygonSize == 3);
 
 	uint32 arrIdx[3];
-	uint32 vertexCounter = 0; // 정점의 개수
+	uint32 vertexCounter = 0;
 
-	const int32 triCount = mesh->GetPolygonCount(); // 메쉬의 삼각형 개수를 가져온다
+	const int32 triCount = mesh->GetPolygonCount();
 	meshInfo.vertices.resize(triCount * 3);
 	meshInfo.boneWeights.resize(triCount * 3);
-	for (int32 i = 0; i < triCount; i++) // 삼각형의 개수
+	for (int32 i = 0; i < triCount; i++)
 	{
-		for (int32 j = 0; j < 3; j++) // 삼각형은 세 개의 정점으로 구성
+		for (int32 j = 0; j < 3; j++)
 		{
 			Vertex vertex = {};
-			int32 controlPointIndex = mesh->GetPolygonVertex(i, j); // 제어점의 인덱스 추출
+			int32 controlPointIndex = mesh->GetPolygonVertex(i, j);
 
 			vertex.pos.x = static_cast<float>(controlPoints[controlPointIndex].mData[0]);
 			vertex.pos.y = static_cast<float>(controlPoints[controlPointIndex].mData[2]);
@@ -246,7 +175,6 @@ void FBXLoader::LoadMeshNotWithAnimation(FbxMesh* mesh)
 				else
 					normalIdx = normal->GetIndexArray().GetAt(controlPointIndex);
 			}
-
 			FbxVector4 vec = normal->GetDirectArray().GetAt(normalIdx);
 			vertex.normal.x = static_cast<float>(vec.mData[0]);
 			vertex.normal.y = static_cast<float>(vec.mData[2]);
@@ -272,8 +200,7 @@ void FBXLoader::LoadMeshNotWithAnimation(FbxMesh* mesh)
 		meshInfo.indices[subsetIdx].push_back(i * 3 + 1);
 	}
 
-	// Animation
-	//LoadAnimationData(mesh, &meshInfo);
+	LoadAnimationData(mesh, &meshInfo);
 }
 
 void FBXLoader::LoadMaterial(FbxSurfaceMaterial* surfaceMaterial)
@@ -291,77 +218,6 @@ void FBXLoader::LoadMaterial(FbxSurfaceMaterial* surfaceMaterial)
 	material.specularTexName = GetTextureRelativeName(surfaceMaterial, FbxSurfaceMaterial::sSpecular);
 
 	_meshes.back().materials.push_back(material);
-}
-
-void FBXLoader::GetNormal(FbxMesh* mesh, FbxMeshInfo* container, int32 idx, int32 vertexCounter)
-{
-	if (mesh->GetElementNormalCount() == 0)
-		return;
-
-	FbxGeometryElementNormal* normal = mesh->GetElementNormal();
-	uint32 normalIdx = 0;
-
-	if (normal->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
-	{
-		if (normal->GetReferenceMode() == FbxGeometryElement::eDirect)
-			normalIdx = vertexCounter;
-		else
-			normalIdx = normal->GetIndexArray().GetAt(vertexCounter);
-	}
-	else if (normal->GetMappingMode() == FbxGeometryElement::eByControlPoint)
-	{
-		if (normal->GetReferenceMode() == FbxGeometryElement::eDirect)
-			normalIdx = idx;
-		else
-			normalIdx = normal->GetIndexArray().GetAt(idx);
-	}
-
-	FbxVector4 vec = normal->GetDirectArray().GetAt(normalIdx);
-	container->vertices[idx].normal.x = static_cast<float>(vec.mData[0]);
-	container->vertices[idx].normal.y = static_cast<float>(vec.mData[2]);
-	container->vertices[idx].normal.z = static_cast<float>(vec.mData[1]);
-}
-
-void FBXLoader::GetTangent(FbxMesh* mesh, FbxMeshInfo* meshInfo, int32 idx, int32 vertexCounter)
-{
-	if (mesh->GetElementTangentCount() == 0)
-	{
-		// TEMP : 원래는 이런 저런 알고리즘으로 Tangent 만들어줘야 함
-		meshInfo->vertices[idx].tangent.x = 1.f;
-		meshInfo->vertices[idx].tangent.y = 0.f;
-		meshInfo->vertices[idx].tangent.z = 0.f;
-		return;
-	}
-
-	FbxGeometryElementTangent* tangent = mesh->GetElementTangent();
-	uint32 tangentIdx = 0;
-
-	if (tangent->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
-	{
-		if (tangent->GetReferenceMode() == FbxGeometryElement::eDirect)
-			tangentIdx = vertexCounter;
-		else
-			tangentIdx = tangent->GetIndexArray().GetAt(vertexCounter);
-	}
-	else if (tangent->GetMappingMode() == FbxGeometryElement::eByControlPoint)
-	{
-		if (tangent->GetReferenceMode() == FbxGeometryElement::eDirect)
-			tangentIdx = idx;
-		else
-			tangentIdx = tangent->GetIndexArray().GetAt(idx);
-	}
-
-	FbxVector4 vec = tangent->GetDirectArray().GetAt(tangentIdx);
-	meshInfo->vertices[idx].tangent.x = static_cast<float>(vec.mData[0]);
-	meshInfo->vertices[idx].tangent.y = static_cast<float>(vec.mData[2]);
-	meshInfo->vertices[idx].tangent.z = static_cast<float>(vec.mData[1]);
-}
-
-void FBXLoader::GetUV(FbxMesh* mesh, FbxMeshInfo* meshInfo, int32 idx, int32 uvIndex)
-{
-	FbxVector2 uv = mesh->GetElementUV()->GetDirectArray().GetAt(uvIndex);
-	meshInfo->vertices[idx].uv.x = static_cast<float>(uv.mData[0]);
-	meshInfo->vertices[idx].uv.y = 1.f - static_cast<float>(uv.mData[1]);
 }
 
 Vec4 FBXLoader::GetMaterialData(FbxSurfaceMaterial* surface, const char* materialName, const char* factorName)
@@ -413,7 +269,6 @@ void FBXLoader::CreateTextures()
 	{
 		for (size_t j = 0; j < _meshes[i].materials.size(); j++)
 		{
-			// DiffuseTexture
 			{
 				wstring relativePath = _meshes[i].materials[j].diffuseTexName.c_str();
 				wstring filename = fs::path(relativePath).filename();
@@ -422,7 +277,6 @@ void FBXLoader::CreateTextures()
 					GET_SINGLE(Resources)->Load<Texture>(filename, fullPath);
 			}
 
-			// NormalTexture
 			{
 				wstring relativePath = _meshes[i].materials[j].normalTexName.c_str();
 				wstring filename = fs::path(relativePath).filename();
@@ -431,7 +285,6 @@ void FBXLoader::CreateTextures()
 					GET_SINGLE(Resources)->Load<Texture>(filename, fullPath);
 			}
 
-			// SpecularTexture
 			{
 				wstring relativePath = _meshes[i].materials[j].specularTexName.c_str();
 				wstring filename = fs::path(relativePath).filename();
@@ -495,6 +348,13 @@ void FBXLoader::LoadBones(FbxNode* node, int32 idx, int32 parentIdx)
 		shared_ptr<FbxBoneInfo> bone = make_shared<FbxBoneInfo>();
 		bone->boneName = s2ws(node->GetName());
 		bone->parentIndex = parentIdx;
+
+		// 손 뼈 위치 기억
+		//if (bone->boneName.find(L"RightHand") != wstring::npos && _rightHandIndex == -1)
+		//{
+		//	_rightHandIndex = static_cast<int32>(_bones.size());
+		//}
+
 		_bones.push_back(bone);
 	}
 
@@ -516,7 +376,7 @@ void FBXLoader::LoadAnimationInfo()
 
 		shared_ptr<FbxAnimClipInfo> animClip = make_shared<FbxAnimClipInfo>();
 		animClip->name = s2ws(animStack->GetName());
-		animClip->keyFrames.resize(_bones.size()); // 키프레임은 본의 개수만큼
+		animClip->keyFrames.resize(_bones.size());
 
 		FbxTakeInfo* takeInfo = _scene->GetTakeInfo(animStack->GetName());
 		animClip->startTime = takeInfo->mLocalTimeSpan.GetStart();
@@ -569,27 +429,38 @@ void FBXLoader::LoadAnimationData(FbxMesh* mesh, FbxMeshInfo* meshInfo)
 	FillBoneWeight(mesh, meshInfo);
 }
 
-
 void FBXLoader::FillBoneWeight(FbxMesh* mesh, FbxMeshInfo* meshInfo)
 {
-	const int32 size = static_cast<int32>(meshInfo->boneWeights.size());
-	for (int32 v = 0; v < size; v++)
+	if (!mesh)
+		return;
+
+	const int32 triCount = mesh->GetPolygonCount();
+	int vertexCounter = 0;
+
+	for (int32 i = 0; i < triCount; ++i)
 	{
-		BoneWeight& boneWeight = meshInfo->boneWeights[v];
-		boneWeight.Normalize();
-
-		float animBoneIndex[4] = {};
-		float animBoneWeight[4] = {};
-
-		const int32 weightCount = static_cast<int32>(boneWeight.boneWeights.size());
-		for (int32 w = 0; w < weightCount; w++)
+		for (int32 j = 0; j < 3; ++j)
 		{
-			animBoneIndex[w] = static_cast<float>(boneWeight.boneWeights[w].first);
-			animBoneWeight[w] = static_cast<float>(boneWeight.boneWeights[w].second);
-		}
+			int32 controlPointIndex = mesh->GetPolygonVertex(i, j);
 
-		memcpy(&meshInfo->vertices[v].indices, animBoneIndex, sizeof(Vec4));
-		memcpy(&meshInfo->vertices[v].weights, animBoneWeight, sizeof(Vec4));
+			BoneWeight srcWeight = meshInfo->boneWeights[controlPointIndex];
+			srcWeight.Normalize();
+
+			float animBoneIndex[4]{};
+			float animBoneWeight[4]{};
+
+			const int32 weightCount = static_cast<int32>(srcWeight.boneWeights.size());
+			for (int32 w = 0; w < weightCount; ++w)
+			{
+				animBoneIndex[w] = static_cast<float>(srcWeight.boneWeights[w].first);
+				animBoneWeight[w] = static_cast<float>(srcWeight.boneWeights[w].second);
+			}
+
+			memcpy(&meshInfo->vertices[vertexCounter].indices, animBoneIndex, sizeof(Vec4));
+			memcpy(&meshInfo->vertices[vertexCounter].weights, animBoneWeight, sizeof(Vec4));
+
+			++vertexCounter;
+		}
 	}
 }
 
@@ -608,9 +479,7 @@ void FBXLoader::LoadOffsetMatrix(FbxCluster* cluster, const FbxAMatrix& matNodeT
 {
 	FbxAMatrix matClusterTrans;
 	FbxAMatrix matClusterLinkTrans;
-	// The transformation of the mesh at binding time 
 	cluster->GetTransformMatrix(matClusterTrans);
-	// The transformation of the cluster(joint) at binding time from joint space to world space 
 	cluster->GetTransformLinkMatrix(matClusterLinkTrans);
 
 	FbxVector4 V0 = { 1, 0, 0, 0 };
@@ -648,7 +517,6 @@ void FBXLoader::LoadKeyframe(int32 animIndex, FbxNode* node, FbxCluster* cluster
 
 	FbxTime::EMode timeMode = _scene->GetGlobalSettings().GetTimeMode();
 
-	// 애니메이션 골라줌
 	FbxAnimStack* animStack = _scene->FindMember<FbxAnimStack>(_animNames[animIndex]->Buffer());
 	_scene->SetCurrentAnimationStack(OUT animStack);
 
