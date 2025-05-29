@@ -36,17 +36,8 @@
     <Filter Include="Game\Object\Component\Particle">
       <UniqueIdentifier>{b930b226-63e2-4209-a757-b243bb4f831f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Object\Gun">
-      <UniqueIdentifier>{4f5c2a86-cd49-4591-af29-fd5636cfe552}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Object\Player">
-      <UniqueIdentifier>{b262e5f0-21af-4994-9a0f-bb05df128c0e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\Object\Resource">
       <UniqueIdentifier>{06e0b30b-37d4-4c6b-a489-9d7468c3ce93}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Object\Zombie">
-      <UniqueIdentifier>{62c9821c-e1ce-4de3-86b1-581ecc26ac66}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\Shader">
       <UniqueIdentifier>{74f7da78-fbbc-42cc-922e-8223e35b185b}</UniqueIdentifier>
@@ -54,8 +45,17 @@
     <Filter Include="Game\Utils\SimpleMath">
       <UniqueIdentifier>{0018461c-747c-41fc-b670-fce027d95414}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Object\Component\Test">
-      <UniqueIdentifier>{bb7f6bbf-dcdf-4536-8e3d-1f5d881c8783}</UniqueIdentifier>
+    <Filter Include="Game\Object\Script">
+      <UniqueIdentifier>{de514a38-e2bd-4f2f-a415-01f1e54c13f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Object\Script\Gun">
+      <UniqueIdentifier>{4f5c2a86-cd49-4591-af29-fd5636cfe552}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Object\Script\Player">
+      <UniqueIdentifier>{b262e5f0-21af-4994-9a0f-bb05df128c0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Object\Script\Zombie">
+      <UniqueIdentifier>{62c9821c-e1ce-4de3-86b1-581ecc26ac66}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -162,16 +162,16 @@
       <Filter>Game\Object\Component</Filter>
     </ClInclude>
     <ClInclude Include="Gun.h">
-      <Filter>Game\Object\Gun</Filter>
+      <Filter>Game\Object\Script\Gun</Filter>
     </ClInclude>
     <ClInclude Include="AK47.h">
-      <Filter>Game\Object\Gun</Filter>
+      <Filter>Game\Object\Script\Gun</Filter>
     </ClInclude>
     <ClInclude Include="M4A1.h">
-      <Filter>Game\Object\Gun</Filter>
+      <Filter>Game\Object\Script\Gun</Filter>
     </ClInclude>
     <ClInclude Include="Zombie.h">
-      <Filter>Game\Object\Zombie</Filter>
+      <Filter>Game\Object\Script\Zombie</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Game\Object</Filter>
@@ -180,10 +180,10 @@
       <Filter>Game\Object</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>Game\Object\Player</Filter>
+      <Filter>Game\Object\Script\Player</Filter>
     </ClInclude>
     <ClInclude Include="MultiPlayer.h">
-      <Filter>Game\Object\Player</Filter>
+      <Filter>Game\Object\Script\Player</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Game\Object\Resource</Filter>
@@ -215,8 +215,8 @@
     <ClInclude Include="SimpleMath.h">
       <Filter>Game\Utils\SimpleMath</Filter>
     </ClInclude>
-    <ClInclude Include="TestCameraScript.h">
-      <Filter>Game\Object\Component\Test</Filter>
+    <ClInclude Include="LocalPlayer.h">
+      <Filter>Game\Object\Script\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -330,16 +330,16 @@
       <Filter>Game\Object\Component</Filter>
     </ClCompile>
     <ClCompile Include="Gun.cpp">
-      <Filter>Game\Object\Gun</Filter>
+      <Filter>Game\Object\Script\Gun</Filter>
     </ClCompile>
     <ClCompile Include="AK47.cpp">
-      <Filter>Game\Object\Gun</Filter>
+      <Filter>Game\Object\Script\Gun</Filter>
     </ClCompile>
     <ClCompile Include="M4A1.cpp">
-      <Filter>Game\Object\Gun</Filter>
+      <Filter>Game\Object\Script\Gun</Filter>
     </ClCompile>
     <ClCompile Include="Zombie.cpp">
-      <Filter>Game\Object\Zombie</Filter>
+      <Filter>Game\Object\Script\Zombie</Filter>
     </ClCompile>
     <ClCompile Include="Object.cpp">
       <Filter>Game\Object</Filter>
@@ -348,10 +348,10 @@
       <Filter>Game\Object</Filter>
     </ClCompile>
     <ClCompile Include="Player.cpp">
-      <Filter>Game\Object\Player</Filter>
+      <Filter>Game\Object\Script\Player</Filter>
     </ClCompile>
     <ClCompile Include="MultiPlayer.cpp">
-      <Filter>Game\Object\Player</Filter>
+      <Filter>Game\Object\Script\Player</Filter>
     </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Game\Object\Resource</Filter>
@@ -380,8 +380,8 @@
     <ClCompile Include="SimpleMath.cpp">
       <Filter>Game\Utils\SimpleMath</Filter>
     </ClCompile>
-    <ClCompile Include="TestCameraScript.cpp">
-      <Filter>Game\Object\Component\Test</Filter>
+    <ClCompile Include="LocalPlayer.cpp">
+      <Filter>Game\Object\Script\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

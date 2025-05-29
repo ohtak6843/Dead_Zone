@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "TestCameraScript.h"
+#include "LocalPlayer.h"
 #include "Framework.h"
 #include "Transform.h"
 #include "Camera.h"
@@ -17,16 +17,16 @@
 #include "M4A1.h"
 #include "AK47.h"
 
-TestCameraScript::TestCameraScript()
+LocalPlayer::LocalPlayer()
 {
 	_name = L"MainCamera";
 }
 
-TestCameraScript::~TestCameraScript()
+LocalPlayer::~LocalPlayer()
 {
 }
 
-void TestCameraScript::LateUpdate()
+void LocalPlayer::LateUpdate()
 {
 	/*static bool bInitialized = false;
 	if (!bInitialized) {
@@ -174,7 +174,7 @@ void TestCameraScript::LateUpdate()
 	GetTransform()->SetLocalPosition(pos);
 }
 
-void TestCameraScript::ProcessKeyInput()
+void LocalPlayer::ProcessKeyInput()
 {
 	// 콜라이더 출력 여부
 	if (INPUT->GetButton(KEY_TYPE::KEY_F5))
@@ -231,7 +231,7 @@ void TestCameraScript::ProcessKeyInput()
 	}
 }
 
-void TestCameraScript::ProcessMouseInput()
+void LocalPlayer::ProcessMouseInput()
 {
 	if (INPUT->GetButton(MOUSE_TYPE::LBUTTON))
 	{
@@ -268,7 +268,7 @@ void TestCameraScript::ProcessMouseInput()
 	GetTransform()->SetLocalRotation(Vec3(finalPitch, finalYaw, 0.f));
 }
 
-void TestCameraScript::Recoil(float pitchAmount, float yawAmount)
+void LocalPlayer::Recoil(float pitchAmount, float yawAmount)
 {
 	// 카메라 반동 설정
 	_recoilPitch += pitchAmount;	// 수직

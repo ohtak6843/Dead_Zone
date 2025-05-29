@@ -10,7 +10,7 @@
 #include "MuzzleFlashParticle.h"
 #include "GameObject.h"
 #include "Timer.h"
-#include "TestCameraScript.h"
+#include "LocalPlayer.h"
 
 bool Gun::_initialized = true;
 shared_ptr<GameObject> Gun::_particle = nullptr;
@@ -72,7 +72,7 @@ void Gun::Reload()
 void Gun::Recoil(float pitchAmount, float yawAmount)
 {
 	shared_ptr<Camera> camera = GET_SINGLE(SceneManager)->GetActiveScene()->GetMainCamera();
-	static_pointer_cast<TestCameraScript>(camera->GetGameObject()->GetMonoBehaviour(L"MainCamera"))->Recoil(pitchAmount, yawAmount); // 카메라 반동 처리
+	static_pointer_cast<LocalPlayer>(camera->GetGameObject()->GetMonoBehaviour(L"MainCamera"))->Recoil(pitchAmount, yawAmount); // 카메라 반동 처리
 }
 
 void Gun::Aiming(float aimFov, Vec3 aimPos)

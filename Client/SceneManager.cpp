@@ -10,7 +10,7 @@
 #include "Camera.h"
 #include "Light.h"
 
-#include "TestCameraScript.h"
+#include "LocalPlayer.h"
 #include "Resources.h"
 #include "ParticleSystem.h"
 #include "BaseCollider.h"
@@ -75,7 +75,7 @@ void SceneManager::RenderUI()
 		D2D1_RECT_F textRect = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
 		int32 currentAmmo = 0;
 		
-		int32 gunType = static_pointer_cast<TestCameraScript>(_activeScene->FindGameObject(L"Main_Camera")->GetMonoBehaviour(L"MainCamera"))->getGunType();
+		int32 gunType = static_pointer_cast<LocalPlayer>(_activeScene->FindGameObject(L"Main_Camera")->GetMonoBehaviour(L"MainCamera"))->getGunType();
 		if (gunType == 0)
 			currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"M4A1")->GetMonoBehaviour(L"M4A1"))->GetCurrentAmmo();
 		else if (gunType == 1)
@@ -359,7 +359,7 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 		camera->SetName(L"Main_Camera");
 		camera->AddComponent(make_shared<Transform>());
 		camera->AddComponent(make_shared<Camera>()); // Near=1, Far=1000, FOV=45µµ
-		camera->AddComponent(make_shared<TestCameraScript>());
+		camera->AddComponent(make_shared<LocalPlayer>());
 		camera->GetCamera()->SetFar(10000.f);
 		camera->GetCamera()->SetFOV(90.f); // 90µµ
 		camera->GetTransform()->SetLocalPosition(Vec3(1185.f, 140.f, 473.f));
