@@ -183,8 +183,8 @@ public:								\
 #define RESOURCE_CMD_LIST	gameFramework->GetGraphicsCmdQueue()->GetResourceCmdList()
 #define COMPUTE_CMD_LIST	gameFramework->GetComputeCmdQueue()->GetCmdList()
 
-#define GRAPHICS_ROOT_SIGNATURE		gameFramework->GetRootSignature()->GetGraphicsRootSignature()
-#define COMPUTE_ROOT_SIGNATURE		gameFramework->GetRootSignature()->GetComputeRootSignature()
+#define GRAPHICS_ROOT_SIGNATURE		gameFramework->GetGraphicsRootSignature()
+#define COMPUTE_ROOT_SIGNATURE		gameFramework->GetComputeRootSignature()
 
 #define INPUT					GET_SINGLE(Input)
 #define DELTA_TIME				GET_SINGLE(Timer)->GetDeltaTime()

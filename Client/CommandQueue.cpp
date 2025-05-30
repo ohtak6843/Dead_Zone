@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "CommandQueue.h"
-#include "SwapChain.h"
 #include "Framework.h"
 
 BaseCommandQueue::~BaseCommandQueue()

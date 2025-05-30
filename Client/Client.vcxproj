@@ -203,7 +203,6 @@
     <ClInclude Include="RenderTargetGroup.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Resources.h" />
-    <ClInclude Include="RootSignature.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Shader.h" />
@@ -211,7 +210,6 @@
     <ClInclude Include="SphereCollider.h" />
     <ClInclude Include="Stage01.h" />
     <ClInclude Include="StructuredBuffer.h" />
-    <ClInclude Include="SwapChain.h" />
     <ClInclude Include="TableDescriptorHeap.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="LocalPlayer.h" />
@@ -260,7 +258,6 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="RenderTargetGroup.cpp" />
     <ClCompile Include="Resources.cpp" />
-    <ClCompile Include="RootSignature.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -268,7 +265,6 @@
     <ClCompile Include="SphereCollider.cpp" />
     <ClCompile Include="Stage01.cpp" />
     <ClCompile Include="StructuredBuffer.cpp" />
-    <ClCompile Include="SwapChain.cpp" />
     <ClCompile Include="TableDescriptorHeap.cpp" />
     <ClCompile Include="LocalPlayer.cpp" />
     <ClCompile Include="Texture.cpp" />

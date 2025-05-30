@@ -1,7 +1,5 @@
 #pragma once
 #include "CommandQueue.h"
-#include "SwapChain.h"
-#include "RootSignature.h"
 #include "Mesh.h"
 #include "Shader.h"
 #include "ConstantBuffer.h"
@@ -27,9 +25,13 @@ public:
 
 	shared_ptr<GraphicsCommandQueue> GetGraphicsCmdQueue() { return _graphicsCmdQueue; }
 	shared_ptr<ComputeCommandQueue> GetComputeCmdQueue() { return _computeCmdQueue; }
-	shared_ptr<RootSignature> GetRootSignature() { return _rootSignature; }
+	
+	ComPtr<ID3D12RootSignature>	GetGraphicsRootSignature() { return _graphicsRootSignature; }
+	ComPtr<ID3D12RootSignature>	GetComputeRootSignature() { return _computeRootSignature; }
+
 	shared_ptr<GraphicsDescriptorHeap>	GetGraphicsDescHeap() { return _graphicsDescHeap; }
 	shared_ptr<ComputeDescriptorHeap>	GetComputeDescHeap() { return _computeDescHeap; }
+
 	shared_ptr<D3D11On12Device> GetD3D11on12Device() { return _d3d11on12Device; }
 
 	shared_ptr<ConstantBuffer> GetConstantBuffer(CONSTANT_BUFFER_TYPE type) { return _constantBuffers[static_cast<uint8>(type)]; }
@@ -46,6 +48,8 @@ private:
 	void ShowFps();
 
 	void CreateSwapChain();
+	void CreateGraphicsRootSignature();
+	void CreateComputeRootSignature();
 	void CreateConstantBuffer(CBV_REGISTER reg, uint32 bufferSize, uint32 count);
 	void CreateRenderTargetGroups();
 
@@ -55,17 +59,21 @@ private:
 	D3D12_VIEWPORT	_viewport = {};
 	D3D12_RECT		_scissorRect = {};
 
-	// Device 관련
+	// Device
 	ComPtr<IDXGIFactory4>		_factory;
 	ComPtr<ID3D12Device>		_device;
 
-	// SwapChain 관련
+	// SwapChain
 	ComPtr<IDXGISwapChain3>		_swapChain;
 	uint32						_currBackBufferIndex = {};
 
+	// RootSignature
+	D3D12_STATIC_SAMPLER_DESC	_staticSamplerDesc = {};
+	ComPtr<ID3D12RootSignature> _graphicsRootSignature;
+	ComPtr<ID3D12RootSignature> _computeRootSignature;
+
 	shared_ptr<GraphicsCommandQueue>	_graphicsCmdQueue = make_shared<GraphicsCommandQueue>();
 	shared_ptr<ComputeCommandQueue>	_computeCmdQueue = make_shared<ComputeCommandQueue>();
-	shared_ptr<RootSignature>	_rootSignature = make_shared<RootSignature>();
 	shared_ptr<GraphicsDescriptorHeap>	_graphicsDescHeap = make_shared<GraphicsDescriptorHeap>();
 	shared_ptr<ComputeDescriptorHeap>	_computeDescHeap = make_shared<ComputeDescriptorHeap>();
 	shared_ptr<D3D11On12Device>	_d3d11on12Device = make_shared<D3D11On12Device>();
