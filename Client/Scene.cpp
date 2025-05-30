@@ -127,7 +127,7 @@ void Scene::RenderUI()
 void Scene::ClearRTV()
 {
 	// SwapChain Group 초기화
-	int8 backIndex = gameFramework->GetSwapChain()->GetBackBufferIndex();
+	int8 backIndex = gameFramework->GetCurrBackBufferIndex();
 	gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)->ClearRenderTargetView(backIndex);
 	// Shadow Group 초기화
 	gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SHADOW)->ClearRenderTargetView();
@@ -184,7 +184,7 @@ void Scene::RenderLights()
 void Scene::RenderFinal()
 {
 	// Swapchain OMSet
-	int8 backIndex = gameFramework->GetSwapChain()->GetBackBufferIndex();
+	int8 backIndex = gameFramework->GetCurrBackBufferIndex();
 	gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)->OMSetRenderTargets(1, backIndex);
 
 	GET_SINGLE(Resources)->Get<Material>(L"Final")->PushGraphicsData();

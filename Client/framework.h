@@ -1,5 +1,4 @@
 #pragma once
-#include "Device.h"
 #include "CommandQueue.h"
 #include "SwapChain.h"
 #include "RootSignature.h"
@@ -19,10 +18,15 @@ public:
 
 public:
 	const WindowInfo& GetWindow() { return _window; }
-	shared_ptr<Device> GetDevice() { return _device; }
+
+	ComPtr<ID3D12Device> GetDevice() { return _device; }
+	ComPtr<IDXGIFactory4> GetDXGI() { return _factory; }
+
+	ComPtr<IDXGISwapChain3> GetSwapChain() { return _swapChain; }
+	uint32 GetCurrBackBufferIndex() { return _currBackBufferIndex; }
+
 	shared_ptr<GraphicsCommandQueue> GetGraphicsCmdQueue() { return _graphicsCmdQueue; }
 	shared_ptr<ComputeCommandQueue> GetComputeCmdQueue() { return _computeCmdQueue; }
-	shared_ptr<SwapChain> GetSwapChain() { return _swapChain; }
 	shared_ptr<RootSignature> GetRootSignature() { return _rootSignature; }
 	shared_ptr<GraphicsDescriptorHeap>	GetGraphicsDescHeap() { return _graphicsDescHeap; }
 	shared_ptr<ComputeDescriptorHeap>	GetComputeDescHeap() { return _computeDescHeap; }
@@ -40,6 +44,8 @@ public:
 
 private:
 	void ShowFps();
+
+	void CreateSwapChain();
 	void CreateConstantBuffer(CBV_REGISTER reg, uint32 bufferSize, uint32 count);
 	void CreateRenderTargetGroups();
 
@@ -49,10 +55,16 @@ private:
 	D3D12_VIEWPORT	_viewport = {};
 	D3D12_RECT		_scissorRect = {};
 
-	shared_ptr<Device>			_device = make_shared<Device>();
+	// Device 관련
+	ComPtr<IDXGIFactory4>		_factory;
+	ComPtr<ID3D12Device>		_device;
+
+	// SwapChain 관련
+	ComPtr<IDXGISwapChain3>		_swapChain;
+	uint32						_currBackBufferIndex = {};
+
 	shared_ptr<GraphicsCommandQueue>	_graphicsCmdQueue = make_shared<GraphicsCommandQueue>();
 	shared_ptr<ComputeCommandQueue>	_computeCmdQueue = make_shared<ComputeCommandQueue>();
-	shared_ptr<SwapChain>		_swapChain = make_shared<SwapChain>();
 	shared_ptr<RootSignature>	_rootSignature = make_shared<RootSignature>();
 	shared_ptr<GraphicsDescriptorHeap>	_graphicsDescHeap = make_shared<GraphicsDescriptorHeap>();
 	shared_ptr<ComputeDescriptorHeap>	_computeDescHeap = make_shared<ComputeDescriptorHeap>();

@@ -28,7 +28,7 @@ namespace fs = std::filesystem;
 #include <d3d12.h>
 #include <wrl.h>
 #include <d3dcompiler.h>
-#include <dxgi.h>
+#include <dxgi1_4.h>
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 #include <DirectXColors.h>
@@ -178,7 +178,7 @@ public:								\
 
 #define GET_SINGLE(type)	type::GetInstance()
 
-#define DEVICE				gameFramework->GetDevice()->GetDevice()
+#define DEVICE				gameFramework->GetDevice()
 #define GRAPHICS_CMD_LIST	gameFramework->GetGraphicsCmdQueue()->GetGraphicsCmdList()
 #define RESOURCE_CMD_LIST	gameFramework->GetGraphicsCmdQueue()->GetResourceCmdList()
 #define COMPUTE_CMD_LIST	gameFramework->GetComputeCmdQueue()->GetCmdList()

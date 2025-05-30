@@ -15,9 +15,6 @@
     <Filter Include="Game\Utils">
       <UniqueIdentifier>{362ae41a-f0d8-4eee-9f36-31fd773826af}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Framework">
-      <UniqueIdentifier>{0f46118c-04fe-47ff-bb3c-62300feb6f60}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\Scenes">
       <UniqueIdentifier>{36633eb9-4a4a-4ee1-bb1b-4212e111e491}</UniqueIdentifier>
     </Filter>
@@ -57,6 +54,9 @@
     <Filter Include="Game\Object\Script\Zombie">
       <UniqueIdentifier>{62c9821c-e1ce-4de3-86b1-581ecc26ac66}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\DX12">
+      <UniqueIdentifier>{0f46118c-04fe-47ff-bb3c-62300feb6f60}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -69,34 +69,31 @@
       <Filter>Game\Utils</Filter>
     </ClInclude>
     <ClInclude Include="TableDescriptorHeap.h">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="CommandQueue.h">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="ConstantBuffer.h">
-      <Filter>Game\Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="Device.h">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="Framework.h">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="InstancingBuffer.h">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="RenderTargetGroup.h">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="RootSignature.h">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="StructuredBuffer.h">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="SwapChain.h">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>Game\Manager</Filter>
@@ -237,34 +234,31 @@
       <Filter>Game\Utils</Filter>
     </ClCompile>
     <ClCompile Include="TableDescriptorHeap.cpp">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="CommandQueue.cpp">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="ConstantBuffer.cpp">
-      <Filter>Game\Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="Device.cpp">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="Framework.cpp">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="InstancingBuffer.cpp">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="RenderTargetGroup.cpp">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="RootSignature.cpp">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="StructuredBuffer.cpp">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="SwapChain.cpp">
-      <Filter>Game\Framework</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>Game\Manager</Filter>

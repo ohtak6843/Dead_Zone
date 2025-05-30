@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "RenderTargetGroup.h"
 #include "Framework.h"
-#include "Device.h"
-
 
 void RenderTargetGroup::Create(RENDER_TARGET_GROUP_TYPE groupType, vector<RenderTarget>& rtVec, shared_ptr<Texture> dsTexture)
 {

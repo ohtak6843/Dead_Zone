@@ -18,10 +18,14 @@ void Framework::Init(const WindowInfo& info)
 	_viewport = { 0, 0, static_cast<FLOAT>(info.width), static_cast<FLOAT>(info.height), 0.0f, 1.0f };
 	_scissorRect = CD3DX12_RECT(0, 0, info.width, info.height);
 
-	_device->Init();
-	_graphicsCmdQueue->Init(_device->GetDevice(), _swapChain);
-	_computeCmdQueue->Init(_device->GetDevice());
-	_swapChain->Init(info, _device->GetDevice(), _device->GetDXGI(), _graphicsCmdQueue->GetCmdQueue());
+	::CreateDXGIFactory(IID_PPV_ARGS(&_factory));
+	::D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&_device));
+
+	_graphicsCmdQueue->Init(_device, _swapChain);
+	_computeCmdQueue->Init(_device);
+
+	CreateSwapChain();
+
 	_rootSignature->Init();
 	_graphicsDescHeap->Init(5120);
 	_computeDescHeap->Init();
@@ -36,7 +40,7 @@ void Framework::Init(const WindowInfo& info)
 		_rtGroups[static_cast<uint8>(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)]->GetRTTexture(0)->GetTex2D(),
 		_rtGroups[static_cast<uint8>(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)]->GetRTTexture(1)->GetTex2D()
 	};
-	_d3d11on12Device->Init(_device->GetDevice(), _device->GetDXGI(), rtVec, _graphicsCmdQueue->GetCmdQueue());
+	_d3d11on12Device->Init(_device, _factory, rtVec, _graphicsCmdQueue->GetCmdQueue());
 
 	ResizeWindow(info.width, info.height);
 
@@ -78,11 +82,11 @@ void Framework::RenderEnd()
 
 	GET_SINGLE(SceneManager)->RenderUI();
 
-	_swapChain->Present();
+	_swapChain->Present(1, 0);
 
 	_graphicsCmdQueue->WaitSync();
 
-	_swapChain->SwapIndex();
+	_currBackBufferIndex = (_currBackBufferIndex + 1) % SWAP_CHAIN_BUFFER_COUNT;
 }
 
 void Framework::ResizeWindow(int32 width, int32 height)
@@ -103,6 +107,40 @@ void Framework::ShowFps()
 	::wsprintf(text, L"FPS : %d", fps);
 
 	::SetWindowText(_window.hwnd, text);
+}
+
+void Framework::CreateSwapChain()
+{
+	_swapChain.Reset();
+
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+	swapChainDesc.Width = _window.width;
+	swapChainDesc.Height = _window.height;
+	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	swapChainDesc.SampleDesc.Count = 1;
+	swapChainDesc.SampleDesc.Quality = 0;
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	swapChainDesc.BufferCount = SWAP_CHAIN_BUFFER_COUNT;
+	swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+	DXGI_SWAP_CHAIN_FULLSCREEN_DESC swapChainFullScreenDesc = {};
+	swapChainFullScreenDesc.RefreshRate.Numerator = 60;
+	swapChainFullScreenDesc.RefreshRate.Denominator = 1;
+	swapChainFullScreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	swapChainFullScreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	swapChainFullScreenDesc.Windowed = _window.windowed;
+
+	_factory->CreateSwapChainForHwnd(
+		_graphicsCmdQueue->GetCmdQueue().Get(),
+		_window.hwnd,
+		&swapChainDesc,
+		&swapChainFullScreenDesc,
+		nullptr,
+		(IDXGISwapChain1**)_swapChain.GetAddressOf()
+	);
 }
 
 void Framework::CreateConstantBuffer(CBV_REGISTER reg, uint32 bufferSize, uint32 count)
@@ -132,7 +170,7 @@ void Framework::CreateRenderTargetGroups()
 			wstring name = L"SwapChainTarget_" + std::to_wstring(i);
 
 			ComPtr<ID3D12Resource> resource;
-			_swapChain->GetSwapChain()->GetBuffer(i, IID_PPV_ARGS(&resource));
+			_swapChain->GetBuffer(i, IID_PPV_ARGS(&resource));
 			rtVec[i].target = GET_SINGLE(Resources)->CreateTextureFromResource(name, resource);
 		}
 

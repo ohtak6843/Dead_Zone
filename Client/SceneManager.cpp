@@ -47,7 +47,7 @@ void SceneManager::Render()
 
 void SceneManager::RenderUI()
 {
-	uint8 backbufferindex = gameFramework->GetSwapChain()->GetBackBufferIndex();
+	uint8 backbufferindex = gameFramework->GetCurrBackBufferIndex();
 	shared_ptr<D3D11On12Device> device = gameFramework->GetD3D11on12Device();
 	D2D1_SIZE_F rtSize = device->GetD3D11On12RT(backbufferindex)->GetSize();
 	//D2D1_RECT_F textRect = D2D1::RectF(0, 0, rtSize.width, rtSize.height);

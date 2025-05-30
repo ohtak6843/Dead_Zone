@@ -40,7 +40,7 @@ GraphicsCommandQueue::~GraphicsCommandQueue()
 	::CloseHandle(_fenceEvent);
 }
 
-void GraphicsCommandQueue::Init(ComPtr<ID3D12Device> device, shared_ptr<SwapChain> swapChain)
+void GraphicsCommandQueue::Init(ComPtr<ID3D12Device> device, ComPtr<IDXGISwapChain3> swapChain)
 {
 	_swapChain = swapChain;
 	BaseCommandQueue::Init(device, D3D12_COMMAND_LIST_TYPE_DIRECT);
@@ -55,7 +55,7 @@ void GraphicsCommandQueue::RenderBegin()
 	_cmdAlloc->Reset();
 	_cmdList->Reset(_cmdAlloc.Get(), nullptr);
 
-	int8 backIndex = _swapChain->GetBackBufferIndex();
+	int8 backIndex = gameFramework->GetCurrBackBufferIndex();
 
 	D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 		gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)->GetRTTexture(backIndex)->GetTex2D().Get(),
@@ -74,7 +74,7 @@ void GraphicsCommandQueue::RenderBegin()
 
 void GraphicsCommandQueue::RenderEnd()
 {
-	int8 backIndex = _swapChain->GetBackBufferIndex();
+	int8 backIndex = gameFramework->GetCurrBackBufferIndex();
 	D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 		gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)->GetRTTexture(backIndex)->GetTex2D().Get(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET,
