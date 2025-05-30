@@ -21,9 +21,6 @@
     <Filter Include="Game\Framework\Manager">
       <UniqueIdentifier>{9bb21940-c36b-4cbd-9678-a9803243f427}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Framework\Shader">
-      <UniqueIdentifier>{74f7da78-fbbc-42cc-922e-8223e35b185b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\Scenes">
       <UniqueIdentifier>{36633eb9-4a4a-4ee1-bb1b-4212e111e491}</UniqueIdentifier>
     </Filter>
@@ -59,6 +56,9 @@
     </Filter>
     <Filter Include="Game\Object\Script\Zombie">
       <UniqueIdentifier>{62c9821c-e1ce-4de3-86b1-581ecc26ac66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Shader">
+      <UniqueIdentifier>{74f7da78-fbbc-42cc-922e-8223e35b185b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -371,46 +371,46 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Resources\Shader\tessellation.fx">
-      <Filter>Game\Framework\Shader</Filter>
+      <Filter>Game\Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\utils.fx">
-      <Filter>Game\Framework\Shader</Filter>
+      <Filter>Game\Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\animation.fx">
-      <Filter>Game\Framework\Shader</Filter>
+      <Filter>Game\Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\compute.fx">
-      <Filter>Game\Framework\Shader</Filter>
+      <Filter>Game\Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\deferred.fx">
-      <Filter>Game\Framework\Shader</Filter>
+      <Filter>Game\Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\forward.fx">
-      <Filter>Game\Framework\Shader</Filter>
+      <Filter>Game\Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\HUD.fx">
-      <Filter>Game\Framework\Shader</Filter>
+      <Filter>Game\Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\lighting.fx">
-      <Filter>Game\Framework\Shader</Filter>
+      <Filter>Game\Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\math.fx">
-      <Filter>Game\Framework\Shader</Filter>
+      <Filter>Game\Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\params.fx">
-      <Filter>Game\Framework\Shader</Filter>
+      <Filter>Game\Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\particle.fx">
-      <Filter>Game\Framework\Shader</Filter>
+      <Filter>Game\Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\shadow.fx">
-      <Filter>Game\Framework\Shader</Filter>
+      <Filter>Game\Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\skybox.fx">
-      <Filter>Game\Framework\Shader</Filter>
+      <Filter>Game\Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\terrain.fx">
-      <Filter>Game\Framework\Shader</Filter>
+      <Filter>Game\Shader</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
