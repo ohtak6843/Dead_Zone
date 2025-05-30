@@ -52,6 +52,7 @@ private:
 	void CreateComputeRootSignature();
 	void CreateConstantBuffer(CBV_REGISTER reg, uint32 bufferSize, uint32 count);
 	void CreateRenderTargetGroups();
+	void CreateD3D11On12Device();
 
 private:
 	// 그려질 화면 크기 관련
@@ -63,6 +64,10 @@ private:
 	ComPtr<IDXGIFactory4>		_factory;
 	ComPtr<ID3D12Device>		_device;
 
+	// CommandQueue
+	shared_ptr<GraphicsCommandQueue>	_graphicsCmdQueue = make_shared<GraphicsCommandQueue>();
+	shared_ptr<ComputeCommandQueue>	_computeCmdQueue = make_shared<ComputeCommandQueue>();
+
 	// SwapChain
 	ComPtr<IDXGISwapChain3>		_swapChain;
 	uint32						_currBackBufferIndex = {};
@@ -72,8 +77,7 @@ private:
 	ComPtr<ID3D12RootSignature> _graphicsRootSignature;
 	ComPtr<ID3D12RootSignature> _computeRootSignature;
 
-	shared_ptr<GraphicsCommandQueue>	_graphicsCmdQueue = make_shared<GraphicsCommandQueue>();
-	shared_ptr<ComputeCommandQueue>	_computeCmdQueue = make_shared<ComputeCommandQueue>();
+
 	shared_ptr<GraphicsDescriptorHeap>	_graphicsDescHeap = make_shared<GraphicsDescriptorHeap>();
 	shared_ptr<ComputeDescriptorHeap>	_computeDescHeap = make_shared<ComputeDescriptorHeap>();
 	shared_ptr<D3D11On12Device>	_d3d11on12Device = make_shared<D3D11On12Device>();

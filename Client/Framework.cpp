@@ -36,12 +36,7 @@ void Framework::Init(const WindowInfo& info)
 	CreateConstantBuffer(CBV_REGISTER::b2, sizeof(MaterialParams), 5120);
 
 	CreateRenderTargetGroups();
-
-	vector<ComPtr<ID3D12Resource>> rtVec = {
-		_rtGroups[static_cast<uint8>(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)]->GetRTTexture(0)->GetTex2D(),
-		_rtGroups[static_cast<uint8>(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)]->GetRTTexture(1)->GetTex2D()
-	};
-	_d3d11on12Device->Init(_device, _factory, rtVec, _graphicsCmdQueue->GetCmdQueue());
+	CreateD3D11On12Device();
 
 	ResizeWindow(info.width, info.height);
 
@@ -302,4 +297,13 @@ void Framework::CreateRenderTargetGroups()
 		_rtGroups[static_cast<uint8>(RENDER_TARGET_GROUP_TYPE::LIGHTING)] = make_shared<RenderTargetGroup>();
 		_rtGroups[static_cast<uint8>(RENDER_TARGET_GROUP_TYPE::LIGHTING)]->Create(RENDER_TARGET_GROUP_TYPE::LIGHTING, rtVec, dsTexture);
 	}
+}
+
+void Framework::CreateD3D11On12Device()
+{
+	vector<ComPtr<ID3D12Resource>> rtVec = {
+	_rtGroups[static_cast<uint8>(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)]->GetRTTexture(0)->GetTex2D(),
+	_rtGroups[static_cast<uint8>(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)]->GetRTTexture(1)->GetTex2D()
+	};
+	_d3d11on12Device->Init(_device, _factory, rtVec, _graphicsCmdQueue->GetCmdQueue());
 }
