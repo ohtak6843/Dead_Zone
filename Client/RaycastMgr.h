@@ -4,6 +4,10 @@ class RaycastMgr
 	DECLARE_SINGLE(RaycastMgr);
 
 public:
+	float GetDistance() const { return _distance; }
+	Vec4 GetCollisionPos() const { return _rayOrigin + _rayDir * _distance; }
+
+public:
 	void SetRayOriginAndDir(int32 screenX, int32 screenY);
 
 	shared_ptr<class GameObject> Pick(int32 screenX, int32 screenY);
