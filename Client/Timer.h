@@ -9,10 +9,10 @@ public:
 	void Init();
 	void Update();
 
-	void SetTimeout(const std::function<void()>& callback, float delay);
-
 	uint32 GetFps() { return _fps; }
 	float GetDeltaTime() { return _deltaTime; }
+
+	void SetTimeout(const std::function<void()>& callback, float delay);
 
 private:
 	struct TimeoutTask {

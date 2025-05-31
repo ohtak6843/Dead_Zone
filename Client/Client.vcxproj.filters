@@ -71,7 +71,7 @@
     <ClInclude Include="pch.h">
       <Filter>Game\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="TableDescriptorHeap.h">
+    <ClInclude Include="DescriptorHeap.h">
       <Filter>Game\Framework\DX12</Filter>
     </ClInclude>
     <ClInclude Include="CommandQueue.h">
@@ -98,10 +98,10 @@
     <ClInclude Include="GameInfo.h">
       <Filter>Game\Framework\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Input.h">
+    <ClInclude Include="InputMgr.h">
       <Filter>Game\Framework\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="InstancingManager.h">
+    <ClInclude Include="InstancingMgr.h">
       <Filter>Game\Framework\Manager</Filter>
     </ClInclude>
     <ClInclude Include="Resources.h">
@@ -110,7 +110,7 @@
     <ClInclude Include="Scene.h">
       <Filter>Game\Framework\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="SceneManager.h">
+    <ClInclude Include="SceneMgr.h">
       <Filter>Game\Framework\Manager</Filter>
     </ClInclude>
     <ClInclude Include="Stage01.h">
@@ -230,7 +230,7 @@
     <ClCompile Include="pch.cpp">
       <Filter>Game\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="TableDescriptorHeap.cpp">
+    <ClCompile Include="DescriptorHeap.cpp">
       <Filter>Game\Framework\DX12</Filter>
     </ClCompile>
     <ClCompile Include="CommandQueue.cpp">
@@ -257,10 +257,10 @@
     <ClCompile Include="GameInfo.cpp">
       <Filter>Game\Framework\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Input.cpp">
+    <ClCompile Include="InputMgr.cpp">
       <Filter>Game\Framework\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="InstancingManager.cpp">
+    <ClCompile Include="InstancingMgr.cpp">
       <Filter>Game\Framework\Manager</Filter>
     </ClCompile>
     <ClCompile Include="Resources.cpp">
@@ -269,7 +269,7 @@
     <ClCompile Include="Scene.cpp">
       <Filter>Game\Framework\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="SceneManager.cpp">
+    <ClCompile Include="SceneMgr.cpp">
       <Filter>Game\Framework\Manager</Filter>
     </ClCompile>
     <ClCompile Include="Stage01.cpp">

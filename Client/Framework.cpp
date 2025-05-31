@@ -2,26 +2,25 @@
 #include "Framework.h"
 #include "Material.h"
 #include "Transform.h"
-#include "Input.h"
+#include "InputMgr.h"
 #include "Timer.h"
-#include "SceneManager.h"
+#include "SceneMgr.h"
 #include "Light.h"
 #include "Resources.h"
-#include "InstancingManager.h"
+#include "InstancingMgr.h"
 #include "GameInfo.h"
 
 void Framework::Init(const WindowInfo& info)
 {
 	_window = info;
 
-	// 그려질 화면의 크기를 설정
 	_viewport = { 0, 0, static_cast<FLOAT>(info.width), static_cast<FLOAT>(info.height), 0.0f, 1.0f };
 	_scissorRect = CD3DX12_RECT(0, 0, info.width, info.height);
 
 	::CreateDXGIFactory(IID_PPV_ARGS(&_factory));
 	::D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&_device));
 
-	_graphicsCmdQueue->Init(_device, _swapChain);
+	_graphicsCmdQueue->Init(_device);
 	_computeCmdQueue->Init(_device);
 
 	CreateSwapChain();

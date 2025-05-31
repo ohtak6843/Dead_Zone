@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "InstancingManager.h"
+#include "InstancingMgr.h"
 #include "InstancingBuffer.h"
 #include "GameObject.h"
 #include "MeshRenderer.h"

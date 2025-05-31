@@ -4,9 +4,9 @@
 #include "Transform.h"
 #include "Camera.h"
 #include "Scene.h"
-#include "SceneManager.h"
+#include "SceneMgr.h"
 
-#include "Input.h"
+#include "InputMgr.h"
 #include "MuzzleFlashParticle.h"
 #include "GameObject.h"
 #include "Gun.h"

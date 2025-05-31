@@ -1,9 +1,5 @@
 #pragma once
 
-// ************************
-// GraphicsDescriptorHeap
-// ************************
-
 class GraphicsDescriptorHeap
 {
 public:
@@ -32,11 +28,6 @@ private:
 
 	uint32					_currentGroupIndex = 0;
 };
-
-
-// ************************
-// ComputeDescriptorHeap
-// ************************
 
 class ComputeDescriptorHeap
 {

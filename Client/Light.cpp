@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "Transform.h"
 #include "Texture.h"
-#include "SceneManager.h"
+#include "SceneMgr.h"
 
 Light::Light() : Component(COMPONENT_TYPE::LIGHT)
 {

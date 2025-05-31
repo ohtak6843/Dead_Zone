@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Zombie.h"
 #include "Timer.h"
-#include "Input.h"
+#include "InputMgr.h"
 #include "Transform.h"
 #include "Animator.h"
 

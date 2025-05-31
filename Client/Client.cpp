@@ -12,7 +12,7 @@
 #include <shellapi.h>
 
 #include "Scene.h"
-#include "SceneManager.h"
+#include "SceneMgr.h"
 
 #pragma comment(lib, "ws2_32.lib")
 

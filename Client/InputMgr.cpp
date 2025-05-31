@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Input.h"
+#include "InputMgr.h"
 #include "Framework.h"
 
 void Input::Init(HWND hwnd)

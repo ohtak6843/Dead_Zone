@@ -9,6 +9,12 @@ BaseCommandQueue::~BaseCommandQueue()
 
 void BaseCommandQueue::Init(ComPtr<ID3D12Device> device, D3D12_COMMAND_LIST_TYPE type)
 {
+	CreateCmdQueueAndList(device, type);
+	CreateFence(device);
+}
+
+void BaseCommandQueue::CreateCmdQueueAndList(ComPtr<ID3D12Device> device, D3D12_COMMAND_LIST_TYPE type)
+{
 	D3D12_COMMAND_QUEUE_DESC desc = {};
 	desc.Type = type;
 	desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
@@ -17,7 +23,10 @@ void BaseCommandQueue::Init(ComPtr<ID3D12Device> device, D3D12_COMMAND_LIST_TYPE
 	device->CreateCommandAllocator(type, IID_PPV_ARGS(&_cmdAlloc));
 	device->CreateCommandList(0, type, _cmdAlloc.Get(), nullptr, IID_PPV_ARGS(&_cmdList));
 	_cmdList->Close();
+}
 
+void BaseCommandQueue::CreateFence(ComPtr<ID3D12Device> device)
+{
 	device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_fence));
 	_fenceEvent = ::CreateEvent(nullptr, FALSE, FALSE, nullptr);
 }
@@ -39,14 +48,19 @@ GraphicsCommandQueue::~GraphicsCommandQueue()
 	::CloseHandle(_fenceEvent);
 }
 
-void GraphicsCommandQueue::Init(ComPtr<ID3D12Device> device, ComPtr<IDXGISwapChain3> swapChain)
+void GraphicsCommandQueue::Init(ComPtr<ID3D12Device> device)
 {
-	_swapChain = swapChain;
 	BaseCommandQueue::Init(device, D3D12_COMMAND_LIST_TYPE_DIRECT);
 
+	CreateResCmdQueueAndList(device);
+}
+
+void GraphicsCommandQueue::CreateResCmdQueueAndList(ComPtr<ID3D12Device> device)
+{
 	device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_resCmdAlloc));
 	device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _resCmdAlloc.Get(), nullptr, IID_PPV_ARGS(&_resCmdList));
-	// _resCmdList->Close(); // 열려 있어도 무방함
+
+	_resCmdList->Close(); // 열려 있어도 무방함
 }
 
 void GraphicsCommandQueue::RenderBegin()

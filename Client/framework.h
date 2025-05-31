@@ -3,7 +3,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "ConstantBuffer.h"
-#include "TableDescriptorHeap.h"
+#include "DescriptorHeap.h"
 #include "Texture.h"
 #include "RenderTargetGroup.h"
 #include "D3D11On12Device.h"

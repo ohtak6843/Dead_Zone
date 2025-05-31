@@ -9,6 +9,10 @@ public:
 	virtual ~BaseCommandQueue();
 
 	void Init(ComPtr<ID3D12Device> device, D3D12_COMMAND_LIST_TYPE type);
+	
+	void CreateCmdQueueAndList(ComPtr<ID3D12Device> device, D3D12_COMMAND_LIST_TYPE type);
+	void CreateFence(ComPtr<ID3D12Device> device);
+
 	void WaitSync();
 
 	ComPtr<ID3D12CommandQueue> GetCmdQueue() const { return _cmdQueue; }
@@ -29,7 +33,10 @@ class GraphicsCommandQueue : public BaseCommandQueue
 public:
 	virtual ~GraphicsCommandQueue();
 
-	void Init(ComPtr<ID3D12Device> device, ComPtr<IDXGISwapChain3> swapChain);
+	void Init(ComPtr<ID3D12Device> device);
+
+	void CreateResCmdQueueAndList(ComPtr<ID3D12Device> device);
+
 	void RenderBegin();
 	void RenderEnd();
 	void FlushResourceCommandQueue();
@@ -38,8 +45,6 @@ public:
 	ComPtr<ID3D12GraphicsCommandList> GetResourceCmdList() { return _resCmdList; }
 
 private:
-	ComPtr<IDXGISwapChain3> _swapChain;
-
 	ComPtr<ID3D12CommandAllocator> _resCmdAlloc;
 	ComPtr<ID3D12GraphicsCommandList> _resCmdList;
 };

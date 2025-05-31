@@ -1,10 +1,6 @@
 #include "pch.h"
-#include "TableDescriptorHeap.h"
+#include "DescriptorHeap.h"
 #include "Framework.h"
-
-// ************************
-// GraphicsDescriptorHeap
-// ************************
 
 void GraphicsDescriptorHeap::Init(uint32 count)
 {
@@ -71,10 +67,6 @@ D3D12_CPU_DESCRIPTOR_HANDLE GraphicsDescriptorHeap::GetCPUHandle(uint8 reg)
 	handle.ptr += (reg - 1) * _handleSize;
 	return handle;
 }
-
-// ************************
-// ComputeDescriptorHeap
-// ************************
 
 void ComputeDescriptorHeap::Init()
 {
