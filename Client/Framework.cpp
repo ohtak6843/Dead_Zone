@@ -39,7 +39,7 @@ void Framework::Init(const WindowInfo& info)
 
 	ResizeWindow(info.width, info.height);
 
-	GET_SINGLE(Input)->Init(info.hwnd);
+	GET_SINGLE(InputMgr)->Init(info.hwnd);
 	GET_SINGLE(Timer)->Init();
 	GET_SINGLE(Resources)->Init();
 	GET_SINGLE(GameInfo)->Init();
@@ -47,10 +47,10 @@ void Framework::Init(const WindowInfo& info)
 
 void Framework::Update()
 {
-	GET_SINGLE(Input)->Update();
+	GET_SINGLE(InputMgr)->Update();
 	GET_SINGLE(Timer)->Update();
-	GET_SINGLE(SceneManager)->Update();
-	GET_SINGLE(InstancingManager)->ClearBuffer();
+	GET_SINGLE(SceneMgr)->Update();
+	GET_SINGLE(InstancingMgr)->ClearBuffer();
 
 	Render();
 
@@ -61,7 +61,7 @@ void Framework::Render()
 {
 	RenderBegin();
 
-	GET_SINGLE(SceneManager)->Render();
+	GET_SINGLE(SceneMgr)->Render();
 
 	RenderEnd();
 }
@@ -75,7 +75,7 @@ void Framework::RenderEnd()
 {
 	_graphicsCmdQueue->RenderEnd();
 
-	GET_SINGLE(SceneManager)->RenderUI();
+	GET_SINGLE(SceneMgr)->RenderUI();
 
 	_swapChain->Present(1, 0);
 

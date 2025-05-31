@@ -60,6 +60,9 @@
     <Filter Include="Game\Shader">
       <UniqueIdentifier>{74f7da78-fbbc-42cc-922e-8223e35b185b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Object\UI">
+      <UniqueIdentifier>{ce0f0708-0557-49a5-b80c-bfecfe1a4345}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -211,6 +214,15 @@
     </ClInclude>
     <ClInclude Include="D3D11On12Device.h">
       <Filter>Game\Framework\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="RaycastMgr.h">
+      <Filter>Game\Framework\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Rigidbody.h">
+      <Filter>Game\Object\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="TextUI.h">
+      <Filter>Game\Object\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -367,6 +379,15 @@
     </ClCompile>
     <ClCompile Include="D3D11On12Device.cpp">
       <Filter>Game\Framework\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="RaycastMgr.cpp">
+      <Filter>Game\Framework\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Rigidbody.cpp">
+      <Filter>Game\Object\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="TextUI.cpp">
+      <Filter>Game\Object\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -2,7 +2,7 @@
 #include "InputMgr.h"
 #include "Framework.h"
 
-void Input::Init(HWND hwnd)
+void InputMgr::Init(HWND hwnd)
 {
 	_hwnd = hwnd;
 	_hInst = (HINSTANCE)::GetWindowLongPtr(_hwnd, GWLP_HINSTANCE);
@@ -70,7 +70,7 @@ void Input::Init(HWND hwnd)
 	}
 }
 
-void Input::Shutdown()
+void InputMgr::Shutdown()
 {
 	// 마우스 반환
 	if (_mouse)
@@ -96,7 +96,7 @@ void Input::Shutdown()
 	}
 }
 
-void Input::Update()
+void InputMgr::Update()
 {
 	if (GetForegroundWindow() != _hwnd)
 	{
@@ -246,7 +246,7 @@ void Input::Update()
 	}
 }
 
-void Input::LockCursor(bool flag)
+void InputMgr::LockCursor(bool flag)
 {
 	_lockCursor = flag;
 

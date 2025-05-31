@@ -111,7 +111,7 @@ void ReceiverThread(SOCKET clientSocket) {
                 case S2C_P_PLAYER_INFO: {
                     auto* pInfo = reinterpret_cast<sc_packet_player_info*>(packet);
                     if (static_cast<uint32_t>(pInfo->playerId) != g_localPlayerId) {
-                        GET_SINGLE(SceneManager)
+                        GET_SINGLE(SceneMgr)
                             ->GetActiveScene()
                             ->AddPlayer(pInfo);
                     }
@@ -119,35 +119,35 @@ void ReceiverThread(SOCKET clientSocket) {
                 }
                 case S2C_P_MOVE: {
                     auto* pMove = reinterpret_cast<sc_packet_move*>(packet);
-                    GET_SINGLE(SceneManager)
+                    GET_SINGLE(SceneMgr)
                         ->GetActiveScene()
                         ->MovePlayer(pMove);
                     break;
                 }
                 case S2C_P_JUMP: {
                     auto* pJump = reinterpret_cast<sc_packet_jump*>(packet);
-                    GET_SINGLE(SceneManager)
+                    GET_SINGLE(SceneMgr)
                         ->GetActiveScene()
                         ->JumpPlayer(pJump);
                     break;
                 }
                 case S2C_P_LAND: {
                     auto* pLand = reinterpret_cast<sc_packet_land*>(packet);
-                    GET_SINGLE(SceneManager)
+                    GET_SINGLE(SceneMgr)
                         ->GetActiveScene()
                         ->LandPlayer(pLand);
                     break;
                 }
                 case S2C_P_SNAPSHOT: {
                     auto* pSnap = reinterpret_cast<sc_packet_snapshot*>(packet);
-                    GET_SINGLE(SceneManager)
+                    GET_SINGLE(SceneMgr)
                         ->GetActiveScene()
                         ->ApplySnapshot(pSnap);
                     break;
                 }
                 case S2C_P_SPAWN_ZOMBIE: {
                     auto * pZombie = reinterpret_cast<sc_packet_spawn_zombie*>(packet);
-                    GET_SINGLE(SceneManager)
+                    GET_SINGLE(SceneMgr)
                          ->GetActiveScene()
                          ->AddZombie(pZombie);
                     break;
@@ -159,41 +159,41 @@ void ReceiverThread(SOCKET clientSocket) {
                 case S2C_P_STATE: {
                     auto* pState = reinterpret_cast<sc_packet_state*>(packet);
                     
-                    GET_SINGLE(SceneManager)
+                    GET_SINGLE(SceneMgr)
                         ->GetActiveScene()
                         ->AnimatePlayer(pState);
                     break;
                 }
                 case S2C_P_ZOMBIE_MOVE: {
                     auto* pZmove = reinterpret_cast<sc_packet_zombie_move*>(packet);
-                    GET_SINGLE(SceneManager)
+                    GET_SINGLE(SceneMgr)
                         ->GetActiveScene()
                         ->MoveZombie(pZmove);
                     break;
                 }
                 case S2C_P_ZOMBIE_STATE: {
                     auto* pZstate = reinterpret_cast<sc_packet_zombie_state*>(packet);
-                    GET_SINGLE(SceneManager)
+                    GET_SINGLE(SceneMgr)
                         ->GetActiveScene()
                         ->AnimateZombie(pZstate);
                     break;
                 }
                 case S2C_P_ZOMBIE_DIE: {
                     auto* pZdie = reinterpret_cast<sc_packet_zombie_die*>(packet);
-                    GET_SINGLE(SceneManager)
+                    GET_SINGLE(SceneMgr)
                         ->GetActiveScene()
                         ->DieZombie(pZdie);
                     break;
                 }
                 case S2C_P_PLAYER_LEAVE: {
                     auto* pLeave = reinterpret_cast<sc_packet_player_leave*>(packet);
-                    GET_SINGLE(SceneManager)
+                    GET_SINGLE(SceneMgr)
                         ->GetActiveScene()
                         ->RemovePlayer(pLeave);
                     break;
                 }
                 case S2C_P_GAME_START: {
-                    GET_SINGLE(SceneManager)
+                    GET_SINGLE(SceneMgr)
                         ->GetActiveScene()
                         ->ClearPlayers();
                     g_gameStarted = true;
@@ -263,7 +263,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // 게임 프레임워크 초기화
     gameFramework->Init(GWindowInfo);
-    GET_SINGLE(SceneManager)->LoadScene(L"TestScene");
+    GET_SINGLE(SceneMgr)->LoadScene(L"TestScene");
 
     std::thread recvThread(ReceiverThread, g_clientSocket);
     // 자동 로그인: cs_packet_login 패킷 전송

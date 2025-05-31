@@ -55,9 +55,9 @@ enum
 	KEY_STATE_COUNT = static_cast<int32>(KEY_STATE::END),
 };
 
-class Input
+class InputMgr
 {
-	DECLARE_SINGLE(Input);
+	DECLARE_SINGLE(InputMgr);
 
 public:
 	void Init(HWND hwnd);

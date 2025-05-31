@@ -3,9 +3,9 @@
 
 class GameObject;
 
-class InstancingManager
+class InstancingMgr
 {
-	DECLARE_SINGLE(InstancingManager);
+	DECLARE_SINGLE(InstancingMgr);
 
 public:
 	void Render(vector<shared_ptr<GameObject>>& gameObjects);

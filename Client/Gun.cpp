@@ -71,7 +71,7 @@ void Gun::Reload()
 
 void Gun::Recoil(float pitchAmount, float yawAmount)
 {
-	shared_ptr<Camera> camera = GET_SINGLE(SceneManager)->GetActiveScene()->GetMainCamera();
+	shared_ptr<Camera> camera = GET_SINGLE(SceneMgr)->GetActiveScene()->GetMainCamera();
 	static_pointer_cast<LocalPlayer>(camera->GetGameObject()->GetMonoBehaviour(L"MainCamera"))->Recoil(pitchAmount, yawAmount); // 카메라 반동 처리
 }
 
@@ -91,7 +91,7 @@ void Gun::Aiming(float aimFov, Vec3 aimPos)
 	*/
 
 	// 카메라 FOV 보간
-	shared_ptr<Camera> camera = GET_SINGLE(SceneManager)->GetActiveScene()->GetMainCamera();
+	shared_ptr<Camera> camera = GET_SINGLE(SceneMgr)->GetActiveScene()->GetMainCamera();
 	float currentFov = camera->GetFOV();
 	float newFov = Lerp(currentFov, aimFov, DELTA_TIME * 5.f);
 	camera->SetFOV(newFov);
@@ -119,12 +119,12 @@ void Gun::input()
 	if (INPUT->GetButton(MOUSE_TYPE::RBUTTON))
 	{
 		_isAiming = true;
-		GET_SINGLE(SceneManager)->GetActiveScene()->FindGameObject(L"Crosshair")->SetActive(false); // 조준선 비활성화
+		GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"Crosshair")->SetActive(false); // 조준선 비활성화
 	}
 	else
 	{
 		_isAiming = false;
-		GET_SINGLE(SceneManager)->GetActiveScene()->FindGameObject(L"Crosshair")->SetActive(true); // 조준선 활성화
+		GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"Crosshair")->SetActive(true); // 조준선 활성화
 	}
 
 }
@@ -137,10 +137,10 @@ void Gun::InitializeParticle()
 	_muzzle = make_shared<MuzzleFlashParticle>();
 	_particle->AddComponent(_muzzle);
 	_particle->GetTransform()->SetLocalPosition(Vec3(0.f,0.f,0.f));
-	uint8 gunLayer = GET_SINGLE(SceneManager)->LayerNameToIndex(L"Gun");
+	uint8 gunLayer = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"Gun");
 	_particle->SetLayerIndex(gunLayer);
 	_particle->SetCheckFrustum(false);
-	GET_SINGLE(SceneManager)->GetActiveScene()->AddGameObject(_particle);
+	GET_SINGLE(SceneMgr)->GetActiveScene()->AddGameObject(_particle);
 	_initialized = false;
 }
 

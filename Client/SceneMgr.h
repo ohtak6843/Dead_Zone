@@ -7,9 +7,9 @@ enum
 	MAX_LAYER = 32
 };
 
-class SceneManager
+class SceneMgr
 {
-	DECLARE_SINGLE(SceneManager);
+	DECLARE_SINGLE(SceneMgr);
 
 public:
 	void Update();
@@ -20,9 +20,6 @@ public:
 	void SetLayerName(uint8 index, const wstring& name);
 	const wstring& IndexToLayerName(uint8 index) { return _layerNames[index]; }
 	uint8 LayerNameToIndex(const wstring& name);
-
-	shared_ptr<class GameObject> Pick(int32 screenX, int32 screenY);
-	shared_ptr<class GameObject> PickZombie(int32 screenX, int32 screenY);
 
 	bool IsDebugMode() { return _debugMode; }
 	void SetDebugMode(bool debugMode) { _debugMode = debugMode; }

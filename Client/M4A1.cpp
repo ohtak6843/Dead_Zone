@@ -36,7 +36,7 @@ void M4A1::Awake()
 	GetTransform()->SetLocalRotation(_baseRotation);
 	GetTransform()->SetLocalScale(_baseScale);
 
-	shared_ptr<Camera> camera = GET_SINGLE(SceneManager)->GetActiveScene()->GetGunCamera();
+	shared_ptr<Camera> camera = GET_SINGLE(SceneMgr)->GetActiveScene()->GetGunCamera();
 	shared_ptr<Transform> parentTransform = camera->GetTransform();
 	GetTransform()->SetParent(parentTransform);
 
@@ -77,7 +77,7 @@ void M4A1::Update()
 
 	// 정조준 처리
 	// fov 설정
-	float fov = IsAiming() ? _info.fov : GET_SINGLE(SceneManager)->GetActiveScene()->GetMainCamera()->GetNormalFOV();
+	float fov = IsAiming() ? _info.fov : GET_SINGLE(SceneMgr)->GetActiveScene()->GetMainCamera()->GetNormalFOV();
 	Vec3 pos = IsAiming() ? _aimingPosition : _basePosition;
 	Aiming(fov, pos);
 	

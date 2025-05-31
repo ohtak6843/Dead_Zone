@@ -186,11 +186,11 @@ public:								\
 #define GRAPHICS_ROOT_SIGNATURE		gameFramework->GetGraphicsRootSignature()
 #define COMPUTE_ROOT_SIGNATURE		gameFramework->GetComputeRootSignature()
 
-#define INPUT					GET_SINGLE(Input)
+#define INPUT					GET_SINGLE(InputMgr)
 #define DELTA_TIME				GET_SINGLE(Timer)->GetDeltaTime()
 
-#define DEBUG_MODE				GET_SINGLE(SceneManager)->IsDebugMode()
-#define SET_DEBUG_MODE(mode)	GET_SINGLE(SceneManager)->SetDebugMode(mode)
+#define DEBUG_MODE				GET_SINGLE(SceneMgr)->IsDebugMode()
+#define SET_DEBUG_MODE(mode)	GET_SINGLE(SceneMgr)->SetDebugMode(mode)
 
 #define CONST_BUFFER(type)	gameFramework->GetConstantBuffer(type)
 

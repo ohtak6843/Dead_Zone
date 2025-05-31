@@ -9,9 +9,9 @@
 #include "SceneMgr.h"
 #include "MultiPlayer.h" 
 #include "Scene.h"
+#include "RaycastMgr.h"
 #include "../echoserver/protocol.h"
 
-#include "Scene.h"
 #include "ParticleSystem.h"
 #include "Gun.h"
 #include "M4A1.h"
@@ -211,10 +211,10 @@ void LocalPlayer::ProcessKeyInput()
 		_GunType = (_GunType + 1) % _MaxGunType;
 		if (_GunType == 0)
 		{
-			GET_SINGLE(SceneManager)->GetActiveScene()->FindGameObject(L"M4A1")->SetActive(true);
-			GET_SINGLE(SceneManager)->GetActiveScene()->FindGameObject(L"AK47")->SetActive(false);
+			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1")->SetActive(true);
+			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47")->SetActive(false);
 
-			auto gun = GET_SINGLE(SceneManager)->GetActiveScene()->FindGameObject(L"M4A1");
+			auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1");
 			gun->SetActive(true);
 			Vec3 pos = static_pointer_cast<M4A1>(gun->GetMonoBehaviour(L"M4A1"))->GetNomalParticlePos();
 			static_pointer_cast<M4A1>(gun->GetMonoBehaviour(L"M4A1"))->setParticlePos(pos);
@@ -222,8 +222,8 @@ void LocalPlayer::ProcessKeyInput()
 		}
 		else if (_GunType == 1)
 		{
-			GET_SINGLE(SceneManager)->GetActiveScene()->FindGameObject(L"M4A1")->SetActive(false);
-			auto gun = GET_SINGLE(SceneManager)->GetActiveScene()->FindGameObject(L"AK47");
+			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1")->SetActive(false);
+			auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47");
 			gun->SetActive(true);
 			Vec3 pos = static_pointer_cast<AK47>(gun->GetMonoBehaviour(L"AK47"))->GetNomalParticlePos();
 			static_pointer_cast<AK47>(gun->GetMonoBehaviour(L"AK47"))->setParticlePos(pos);
@@ -235,7 +235,7 @@ void LocalPlayer::ProcessMouseInput()
 {
 	if (INPUT->GetButton(MOUSE_TYPE::LBUTTON))
 	{
-		shared_ptr<GameObject> obj = GET_SINGLE(SceneManager)->PickZombie(gameFramework->GetWindow().width / 2, gameFramework->GetWindow().height / 2);
+		shared_ptr<GameObject> obj = GET_SINGLE(RaycastMgr)->PickZombie(gameFramework->GetWindow().width / 2, gameFramework->GetWindow().height / 2);
 
 		if (obj) {
 			cs_packet_attack atkPkt{};

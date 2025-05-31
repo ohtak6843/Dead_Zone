@@ -28,7 +28,7 @@
 #include "Timer.h"
 #include <sstream>
 
-void SceneManager::Update()
+void SceneMgr::Update()
 {
 	if (_activeScene == nullptr)
 		return;
@@ -39,13 +39,13 @@ void SceneManager::Update()
 }
 
 // TEMP
-void SceneManager::Render()
+void SceneMgr::Render()
 {
 	if (_activeScene)
 		_activeScene->Render();
 }
 
-void SceneManager::RenderUI()
+void SceneMgr::RenderUI()
 {
 	uint8 backbufferindex = gameFramework->GetCurrBackBufferIndex();
 	shared_ptr<D3D11On12Device> device = gameFramework->GetD3D11on12Device();
@@ -156,7 +156,7 @@ void SceneManager::RenderUI()
 	device->GetD3D11DeviceContext()->Flush();
 }
 
-void SceneManager::LoadScene(wstring sceneName)
+void SceneMgr::LoadScene(wstring sceneName)
 {
 	// TODO : 기존 Scene 정리
 	// TODO : 파일에서 Scene 정보 로드
@@ -167,7 +167,7 @@ void SceneManager::LoadScene(wstring sceneName)
 	_activeScene->Start();
 }
 
-void SceneManager::SetLayerName(uint8 index, const wstring& name)
+void SceneMgr::SetLayerName(uint8 index, const wstring& name)
 {
 	// 기존 데이터 삭제
 	const wstring& prevName = _layerNames[index];
@@ -177,7 +177,7 @@ void SceneManager::SetLayerName(uint8 index, const wstring& name)
 	_layerIndex[name] = index;
 }
 
-uint8 SceneManager::LayerNameToIndex(const wstring& name)
+uint8 SceneMgr::LayerNameToIndex(const wstring& name)
 {
 	auto findIt = _layerIndex.find(name);
 	if (findIt == _layerIndex.end())
@@ -186,144 +186,7 @@ uint8 SceneManager::LayerNameToIndex(const wstring& name)
 	return findIt->second;
 }
 
-shared_ptr<GameObject> SceneManager::Pick(int32 screenX, int32 screenY)
-{
-	shared_ptr<Camera> camera = GetActiveScene()->GetMainCamera();
-
-	float width = static_cast<float>(gameFramework->GetWindow().width);
-	float height = static_cast<float>(gameFramework->GetWindow().height);
-
-	Matrix projectionMatrix = camera->GetProjectionMatrix();
-
-	// ViewSpace에서 Picking 진행
-	float viewX = (+2.0f * screenX / width - 1.0f) / projectionMatrix(0, 0);
-	float viewY = (-2.0f * screenY / height + 1.0f) / projectionMatrix(1, 1);
-
-	Matrix viewMatrix = camera->GetViewMatrix();
-	Matrix viewMatrixInv = viewMatrix.Invert();
-
-	auto& gameObjects = GET_SINGLE(SceneManager)->GetActiveScene()->GetGameObjects();
-
-	float minDistance = FLT_MAX;
-	shared_ptr<GameObject> picked;
-
-	for (auto& gameObject : gameObjects)
-	{
-		if (gameObject->GetCollider() == nullptr)
-			continue;
-
-		// ViewSpace에서의 Ray 정의
-		Vec4 rayOrigin = Vec4(0.0f, 0.0f, 0.0f, 1.0f);
-		Vec4 rayDir = Vec4(viewX, viewY, 1.0f, 0.0f);
-
-		// WorldSpace에서의 Ray 정의
-		rayOrigin = XMVector3TransformCoord(rayOrigin, viewMatrixInv);
-		rayDir = XMVector3TransformNormal(rayDir, viewMatrixInv);
-		rayDir.Normalize();
-
-		// WorldSpace에서 연산
-		float distance = 0.f;
-
-		ColliderType colliderType = gameObject->GetCollider()->GetColliderType();
-		if (colliderType == ColliderType::SPHERE)
-		{
-			shared_ptr<SphereCollider> sphere = static_pointer_cast<SphereCollider>(gameObject->GetCollider());
-			if (sphere->Intersects(rayOrigin, rayDir, OUT distance) == false)
-				continue;
-		}
-		else if (colliderType == ColliderType::OBB)
-		{
-			shared_ptr<OrientedBoxCollider> obb = static_pointer_cast<OrientedBoxCollider>(gameObject->GetCollider());
-			if (obb->Intersects(rayOrigin, rayDir, OUT distance) == false)
-				continue;
-		}
-		else
-		{
-			continue;
-		}
-
-		if (distance < minDistance)
-		{
-			minDistance = distance;
-			picked = gameObject;
-		}
-	}
-
-	return picked;
-}
-
-shared_ptr<class GameObject> SceneManager::PickZombie(int32 screenX, int32 screenY)
-{
-	shared_ptr<Camera> camera = GetActiveScene()->GetMainCamera();
-
-	float width = static_cast<float>(gameFramework->GetWindow().width);
-	float height = static_cast<float>(gameFramework->GetWindow().height);
-
-	Matrix projectionMatrix = camera->GetProjectionMatrix();
-
-	// ViewSpace에서 Picking 진행
-	float viewX = (+2.0f * screenX / width - 1.0f) / projectionMatrix(0, 0);
-	float viewY = (-2.0f * screenY / height + 1.0f) / projectionMatrix(1, 1);
-
-	Matrix viewMatrix = camera->GetViewMatrix();
-	Matrix viewMatrixInv = viewMatrix.Invert();
-
-	auto& zombies = GET_SINGLE(SceneManager)->GetActiveScene()->GetZombies();
-
-	float minDistance = FLT_MAX;
-	shared_ptr<GameObject> picked;
-
-	// ViewSpace에서의 Ray 정의
-	Vec4 rayOrigin = Vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	Vec4 rayDir = Vec4(viewX, viewY, 1.0f, 0.0f);
-
-	// WorldSpace에서의 Ray 정의
-	rayOrigin = XMVector3TransformCoord(rayOrigin, viewMatrixInv);
-	rayDir = XMVector3TransformNormal(rayDir, viewMatrixInv);
-	rayDir.Normalize();
-
-	for (auto& zombieGroup : zombies)
-	{
-		for (auto& zombiePart : zombieGroup)
-		{
-			if (zombiePart->GetCollider() == nullptr)
-				continue;
-
-			// WorldSpace에서 연산
-			float distance = 0.f;
-
-			ColliderType colliderType = zombiePart->GetCollider()->GetColliderType();
-			if (colliderType == ColliderType::SPHERE)
-			{
-				shared_ptr<SphereCollider> sphere = static_pointer_cast<SphereCollider>(zombiePart->GetCollider());
-				if (sphere->Intersects(rayOrigin, rayDir, OUT distance) == false)
-					continue;
-			}
-			else if (colliderType == ColliderType::OBB)
-			{
-				shared_ptr<OrientedBoxCollider> obb = static_pointer_cast<OrientedBoxCollider>(zombiePart->GetCollider());
-				if (obb->Intersects(rayOrigin, rayDir, OUT distance) == false)
-					continue;
-			}
-			else
-			{
-				continue;
-			}
-
-			if (distance < minDistance)
-			{
-				// 이번 좀비가 picked된걸 확인했으면 다음 좀비로 넘어가기
-				minDistance = distance;
-				picked = zombieGroup[0];
-				break;
-			}
-		}
-	}
-
-	return picked;
-}
-
-shared_ptr<Scene> SceneManager::LoadTestScene()
+shared_ptr<Scene> SceneMgr::LoadTestScene()
 {
 #pragma region LayerMask
 	SetLayerName(0, L"Default");
@@ -363,10 +226,10 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 		camera->GetCamera()->SetFar(10000.f);
 		camera->GetCamera()->SetFOV(90.f); // 90도
 		camera->GetTransform()->SetLocalPosition(Vec3(1185.f, 140.f, 473.f));
-		uint8 layerIndex = GET_SINGLE(SceneManager)->LayerNameToIndex(L"UI");
+		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
 		camera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, true); // UI는 안 찍음
 
-		layerIndex = GET_SINGLE(SceneManager)->LayerNameToIndex(L"Gun");
+		layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"Gun");
 		camera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, true); // Gun은 안 찍음
 
 		scene->AddGameObject(camera);
@@ -381,7 +244,7 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 		camera->AddComponent(make_shared<Camera>()); // Near=1, Far=1000, 800*600
 		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 0.f));
 		camera->GetCamera()->SetProjectionType(PROJECTION_TYPE::ORTHOGRAPHIC);
-		uint8 layerIndex = GET_SINGLE(SceneManager)->LayerNameToIndex(L"UI");
+		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
 		camera->GetCamera()->SetCullingMaskAll(); // 다 끄고
 		camera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, false); // UI만 찍음
 		scene->AddGameObject(camera);
@@ -400,7 +263,7 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 		gunCamera->GetCamera()->SetFar(1000.f);
 
 		gunCamera->GetCamera()->SetCullingMaskAll(); // 다 끄고
-		gunCamera->GetCamera()->SetCullingMaskLayerOnOff(GET_SINGLE(SceneManager)->LayerNameToIndex(L"Gun"), false); // Gun만 찍음
+		gunCamera->GetCamera()->SetCullingMaskLayerOnOff(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"Gun"), false); // Gun만 찍음
 
 		// Main_Camera의 Transform을 따라가도록 설정
 		shared_ptr<GameObject> mainCam = scene->FindGameObject(L"Main_Camera");
@@ -436,7 +299,7 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 #pragma region Crosshair
 	{
 		shared_ptr<GameObject> crosshair = make_shared<GameObject>();
-		crosshair->SetLayerIndex(GET_SINGLE(SceneManager)->LayerNameToIndex(L"UI"));
+		crosshair->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
 		crosshair->AddComponent(make_shared<Transform>());
 		crosshair->GetTransform()->SetLocalScale(Vec3(50.f, 50.f, 50.f));
 		crosshair->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 300.f));
@@ -465,7 +328,7 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\M4A1.fbx");
 
 		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate();
-		uint8 gunLayer = GET_SINGLE(SceneManager)->LayerNameToIndex(L"Gun");
+		uint8 gunLayer = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"Gun");
 
 		for (auto& gameObject : gameObjects)
 		{
@@ -494,7 +357,7 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\AK74.fbx");
 
 		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate();
-		uint8 gunLayer = GET_SINGLE(SceneManager)->LayerNameToIndex(L"Gun");
+		uint8 gunLayer = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"Gun");
 
 		for (auto& gameObject : gameObjects)
 		{

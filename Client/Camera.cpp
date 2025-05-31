@@ -49,7 +49,7 @@ void Camera::FinalUpdate()
 
 void Camera::SortGameObject()
 {
-	shared_ptr<Scene> scene = GET_SINGLE(SceneManager)->GetActiveScene();
+	shared_ptr<Scene> scene = GET_SINGLE(SceneMgr)->GetActiveScene();
 	const vector<shared_ptr<GameObject>>& gameObjects = scene->GetGameObjects();
 
 	_vecForward.clear();
@@ -101,7 +101,7 @@ void Camera::SortGameObject()
 
 void Camera::SortShadowObject()
 {
-	shared_ptr<Scene> scene = GET_SINGLE(SceneManager)->GetActiveScene();
+	shared_ptr<Scene> scene = GET_SINGLE(SceneMgr)->GetActiveScene();
 	const vector<shared_ptr<GameObject>>& gameObjects = scene->GetGameObjects();
 
 	_vecShadow.clear();
@@ -134,7 +134,7 @@ void Camera::Render_Deferred()
 	S_MatView = _matView;
 	S_MatProjection = _matProjection;
 
-	GET_SINGLE(InstancingManager)->Render(_vecDeferred);
+	GET_SINGLE(InstancingMgr)->Render(_vecDeferred);
 }
 
 void Camera::Render_Forward()
@@ -142,7 +142,7 @@ void Camera::Render_Forward()
 	S_MatView = _matView;
 	S_MatProjection = _matProjection;
 
-	GET_SINGLE(InstancingManager)->Render(_vecForward);
+	GET_SINGLE(InstancingMgr)->Render(_vecForward);
 
 	for (auto& gameObject : _vecParticle)
 	{

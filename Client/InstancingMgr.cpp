@@ -6,7 +6,7 @@
 #include "Transform.h"
 #include "Camera.h"
 
-void InstancingManager::Render(vector<shared_ptr<GameObject>>& gameObjects)
+void InstancingMgr::Render(vector<shared_ptr<GameObject>>& gameObjects)
 {
 	map<uint64, vector<shared_ptr<GameObject>>> cache;
 
@@ -45,7 +45,7 @@ void InstancingManager::Render(vector<shared_ptr<GameObject>>& gameObjects)
 	}
 }
 
-void InstancingManager::ClearBuffer()
+void InstancingMgr::ClearBuffer()
 {
 	for (auto& pair : _buffers)
 	{
@@ -54,7 +54,7 @@ void InstancingManager::ClearBuffer()
 	}
 }
 
-void InstancingManager::AddParam(uint64 instanceId, InstancingParams& data)
+void InstancingMgr::AddParam(uint64 instanceId, InstancingParams& data)
 {
 	if (_buffers.find(instanceId) == _buffers.end())
 		_buffers[instanceId] = make_shared<InstancingBuffer>();
