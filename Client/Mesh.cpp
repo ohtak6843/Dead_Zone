@@ -2,7 +2,7 @@
 #include "Mesh.h"
 #include "Framework.h"
 #include "Material.h"
-#include "InstancingBuffer.h"
+#include "InstancingMgr.h"
 #include "FBXLoader.h"
 #include "StructuredBuffer.h"
 

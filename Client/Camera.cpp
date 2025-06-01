@@ -8,7 +8,7 @@
 #include "Framework.h"
 #include "Material.h"
 #include "Shader.h"
-#include "ParticleSystem.h"
+#include "Particle.h"
 #include "InstancingMgr.h"
 
 #include "BaseCollider.h"

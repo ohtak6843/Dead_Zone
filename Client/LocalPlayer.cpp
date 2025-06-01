@@ -12,7 +12,7 @@
 #include "RaycastMgr.h"
 #include "../echoserver/protocol.h"
 
-#include "ParticleSystem.h"
+#include "Particle.h"
 #include "Gun.h"
 #include "M4A1.h"
 #include "AK47.h"

@@ -32,19 +32,17 @@ struct ComputeSharedInfo
 	int32 padding[3];
 };
 
-class ParticleSystem : public Component
+class Particle : public Component
 {
 public:
-	ParticleSystem();
-	virtual ~ParticleSystem();
+	Particle();
+	virtual ~Particle();
 
 public:
 	virtual void FinalUpdate();
 	void Render();
 
 public:
-	virtual void Load(const wstring& path) override { }
-	virtual void Save(const wstring& path) override { }
 
 	void SetMaxParticle(uint32 max) { _maxParticle = max; }
 	void SetLifeTime(float min, float max) { _minLifeTime = min; _maxLifeTime = max; }

@@ -3,7 +3,7 @@
 #include "Mesh.h"
 #include "Material.h"
 #include "Transform.h"
-#include "InstancingBuffer.h"
+#include "InstancingMgr.h"
 #include "Resources.h"
 #include "Animator.h"
 

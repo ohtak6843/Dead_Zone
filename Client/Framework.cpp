@@ -39,6 +39,8 @@ void Framework::Init(const WindowInfo& info)
 
 	ResizeWindow(info.width, info.height);
 
+	ToggleFullScreen();
+
 	GET_SINGLE(InputMgr)->Init(info.hwnd);
 	GET_SINGLE(Timer)->Init();
 	GET_SINGLE(Resources)->Init();
@@ -92,6 +94,27 @@ void Framework::ResizeWindow(int32 width, int32 height)
 	RECT rect = { 0, 0, width, height };
 	::AdjustWindowRect(&rect, WS_OVERLAPPED, false);
 	::SetWindowPos(_window.hwnd, 0, 100, 100, width, height, 0);
+}
+
+void Framework::ToggleFullScreen()
+{
+	// 현재 윈도우 스타일 가져오기
+	LONG style = ::GetWindowLong(_window.hwnd, GWL_STYLE);
+	style &= ~WS_OVERLAPPEDWINDOW;
+	style |= WS_POPUP;
+	::SetWindowLong(_window.hwnd, GWL_STYLE, style);
+
+	// 전체 화면으로 전환
+	MONITORINFO monitorInfo = { sizeof(MONITORINFO) };
+	if (::GetMonitorInfo(MonitorFromWindow(_window.hwnd, MONITOR_DEFAULTTOPRIMARY), &monitorInfo))
+	{
+		const RECT& rc = monitorInfo.rcMonitor;
+		::SetWindowPos(_window.hwnd, HWND_TOP,
+			rc.left, rc.top,
+			rc.right - rc.left,
+			rc.bottom - rc.top,
+			SWP_NOZORDER | SWP_FRAMECHANGED);
+	}
 }
 
 void Framework::ShowFps()

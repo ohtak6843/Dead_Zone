@@ -12,7 +12,7 @@
 
 #include "LocalPlayer.h"
 #include "Resources.h"
-#include "ParticleSystem.h"
+#include "Particle.h"
 #include "BaseCollider.h"
 #include "SphereCollider.h"
 #include "OrientedBoxCollider.h"

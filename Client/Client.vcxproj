@@ -184,7 +184,6 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Gun.h" />
     <ClInclude Include="InputMgr.h" />
-    <ClInclude Include="InstancingBuffer.h" />
     <ClInclude Include="InstancingMgr.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="M4A1.h" />
@@ -197,7 +196,7 @@
     <ClInclude Include="MuzzleFlashParticle.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="OrientedBoxCollider.h" />
-    <ClInclude Include="ParticleSystem.h" />
+    <ClInclude Include="Particle.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="RaycastMgr.h" />
@@ -239,7 +238,6 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Gun.cpp" />
     <ClCompile Include="InputMgr.cpp" />
-    <ClCompile Include="InstancingBuffer.cpp" />
     <ClCompile Include="InstancingMgr.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="M4A1.cpp" />
@@ -252,7 +250,7 @@
     <ClCompile Include="MuzzleFlashParticle.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="OrientedBoxCollider.cpp" />
-    <ClCompile Include="ParticleSystem.cpp" />
+    <ClCompile Include="Particle.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -299,8 +297,6 @@
     <FxCompile Include="..\Resources\Shader\particle.fx" />
     <FxCompile Include="..\Resources\Shader\shadow.fx" />
     <FxCompile Include="..\Resources\Shader\skybox.fx" />
-    <FxCompile Include="..\Resources\Shader\terrain.fx" />
-    <FxCompile Include="..\Resources\Shader\tessellation.fx" />
     <FxCompile Include="..\Resources\Shader\utils.fx" />
   </ItemGroup>
   <ItemGroup>

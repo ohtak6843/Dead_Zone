@@ -86,9 +86,6 @@
     <ClInclude Include="Framework.h">
       <Filter>Game\Framework\DX12</Filter>
     </ClInclude>
-    <ClInclude Include="InstancingBuffer.h">
-      <Filter>Game\Framework\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="RenderTargetGroup.h">
       <Filter>Game\Framework\DX12</Filter>
     </ClInclude>
@@ -127,9 +124,6 @@
     </ClInclude>
     <ClInclude Include="OrientedBoxCollider.h">
       <Filter>Game\Object\Component\Collider</Filter>
-    </ClInclude>
-    <ClInclude Include="ParticleSystem.h">
-      <Filter>Game\Object\Component\Particle</Filter>
     </ClInclude>
     <ClInclude Include="BloodParticle.h">
       <Filter>Game\Object\Component\Particle</Filter>
@@ -227,6 +221,9 @@
     <ClInclude Include="TP_AK47.h">
       <Filter>Game\Object\Script\Gun</Filter>
     </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>Game\Object\Component\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc">
@@ -255,9 +252,6 @@
       <Filter>Game\Framework\DX12</Filter>
     </ClCompile>
     <ClCompile Include="Framework.cpp">
-      <Filter>Game\Framework\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="InstancingBuffer.cpp">
       <Filter>Game\Framework\DX12</Filter>
     </ClCompile>
     <ClCompile Include="RenderTargetGroup.cpp">
@@ -298,9 +292,6 @@
     </ClCompile>
     <ClCompile Include="OrientedBoxCollider.cpp">
       <Filter>Game\Object\Component\Collider</Filter>
-    </ClCompile>
-    <ClCompile Include="ParticleSystem.cpp">
-      <Filter>Game\Object\Component\Particle</Filter>
     </ClCompile>
     <ClCompile Include="BloodParticle.cpp">
       <Filter>Game\Object\Component\Particle</Filter>
@@ -395,11 +386,11 @@
     <ClCompile Include="TP_AK47.cpp">
       <Filter>Game\Object\Script\Gun</Filter>
     </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Game\Object\Component\Particle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\Resources\Shader\tessellation.fx">
-      <Filter>Game\Shader</Filter>
-    </FxCompile>
     <FxCompile Include="..\Resources\Shader\utils.fx">
       <Filter>Game\Shader</Filter>
     </FxCompile>
@@ -434,9 +425,6 @@
       <Filter>Game\Shader</Filter>
     </FxCompile>
     <FxCompile Include="..\Resources\Shader\skybox.fx">
-      <Filter>Game\Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Resources\Shader\terrain.fx">
       <Filter>Game\Shader</Filter>
     </FxCompile>
   </ItemGroup>

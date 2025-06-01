@@ -1,7 +1,7 @@
 #pragma once
-#include "ParticleSystem.h"
+#include "Particle.h"
 
-class BloodParticle : public ParticleSystem
+class BloodParticle : public Particle
 {
 public:
 	BloodParticle();

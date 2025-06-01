@@ -1,7 +1,7 @@
 #pragma once
-#include "ParticleSystem.h"
+#include "Particle.h"
 
-class MuzzleFlashParticle : public ParticleSystem
+class MuzzleFlashParticle : public Particle
 {
 public:
 	MuzzleFlashParticle();

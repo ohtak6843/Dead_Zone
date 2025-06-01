@@ -44,6 +44,8 @@ public:
 
 	void ResizeWindow(int32 widht, int32 height);
 
+	void ToggleFullScreen();
+
 private:
 	void ShowFps();
 

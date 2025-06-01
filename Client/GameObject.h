@@ -7,7 +7,7 @@ class MeshRenderer;
 class Camera;
 class Light;
 class MonoBehaviour;
-class ParticleSystem;
+class Particle;
 class Terrain;
 class BaseCollider;
 class Animator;
@@ -30,7 +30,7 @@ public:
 	shared_ptr<MeshRenderer> GetMeshRenderer();
 	shared_ptr<Camera> GetCamera();
 	shared_ptr<Light> GetLight();
-	shared_ptr<ParticleSystem> GetParticleSystem();
+	shared_ptr<Particle> GetParticleSystem();
 	shared_ptr<BaseCollider> GetCollider();
 	shared_ptr<Animator> GetAnimator();
 	

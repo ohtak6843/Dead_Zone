@@ -5,7 +5,7 @@
 #include "Camera.h"
 #include "Light.h"
 #include "MonoBehaviour.h"
-#include "ParticleSystem.h"
+#include "Particle.h"
 #include "BaseCollider.h"
 #include "Animator.h"
 
@@ -115,10 +115,10 @@ shared_ptr<Light> GameObject::GetLight()
 	return static_pointer_cast<Light>(component);
 }
 
-shared_ptr<ParticleSystem> GameObject::GetParticleSystem()
+shared_ptr<Particle> GameObject::GetParticleSystem()
 {
 	shared_ptr<Component> component = GetFixedComponent(COMPONENT_TYPE::PARTICLE_SYSTEM);
-	return static_pointer_cast<ParticleSystem>(component);
+	return static_pointer_cast<Particle>(component);
 }
 
 shared_ptr<BaseCollider> GameObject::GetCollider()

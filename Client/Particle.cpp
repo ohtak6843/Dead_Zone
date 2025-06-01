@@ -1,12 +1,12 @@
 #include "pch.h"
-#include "ParticleSystem.h"
+#include "Particle.h"
 #include "StructuredBuffer.h"
 #include "Mesh.h"
 #include "Resources.h"
 #include "Transform.h"
 #include "Timer.h"
 
-ParticleSystem::ParticleSystem() : Component(COMPONENT_TYPE::PARTICLE_SYSTEM)
+Particle::Particle() : Component(COMPONENT_TYPE::PARTICLE_SYSTEM)
 {
 	_particleBuffer = make_shared<StructuredBuffer>();
 	_particleBuffer->Init(sizeof(ParticleInfo), _maxParticle);
@@ -24,11 +24,11 @@ ParticleSystem::ParticleSystem() : Component(COMPONENT_TYPE::PARTICLE_SYSTEM)
 	_computeMaterial = GET_SINGLE(Resources)->Get<Material>(L"ComputeParticle");
 }
 
-ParticleSystem::~ParticleSystem()
+Particle::~Particle()
 {
 }
 
-void ParticleSystem::FinalUpdate()
+void Particle::FinalUpdate()
 {
 	_elapsedTime += DELTA_TIME;
 
@@ -58,12 +58,12 @@ void ParticleSystem::FinalUpdate()
 
 	_computeMaterial->SetVec2(1, Vec2(DELTA_TIME, _accTime));
 	_computeMaterial->SetVec4(0, Vec4(_minLifeTime, _maxLifeTime, _minSpeed, _maxSpeed));
-	
+
 
 	_computeMaterial->Dispatch(1, 1, 1);
 }
 
-void ParticleSystem::Render()
+void Particle::Render()
 {
 	if (_accTime >= (_lifeTime + _maxLifeTime))
 		return;
