@@ -19,7 +19,7 @@ ParticleSystem::ParticleSystem() : Component(COMPONENT_TYPE::PARTICLE_SYSTEM)
 	shared_ptr<Texture> tex = GET_SINGLE(Resources)->Load<Texture>(
 		L"Bubbles", L"..\\Resources\\Texture\\Particle\\bubble.png");
 
-	_material->SetTexture(0, tex);
+	_material->SetTexture(_type, tex);
 
 	_computeMaterial = GET_SINGLE(Resources)->Get<Material>(L"ComputeParticle");
 }

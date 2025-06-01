@@ -17,7 +17,7 @@ BloodParticle::BloodParticle()
 	SetLifeTime(1.2f, 1.5f);
 	SetSpeed(50.0f, 100.f);
 	SetScale(50.f, 25.f);
-	SetlifeTime(0.1f);
+	SetlifeTime(20.1f);
 	SetCreateInterval(0.005f);
 	SetParticleType(PARTICLE_TYPE::BLOOD);
 	
@@ -25,7 +25,7 @@ BloodParticle::BloodParticle()
 	// 텍스처 설정
 	shared_ptr<Texture> tex = GET_SINGLE(Resources)->Load<Texture>(
 		L"Blood", L"..\\Resources\\Texture\\Particle\\Blood.png");
-	SetTexture(tex);
+	SetTexture(_type, tex);
 }
 
 void BloodParticle::FinalUpdate()

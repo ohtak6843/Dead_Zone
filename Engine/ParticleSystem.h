@@ -51,7 +51,7 @@ public:
 	void SetSpeed(float min, float max) { _minSpeed = min; _maxSpeed = max; }
 	void SetScale(float start, float end) { _startScale = start; _endScale = end; }
 	void SetCreateInterval(float interval) { _createInterval = interval; }
-	void SetTexture(shared_ptr<Texture> tex) { _material->SetTexture(0, tex); }
+	void SetTexture(int32 index, shared_ptr<Texture> tex) { _material->SetTexture(index, tex); }
 	void SetlifeTime(float lifeTime) { _lifeTime = lifeTime; }
 	void SetParticleType(int32 type) { _type = type; }
 
