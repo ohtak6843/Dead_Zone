@@ -2,7 +2,7 @@
 #include "Object.h"
 
 class Material;
-class StructuredBuffer;
+class UploadBuffer;
 
 struct IndexBufferInfo
 {
@@ -63,8 +63,8 @@ public:
 	const vector<AnimClipInfo>* GetAnimClip() { return &_animClips; }
 
 	bool							IsAnimMesh() { return !_animClips.empty(); }
-	shared_ptr<StructuredBuffer>	GetBoneFrameDataBuffer(int32 index = 0) { return _frameBuffer[index]; } // 전체 본 프레임 정보
-	shared_ptr<StructuredBuffer>	GetBoneOffsetBuffer() { return  _offsetBuffer; }
+	shared_ptr<UploadBuffer>	GetBoneFrameDataBuffer(int32 index = 0) { return _frameBuffer[index]; } // 전체 본 프레임 정보
+	shared_ptr<UploadBuffer>	GetBoneOffsetBuffer() { return  _offsetBuffer; }
 
 private:
 	ComPtr<ID3D12Resource>		_vertexBuffer;
@@ -77,8 +77,8 @@ private:
 	vector<AnimClipInfo>			_animClips;
 	vector<BoneInfo>				_bones;
 
-	shared_ptr<StructuredBuffer>	_offsetBuffer; // 각 뼈의 offset 행렬
-	vector<shared_ptr<StructuredBuffer>> _frameBuffer; // 전체 본 프레임 정보
+	shared_ptr<UploadBuffer>	_offsetBuffer; // 각 뼈의 offset 행렬
+	vector<shared_ptr<UploadBuffer>> _frameBuffer; // 전체 본 프레임 정보
 
 	int32							_rightHandBoneIndex = -1;
 };

@@ -38,7 +38,6 @@ void SceneMgr::Update()
 	_activeScene->FinalUpdate();
 }
 
-// TEMP
 void SceneMgr::Render()
 {
 	if (_activeScene)

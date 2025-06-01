@@ -115,9 +115,9 @@ shared_ptr<Light> GameObject::GetLight()
 	return static_pointer_cast<Light>(component);
 }
 
-shared_ptr<Particle> GameObject::GetParticleSystem()
+shared_ptr<Particle> GameObject::GetParticle()
 {
-	shared_ptr<Component> component = GetFixedComponent(COMPONENT_TYPE::PARTICLE_SYSTEM);
+	shared_ptr<Component> component = GetFixedComponent(COMPONENT_TYPE::PARTICLE);
 	return static_pointer_cast<Particle>(component);
 }
 

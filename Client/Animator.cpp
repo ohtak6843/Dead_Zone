@@ -5,12 +5,12 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "MeshRenderer.h"
-#include "StructuredBuffer.h"
+#include "UploadBuffer.h"
 
 Animator::Animator() : Component(COMPONENT_TYPE::ANIMATOR)
 {
 	_computeMaterial = GET_SINGLE(Resources)->Get<Material>(L"ComputeAnimation");
-	_boneFinalMatrix = make_shared<StructuredBuffer>();
+	_boneFinalMatrix = make_shared<UploadBuffer>();
 }
 
 Animator::~Animator()

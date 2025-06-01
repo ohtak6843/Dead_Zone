@@ -12,6 +12,9 @@ struct JumpState {
 class Scene
 {
 public:
+	Scene();
+	virtual ~Scene();
+
 	void Awake();
 	void Start();
 	void Update();
@@ -23,18 +26,8 @@ public:
 
 	void Render();
 	void RenderUI();
-
-	void ClearRTV();
-
-	void RenderShadow();
-	void RenderDeferred();
-	void RenderLights();
-	void RenderFinal();
-
-	void RenderForward();
 	
 private:
-	void PushLightData();
 
 public:
 	void AddGameObject(shared_ptr<GameObject> gameObject);
@@ -69,6 +62,9 @@ public:
 
 private:
 	vector<shared_ptr<GameObject>>		_gameObjects;
+	
+	shared_ptr<class RenderPass>		_renderPass;
+
 	vector<shared_ptr<class Camera>>	_cameras;
 	vector<shared_ptr<class Light>>		_lights;
 

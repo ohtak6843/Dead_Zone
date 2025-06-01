@@ -4,7 +4,7 @@
 
 class Material;
 class Mesh;
-class StructuredBuffer;
+class UploadBuffer;
 class Texture;
 
 struct ParticleInfo
@@ -56,8 +56,8 @@ public:
 	void SetActive(bool active) { _isActive = active; _elapsedTime = 0.0f; _accTime = 0.f; }
 
 protected:
-	shared_ptr<StructuredBuffer>	_particleBuffer;
-	shared_ptr<StructuredBuffer>	_computeSharedBuffer;
+	shared_ptr<UploadBuffer>	_particleBuffer;
+	shared_ptr<UploadBuffer>	_computeSharedBuffer;
 	uint32							_maxParticle = 100;
 
 	shared_ptr<Material>		_computeMaterial;

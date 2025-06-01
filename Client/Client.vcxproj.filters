@@ -89,7 +89,7 @@
     <ClInclude Include="RenderTargetGroup.h">
       <Filter>Game\Framework\DX12</Filter>
     </ClInclude>
-    <ClInclude Include="StructuredBuffer.h">
+    <ClInclude Include="UploadBuffer.h">
       <Filter>Game\Framework\DX12</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
@@ -224,6 +224,9 @@
     <ClInclude Include="Particle.h">
       <Filter>Game\Object\Component\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="RenderPass.h">
+      <Filter>Game\Framework\Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc">
@@ -257,7 +260,7 @@
     <ClCompile Include="RenderTargetGroup.cpp">
       <Filter>Game\Framework\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="StructuredBuffer.cpp">
+    <ClCompile Include="UploadBuffer.cpp">
       <Filter>Game\Framework\DX12</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
@@ -388,6 +391,9 @@
     </ClCompile>
     <ClCompile Include="Particle.cpp">
       <Filter>Game\Object\Component\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPass.cpp">
+      <Filter>Game\Framework\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

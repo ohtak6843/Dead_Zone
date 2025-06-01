@@ -2,14 +2,14 @@
 #include "BloodParticle.h"
 #include "Resources.h"
 #include "Timer.h"
-#include "StructuredBuffer.h"
+#include "UploadBuffer.h"
 
 BloodParticle::BloodParticle()
 {
-	_particleBuffer = make_shared<StructuredBuffer>();
+	_particleBuffer = make_shared<UploadBuffer>();
 	_particleBuffer->Init(sizeof(ParticleInfo), _maxParticle);
 
-	_computeSharedBuffer = make_shared<StructuredBuffer>();
+	_computeSharedBuffer = make_shared<UploadBuffer>();
 	_computeSharedBuffer->Init(sizeof(ComputeSharedInfo), 1);
 
 	// 파라미터 설정

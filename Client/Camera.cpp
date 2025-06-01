@@ -40,125 +40,12 @@ void Camera::FinalUpdate()
 	Camera::S_MatView = _matView;
 	Camera::S_MatProjection = _matProjection;
 
+	// 절두체 위치 업데이트
 	BoundingFrustum frustum;
 	BoundingFrustum::CreateFromMatrix(frustum, Camera::S_MatProjection);
 	Matrix viewInv = Camera::S_MatView.Invert();
 	frustum.Transform(frustum, viewInv);
 	_frustum = frustum;
-}
-
-void Camera::SortGameObject()
-{
-	shared_ptr<Scene> scene = GET_SINGLE(SceneMgr)->GetActiveScene();
-	const vector<shared_ptr<GameObject>>& gameObjects = scene->GetGameObjects();
-
-	_vecForward.clear();
-	_vecDeferred.clear();
-	_vecParticle.clear();
-
-	for (auto& gameObject : gameObjects)
-	{
-		if (gameObject->GetMeshRenderer() == nullptr && gameObject->GetParticleSystem() == nullptr)
-			continue;
-
-		if (IsCulled(gameObject->GetLayerIndex()))
-			continue;
-
-		if (gameObject->GetCheckFrustum())
-		{
-			if (FrustumCulling(gameObject) == DISJOINT)
-			{
-				continue;
-			}
-		}
-
-		if(gameObject->GetMeshRenderer())
-		{
-			SHADER_TYPE shaderType = gameObject->GetMeshRenderer()->GetMaterial()->GetShader()->GetShaderType();
-			switch (shaderType)
-			{
-			case SHADER_TYPE::DEFERRED:
-				_vecDeferred.push_back(gameObject);
-				{
-					shared_ptr<BaseCollider> collider = gameObject->GetCollider();
-					if (collider && DEBUG_MODE)
-					{
-						_vecDeferred.push_back(collider->GetDebugCollider());
-					}
-				}
-				break;
-			case SHADER_TYPE::FORWARD:
-				_vecForward.push_back(gameObject);
-				break;
-			}
-		}
-		else
-		{
-			_vecParticle.push_back(gameObject);
-		}
-	}
-}
-
-void Camera::SortShadowObject()
-{
-	shared_ptr<Scene> scene = GET_SINGLE(SceneMgr)->GetActiveScene();
-	const vector<shared_ptr<GameObject>>& gameObjects = scene->GetGameObjects();
-
-	_vecShadow.clear();
-
-	for (auto& gameObject : gameObjects)
-	{
-		if (gameObject->GetMeshRenderer() == nullptr)
-			continue;
-
-		if (gameObject->IsStatic())
-			continue;
-
-		if (IsCulled(gameObject->GetLayerIndex()))
-			continue;
-
-		if (gameObject->GetCheckFrustum())
-		{
-			if (FrustumCulling(gameObject) == DISJOINT)
-			{
-				continue;
-			}
-		}
-
-		_vecShadow.push_back(gameObject);
-	}
-}
-
-void Camera::Render_Deferred()
-{
-	S_MatView = _matView;
-	S_MatProjection = _matProjection;
-
-	GET_SINGLE(InstancingMgr)->Render(_vecDeferred);
-}
-
-void Camera::Render_Forward()
-{
-	S_MatView = _matView;
-	S_MatProjection = _matProjection;
-
-	GET_SINGLE(InstancingMgr)->Render(_vecForward);
-
-	for (auto& gameObject : _vecParticle)
-	{
-		gameObject->GetParticleSystem()->Render();
-	}
-}
-
-void Camera::Render_Shadow()
-{
-	S_MatView = _matView;
-	S_MatProjection = _matProjection;
-
-	for (auto& gameObject : _vecShadow)
-	{
-		gameObject->GetMeshRenderer()->RenderShadow();
-	}
 }
 
 ContainmentType Camera::FrustumCulling(shared_ptr<GameObject> gameObject)

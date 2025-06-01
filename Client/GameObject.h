@@ -30,7 +30,7 @@ public:
 	shared_ptr<MeshRenderer> GetMeshRenderer();
 	shared_ptr<Camera> GetCamera();
 	shared_ptr<Light> GetLight();
-	shared_ptr<Particle> GetParticleSystem();
+	shared_ptr<Particle> GetParticle();
 	shared_ptr<BaseCollider> GetCollider();
 	shared_ptr<Animator> GetAnimator();
 	

@@ -1,10 +1,10 @@
 #pragma once
 
-class StructuredBuffer
+class UploadBuffer
 {
 public:
-	StructuredBuffer();
-	~StructuredBuffer();
+	UploadBuffer();
+	~UploadBuffer();
 
 	void Init(uint32 elementSize, uint32 elementCount, void* initialData = nullptr);
 

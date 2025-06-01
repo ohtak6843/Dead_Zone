@@ -1,6 +1,9 @@
 #pragma once
 #include "Component.h"
 
+class Mesh;
+class Material;
+
 enum class LIGHT_TYPE : uint8
 {
 	DIRECTIONAL_LIGHT,
@@ -58,14 +61,20 @@ public:
 	void SetLightRange(float range) { _lightInfo.range = range; }
 	void SetLightAngle(float angle) { _lightInfo.angle = angle; }
 
+	int8 GetLightIndex() { return _lightIndex; }
 	void SetLightIndex(int8 index) { _lightIndex = index; }
+
+	shared_ptr<Mesh> GetVolumeMesh() { return _volumeMesh; }
+	shared_ptr<Material> GetLightMaterial() { return _lightMaterial; }
+
+	shared_ptr<GameObject> GetShadowCamera() { return _shadowCamera; }
 
 private:
 	LightInfo _lightInfo = {};
 
 	int8 _lightIndex = -1;
-	shared_ptr<class Mesh> _volumeMesh;
-	shared_ptr<class Material> _lightMaterial;
+	shared_ptr<Mesh> _volumeMesh;
+	shared_ptr<Material> _lightMaterial;
 
 	shared_ptr<GameObject> _shadowCamera;
 };

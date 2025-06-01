@@ -4,7 +4,7 @@
 #include "Material.h"
 #include "InstancingMgr.h"
 #include "FBXLoader.h"
-#include "StructuredBuffer.h"
+#include "UploadBuffer.h"
 
 Mesh::Mesh() : Object(OBJECT_TYPE::MESH)
 {
@@ -208,7 +208,7 @@ void Mesh::CreateBonesAndAnimations(class FBXLoader& loader)
 			offsetVec[b] = _bones[b].matOffset;
 
 		// OffsetMatrix StructuredBuffer 세팅
-		_offsetBuffer = make_shared<StructuredBuffer>();
+		_offsetBuffer = make_shared<UploadBuffer>();
 		_offsetBuffer->Init(sizeof(Matrix), static_cast<uint32>(offsetVec.size()), offsetVec.data());
 
 		const int32 animCount = static_cast<int32>(_animClips.size());
@@ -241,7 +241,7 @@ void Mesh::CreateBonesAndAnimations(class FBXLoader& loader)
 			}
 
 			// StructuredBuffer 세팅
-			_frameBuffer.push_back(make_shared<StructuredBuffer>());
+			_frameBuffer.push_back(make_shared<UploadBuffer>());
 			_frameBuffer.back()->Init(sizeof(AnimFrameParams), static_cast<uint32>(frameParams.size()), frameParams.data());
 		}
 	}

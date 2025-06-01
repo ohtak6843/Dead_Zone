@@ -18,13 +18,6 @@ public:
 	void SetProjectionType(PROJECTION_TYPE type) { _type = type; }
 	PROJECTION_TYPE GetProjectionType() { return _type; }
 
-	void SortGameObject();
-	void SortShadowObject();
-
-	void Render_Deferred();
-	void Render_Forward();
-	void Render_Shadow();
-
 	void SetCullingMaskLayerOnOff(uint8 layer, bool on)
 	{
 		if (on)
@@ -80,7 +73,6 @@ private:
 	vector<shared_ptr<GameObject>> _vecShadow;
 
 public:
-	// TEMP
 	static Matrix S_MatView;
 	static Matrix S_MatProjection;
 };

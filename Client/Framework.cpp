@@ -39,7 +39,7 @@ void Framework::Init(const WindowInfo& info)
 
 	ResizeWindow(info.width, info.height);
 
-	ToggleFullScreen();
+	//ToggleFullScreen();
 
 	GET_SINGLE(InputMgr)->Init(info.hwnd);
 	GET_SINGLE(Timer)->Init();

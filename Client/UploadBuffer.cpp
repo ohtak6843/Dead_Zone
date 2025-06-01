@@ -1,16 +1,16 @@
 #include "pch.h"
-#include "StructuredBuffer.h"
+#include "UploadBuffer.h"
 #include "Framework.h"
 
-StructuredBuffer::StructuredBuffer()
+UploadBuffer::UploadBuffer()
 {
 }
 
-StructuredBuffer::~StructuredBuffer()
+UploadBuffer::~UploadBuffer()
 {
 }
 
-void StructuredBuffer::Init(uint32 elementSize, uint32 elementCount, void* initialData)
+void UploadBuffer::Init(uint32 elementSize, uint32 elementCount, void* initialData)
 {
 	_elementSize = elementSize;
 	_elementCount = elementCount;
@@ -79,22 +79,22 @@ void StructuredBuffer::Init(uint32 elementSize, uint32 elementCount, void* initi
 	}
 }
 
-void StructuredBuffer::PushGraphicsData(SRV_REGISTER reg)
+void UploadBuffer::PushGraphicsData(SRV_REGISTER reg)
 {
 	gameFramework->GetGraphicsDescHeap()->SetSRV(_srvHeapBegin, reg);
 }
 
-void StructuredBuffer::PushComputeSRVData(SRV_REGISTER reg)
+void UploadBuffer::PushComputeSRVData(SRV_REGISTER reg)
 {
 	gameFramework->GetComputeDescHeap()->SetSRV(_srvHeapBegin, reg);
 }
 
-void StructuredBuffer::PushComputeUAVData(UAV_REGISTER reg)
+void UploadBuffer::PushComputeUAVData(UAV_REGISTER reg)
 {
 	gameFramework->GetComputeDescHeap()->SetUAV(_uavHeapBegin, reg);
 }
 
-void StructuredBuffer::CopyInitialData(uint64 bufferSize, void* initialData)
+void UploadBuffer::CopyInitialData(uint64 bufferSize, void* initialData)
 {
 	ComPtr<ID3D12Resource> readBuffer = nullptr;
 	D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize, D3D12_RESOURCE_FLAG_NONE);

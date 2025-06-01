@@ -3,7 +3,7 @@
 #include "Mesh.h"
 
 class Material;
-class StructuredBuffer;
+class UploadBuffer;
 class Mesh;
 
 class Animator : public Component
@@ -50,6 +50,6 @@ private:
 	int32							_blendFrame = 0;
 
 	shared_ptr<Material>			_computeMaterial;
-	shared_ptr<StructuredBuffer>	_boneFinalMatrix;  // 특정 프레임의 최종 행렬
+	shared_ptr<UploadBuffer>	_boneFinalMatrix;  // 특정 프레임의 최종 행렬
 	bool							_boneFinalUpdated = false;
 };

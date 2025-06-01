@@ -1,17 +1,17 @@
 #include "pch.h"
 #include "Particle.h"
-#include "StructuredBuffer.h"
+#include "UploadBuffer.h"
 #include "Mesh.h"
 #include "Resources.h"
 #include "Transform.h"
 #include "Timer.h"
 
-Particle::Particle() : Component(COMPONENT_TYPE::PARTICLE_SYSTEM)
+Particle::Particle() : Component(COMPONENT_TYPE::PARTICLE)
 {
-	_particleBuffer = make_shared<StructuredBuffer>();
+	_particleBuffer = make_shared<UploadBuffer>();
 	_particleBuffer->Init(sizeof(ParticleInfo), _maxParticle);
 
-	_computeSharedBuffer = make_shared<StructuredBuffer>();
+	_computeSharedBuffer = make_shared<UploadBuffer>();
 	_computeSharedBuffer->Init(sizeof(ComputeSharedInfo), 1);
 
 	_mesh = GET_SINGLE(Resources)->LoadPointMesh();
