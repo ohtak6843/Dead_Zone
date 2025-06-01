@@ -218,6 +218,7 @@
     <ClInclude Include="TextUI.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="TP_AK47.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Zombie.h" />
   </ItemGroup>
@@ -275,6 +276,7 @@
     <ClCompile Include="TextUI.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="TP_AK47.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Zombie.cpp" />
   </ItemGroup>

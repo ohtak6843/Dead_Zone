@@ -57,6 +57,8 @@ private:
 public:
 	uint32 GetSubsetCount() { return static_cast<uint32>(_vecIndexInfo.size()); }
 	const vector<BoneInfo>*		GetBones() { return &_bones; }
+	int32 GetRightHandBoneIndex();
+
 	uint32						GetBoneCount() { return static_cast<uint32>(_bones.size()); }
 	const vector<AnimClipInfo>* GetAnimClip() { return &_animClips; }
 
@@ -77,5 +79,7 @@ private:
 
 	shared_ptr<StructuredBuffer>	_offsetBuffer; // 각 뼈의 offset 행렬
 	vector<shared_ptr<StructuredBuffer>> _frameBuffer; // 전체 본 프레임 정보
+
+	int32							_rightHandBoneIndex = -1;
 };
 

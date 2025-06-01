@@ -84,17 +84,16 @@ void Mesh::CreateVertexBuffer(const vector<Vertex>& buffer)
 		nullptr,
 		IID_PPV_ARGS(&_vertexBuffer));
 
-	// Copy the triangle data to the vertex buffer.
 	void* vertexDataBuffer = nullptr;
-	CD3DX12_RANGE readRange(0, 0); // We do not intend to read from this resource on the CPU.
+	CD3DX12_RANGE readRange(0, 0);
 	_vertexBuffer->Map(0, &readRange, &vertexDataBuffer);
 	::memcpy(vertexDataBuffer, &buffer[0], bufferSize);
 	_vertexBuffer->Unmap(0, nullptr);
 
-	// Initialize the vertex buffer view.
+
 	_vertexBufferView.BufferLocation = _vertexBuffer->GetGPUVirtualAddress();
-	_vertexBufferView.StrideInBytes = sizeof(Vertex); // 정점 1개 크기
-	_vertexBufferView.SizeInBytes = bufferSize; // 버퍼의 크기	
+	_vertexBufferView.StrideInBytes = sizeof(Vertex);
+	_vertexBufferView.SizeInBytes = bufferSize;
 }
 
 void Mesh::CreateIndexBuffer(const vector<uint32>& buffer)
@@ -167,7 +166,6 @@ void Mesh::CreateBonesAndAnimations(class FBXLoader& loader)
 			for (int32 f = 0; f < size; f++)
 			{
 				FbxKeyFrameInfo& kf = vec[f];
-				// FBX에서 파싱한 정보들로 채워준다
 				KeyFrameInfo& kfInfo = info.keyFrames[b][f];
 				kfInfo.time = kf.time;
 				kfInfo.frame = static_cast<int32>(size);
@@ -203,7 +201,7 @@ void Mesh::CreateBonesAndAnimations(class FBXLoader& loader)
 #pragma region SkinData
 	if (IsAnimMesh())
 	{
-		// BoneOffet 행렬
+		// BoneOffset 행렬
 		const int32 boneCount = static_cast<int32>(_bones.size());
 		vector<Matrix> offsetVec(boneCount);
 		for (size_t b = 0; b < boneCount; b++)
@@ -259,4 +257,21 @@ Matrix Mesh::GetMatrix(FbxAMatrix& matrix)
 			mat.m[y][x] = static_cast<float>(matrix.Get(y, x));
 
 	return mat;
+}
+
+int32 Mesh::GetRightHandBoneIndex()
+{
+	if (_rightHandBoneIndex != -1)
+		return _rightHandBoneIndex;
+	
+	for (int32 i = 0; i < _bones.size(); ++i)
+	{
+		if (_bones[i].boneName.find(L"RightHand") != wstring::npos)
+		{
+			_rightHandBoneIndex = i;
+			return _rightHandBoneIndex;
+		}
+	}
+
+	return -1;
 }

@@ -19,7 +19,11 @@ public:
 
 	int32 GetAnimCount() { return static_cast<uint32>(_animClips->size()); }
 	int32 GetCurrentClipIndex() { return _clipIndex; }
+
+	const Matrix& GetBoneMatrix(int32 idx);
+
 	void Play(uint32 idx);
+
 	float GetUpdateTime() const { return _updateTime; }
 	double GetAnimDuration(uint32 idx)
 	{

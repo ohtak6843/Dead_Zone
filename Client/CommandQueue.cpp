@@ -59,8 +59,6 @@ void GraphicsCommandQueue::CreateResCmdQueueAndList(ComPtr<ID3D12Device> device)
 {
 	device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_resCmdAlloc));
 	device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _resCmdAlloc.Get(), nullptr, IID_PPV_ARGS(&_resCmdList));
-
-	_resCmdList->Close(); // 열려 있어도 무방함
 }
 
 void GraphicsCommandQueue::RenderBegin()

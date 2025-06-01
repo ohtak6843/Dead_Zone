@@ -12,9 +12,11 @@
 #include "MeshRenderer.h"
 #include "MeshData.h"
 #include "SphereCollider.h"
-#include "MultiPlayer.h"
-#include "Zombie.h"
 #include "Animator.h"
+
+#include "MultiPlayer.h"
+#include "TP_AK47.h"
+#include "Zombie.h"
 
 #include "..//echoserver//protocol.h"
 
@@ -220,7 +222,7 @@ void Scene::PushLightData()
 		lightParams.lightCount++;
 	}
 
-	CONST_BUFFER(CONSTANT_BUFFER_TYPE::GLOBAL)->SetGraphicsGlobalData(&lightParams, sizeof(lightParams));
+	CONST_BUFFER(CONSTANT_BUFFER_TYPE::LIGHT)->SetGraphicsGlobalData(&lightParams, sizeof(lightParams));
 }
 
 void Scene::AddGameObject(shared_ptr<GameObject> gameObject)
@@ -279,6 +281,7 @@ void Scene::AddPlayer(sc_packet_player_info* packet)
 
 	vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate(ColliderType::OBB);
 
+	// ÇÃ·¹ÀÌ¾î ¸ðµ¨
 	for (auto& gameObject : gameObjects)
 	{
 		gameObject->SetName(L"Player");
@@ -297,6 +300,19 @@ void Scene::AddPlayer(sc_packet_player_info* packet)
 		gameObjects[i]->GetTransform()->SetParent(gameObjects[0]->GetTransform());
 	}
 	_players.push_back(gameObjects);
+
+	// ÃÑ ¸ðµ¨
+	shared_ptr<MeshData> guns = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\AK74.fbx");
+	vector<shared_ptr<GameObject>> gunObjects = guns->Instantiate();
+
+	for (auto& gunObject : gunObjects)
+	{
+		gunObject->SetName(L"AK47");
+		shared_ptr<TP_AK47> script = make_shared<TP_AK47>();
+		script->SetParentObject(gameObjects[0]);
+		gunObject->AddComponent(script);
+		AddGameObject(gunObject);
+	}
 }
 
 void Scene::RemovePlayer(sc_packet_player_leave* packet)

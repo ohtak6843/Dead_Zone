@@ -224,6 +224,9 @@
     <ClInclude Include="TextUI.h">
       <Filter>Game\Object\UI</Filter>
     </ClInclude>
+    <ClInclude Include="TP_AK47.h">
+      <Filter>Game\Object\Script\Gun</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc">
@@ -388,6 +391,9 @@
     </ClCompile>
     <ClCompile Include="TextUI.cpp">
       <Filter>Game\Object\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="TP_AK47.cpp">
+      <Filter>Game\Object\Script\Gun</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
