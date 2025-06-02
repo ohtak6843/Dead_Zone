@@ -39,12 +39,12 @@ void Zombie::Awake()
 	_particle->AddComponent(_blood);
 
 
-	_particle->GetTransform()->SetParent(GetTransform());
-	_particle->GetTransform()->SetLocalPosition(Vec3(0.f, 13.f, 100.f));
+	//_particle->GetTransform()->SetParent(GetTransform());
+	//_particle->GetTransform()->SetLocalPosition(Vec3(0.f, 13.f, 100.f));
 	_particle->SetCheckFrustum(false);
 
 	GET_SINGLE(SceneManager)->GetActiveScene()->AddGameObject(_particle);
-	_blood->SetActive(true);
+	_blood->SetActive(false);
 }
 
 void Zombie::Start()

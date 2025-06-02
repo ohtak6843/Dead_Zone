@@ -48,6 +48,7 @@ public:
 	void SetRandomDirection();
 	void SetPauseDuration();
 	void Move();
+	shared_ptr<class GameObject> GetParticle() { return _particle; }
 
 private:
 	ZOMBIE_STATE _state;

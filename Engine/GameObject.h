@@ -52,6 +52,19 @@ public:
 	void SetActive(bool active) { _isActive = active; }
 	bool IsActive() const { return _isActive; }
 
+public:
+	template<typename T>
+	shared_ptr<T> GetScript()
+	{
+		for (auto& script : _scripts)
+		{
+			shared_ptr<T> casted = dynamic_pointer_cast<T>(script);
+			if (casted)
+				return casted;
+		}
+		return nullptr;
+	}
+
 private:
 	array<shared_ptr<Component>, FIXED_COMPONENT_COUNT> _components;
 	vector<shared_ptr<MonoBehaviour>> _scripts;

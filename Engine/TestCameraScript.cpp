@@ -210,17 +210,31 @@ void TestCameraScript::ProcessMouseInput()
 {
 	if (INPUT->GetButton(MOUSE_TYPE::LBUTTON))
 	{
-		shared_ptr<GameObject> obj = GET_SINGLE(SceneManager)->PickZombie(GEngine->GetWindow().width / 2, GEngine->GetWindow().height / 2);
+		Vec3 hitPos;
+		shared_ptr<GameObject> zombie;
 
-		if (obj) {
+		if (GET_SINGLE(SceneManager)->PickZombie(GEngine->GetWindow().width / 2, GEngine->GetWindow().height / 2, OUT hitPos, OUT zombie)) {
 			cs_packet_attack atkPkt{};
 			atkPkt.size = sizeof(atkPkt);
 			atkPkt.type = C2S_P_ATTACK;
-			atkPkt.zombieId = obj ? static_cast<long long>(obj->GetID()) : -1;
+			atkPkt.zombieId = zombie ? static_cast<long long>(zombie->GetID()) : -1;
 			send(GEngine->GetWindow().sock,
 				reinterpret_cast<char*>(&atkPkt),
 				sizeof(atkPkt),
 				0);
+
+			// 파티클 출력
+			auto zombieObj = zombie->GetScript<Zombie>();
+			
+			if (zombieObj != nullptr)
+			{
+				auto particle = zombieObj->GetParticle();
+				if (particle != nullptr)
+				{
+					particle->GetParticleSystem()->SetActive(true);
+					particle->GetTransform()->SetLocalPosition(hitPos);
+				}
+			}
 		}
 	}
 
@@ -254,13 +268,6 @@ void TestCameraScript::ProcessMouseInput()
 			Vec3 pos = static_pointer_cast<AK47>(gun->GetMonoBehaviour(L"AK47"))->GetNomalParticlePos();
 			static_pointer_cast<AK47>(gun->GetMonoBehaviour(L"AK47"))->setParticlePos(pos);
 		}
-	}
-
-	if (INPUT->GetButtonDown(MOUSE_TYPE::LBUTTON))
-	{
-		shared_ptr<GameObject> obj = GET_SINGLE(SceneManager)->Pick(GEngine->GetWindow().width / 2, GEngine->GetWindow().height / 2);
-		
-		
 	}
 
 	POINT deltaPos = INPUT->GetDeltaPos();

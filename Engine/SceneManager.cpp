@@ -256,7 +256,8 @@ shared_ptr<GameObject> SceneManager::Pick(int32 screenX, int32 screenY)
 	return picked;
 }
 
-shared_ptr<class GameObject> SceneManager::PickZombie(int32 screenX, int32 screenY)
+
+bool SceneManager::PickZombie(int32 screenX, int32 screenY, Vec3& hitPos, shared_ptr<GameObject>& pickedZombie)
 {
 	shared_ptr<Camera> camera = GetActiveScene()->GetMainCamera();
 
@@ -265,7 +266,6 @@ shared_ptr<class GameObject> SceneManager::PickZombie(int32 screenX, int32 scree
 
 	Matrix projectionMatrix = camera->GetProjectionMatrix();
 
-	// ViewSpace에서 Picking 진행
 	float viewX = (+2.0f * screenX / width - 1.0f) / projectionMatrix(0, 0);
 	float viewY = (-2.0f * screenY / height + 1.0f) / projectionMatrix(1, 1);
 
@@ -274,17 +274,18 @@ shared_ptr<class GameObject> SceneManager::PickZombie(int32 screenX, int32 scree
 
 	auto& zombies = GET_SINGLE(SceneManager)->GetActiveScene()->GetZombies();
 
-	float minDistance = FLT_MAX;
-	shared_ptr<GameObject> picked;
-
-	// ViewSpace에서의 Ray 정의
+	// Ray 정의 (world space)
 	Vec4 rayOrigin = Vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	Vec4 rayDir = Vec4(viewX, viewY, 1.0f, 0.0f);
 
-	// WorldSpace에서의 Ray 정의
 	rayOrigin = XMVector3TransformCoord(rayOrigin, viewMatrixInv);
 	rayDir = XMVector3TransformNormal(rayDir, viewMatrixInv);
 	rayDir.Normalize();
+
+	float minDistance = FLT_MAX;
+	bool hit = false;
+	Vec3 closestHitPos;
+	shared_ptr<GameObject> closestZombie = nullptr;
 
 	for (auto& zombieGroup : zombies)
 	{
@@ -293,38 +294,45 @@ shared_ptr<class GameObject> SceneManager::PickZombie(int32 screenX, int32 scree
 			if (zombiePart->GetCollider() == nullptr)
 				continue;
 
-			// WorldSpace에서 연산
 			float distance = 0.f;
+			bool intersected = false;
 
-			ColliderType colliderType = zombiePart->GetCollider()->GetColliderType();
+			auto colliderType = zombiePart->GetCollider()->GetColliderType();
 			if (colliderType == ColliderType::SPHERE)
 			{
-				shared_ptr<SphereCollider> sphere = static_pointer_cast<SphereCollider>(zombiePart->GetCollider());
-				if (sphere->Intersects(rayOrigin, rayDir, OUT distance) == false)
-					continue;
+				auto sphere = static_pointer_cast<SphereCollider>(zombiePart->GetCollider());
+				intersected = sphere->Intersects(rayOrigin, rayDir, OUT distance);
 			}
 			else if (colliderType == ColliderType::OBB)
 			{
-				shared_ptr<OrientedBoxCollider> obb = static_pointer_cast<OrientedBoxCollider>(zombiePart->GetCollider());
-				if (obb->Intersects(rayOrigin, rayDir, OUT distance) == false)
-					continue;
+				auto obb = static_pointer_cast<OrientedBoxCollider>(zombiePart->GetCollider());
+				intersected = obb->Intersects(rayOrigin, rayDir, OUT distance);
 			}
-			else
-			{
+
+			if (!intersected)
 				continue;
-			}
 
 			if (distance < minDistance)
 			{
-				// 이번 좀비가 picked된걸 확인했으면 다음 좀비로 넘어가기
 				minDistance = distance;
-				picked = zombieGroup[0];
-				break;
+				Vec3 origin3 = Vec3(rayOrigin.x, rayOrigin.y, rayOrigin.z);
+				Vec3 dir3 = Vec3(rayDir.x, rayDir.y, rayDir.z);
+				closestHitPos = origin3 + dir3 * distance;
+				closestZombie = zombieGroup[0]; // 대표 좀비 저장
+				hit = true;
+				break; // 하나의 파트라도 맞으면 그 좀비 그룹은 더 안 검사
 			}
 		}
 	}
 
-	return picked;
+	if (hit)
+	{
+		hitPos = closestHitPos;
+		pickedZombie = closestZombie;
+		return true;
+	}
+
+	return false;
 }
 
 shared_ptr<Scene> SceneManager::LoadTestScene()
@@ -660,27 +668,27 @@ shared_ptr<Scene> SceneManager::LoadTestScene()
 //
 //#pragma endregion
 
-//#pragma region Zombie
-//	{
-//		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
-//
-//		for (int i = 0; i < 10; i++)
-//		{
-//			vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate();
-//
-//			for (auto& gameObject : gameObjects)
-//			{
-//				gameObject->SetName(L"Zombie");
-//				gameObject->SetCheckFrustum(false);
-//				gameObject->GetTransform()->SetLocalPosition(Vec3(-800.f + (160.f * i), 70.f, 2000.f));
-//				gameObject->GetTransform()->SetLocalScale(Vec3(2.f, 2.f, 2.f));
-//				gameObject->GetTransform()->SetLocalRotation(Vec3(-90.f, 0.f, 0.f));
-//				scene->AddGameObject(gameObject);
-//				gameObject->AddComponent(make_shared<Zombie>());
-//			}
-//		}
-//	}
-//#pragma endregion
+#pragma region Zombie
+	{
+		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
+
+		for (int i = 0; i < 10; i++)
+		{
+			vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate();
+
+			for (auto& gameObject : gameObjects)
+			{
+				gameObject->SetName(L"Zombie");
+				gameObject->SetCheckFrustum(false);
+				gameObject->GetTransform()->SetLocalPosition(Vec3(-800.f + (160.f * i), 70.f, 2000.f));
+				gameObject->GetTransform()->SetLocalScale(Vec3(2.f, 2.f, 2.f));
+				gameObject->GetTransform()->SetLocalRotation(Vec3(-90.f, 0.f, 0.f));
+				scene->AddGameObject(gameObject);
+				gameObject->AddComponent(make_shared<Zombie>());
+			}
+		}
+	}
+#pragma endregion
 
 #pragma region TestFBX
 	{

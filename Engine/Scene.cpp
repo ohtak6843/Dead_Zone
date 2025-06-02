@@ -486,6 +486,8 @@ void Scene::AddZombie(sc_packet_spawn_zombie* packet)
 		shared_ptr<Zombie> playerScript = static_pointer_cast<Zombie>(gameObject->GetMonoBehaviour(L"Zombie"));
 		playerScript->SetState(ZOMBIE_STATE::IDLE);
 		AddGameObject(gameObject);
+		gameObject->Awake();
+		gameObject->Start();
 	}
 
 	gameObjects[0]->SetID(static_cast<uint32_t>(packet->zombieId));
