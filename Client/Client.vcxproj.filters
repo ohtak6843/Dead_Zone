@@ -227,6 +227,9 @@
     <ClInclude Include="RenderPass.h">
       <Filter>Game\Framework\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="LoadingScene.h">
+      <Filter>Game\Scenes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc">
@@ -394,6 +397,9 @@
     </ClCompile>
     <ClCompile Include="RenderPass.cpp">
       <Filter>Game\Framework\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadingScene.cpp">
+      <Filter>Game\Scenes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

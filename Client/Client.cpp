@@ -256,8 +256,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     if (!InitNetwork(serverIp))
         return 1;
 
-    GWindowInfo.width = 1280;
-    GWindowInfo.height = 800;
+    GWindowInfo.width = WINDOW_WIDTH;
+    GWindowInfo.height = WINDOW_HEIGHT;
     GWindowInfo.windowed = true;
     GWindowInfo.sock = g_clientSocket;
 

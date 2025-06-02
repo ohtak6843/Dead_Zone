@@ -30,9 +30,7 @@ void Framework::Init(const WindowInfo& info)
 	_graphicsDescHeap->Init(5120);
 	_computeDescHeap->Init();
 
-	CreateConstantBuffer(CBV_REGISTER::b0, sizeof(LightParams), 1);
-	CreateConstantBuffer(CBV_REGISTER::b1, sizeof(TransformParams), 5120);
-	CreateConstantBuffer(CBV_REGISTER::b2, sizeof(MaterialParams), 5120);
+	CreateConstantBuffers();
 
 	CreateRenderTargetGroups();
 	CreateD3D11On12Device();
@@ -98,22 +96,43 @@ void Framework::ResizeWindow(int32 width, int32 height)
 
 void Framework::ToggleFullScreen()
 {
-	// 현재 윈도우 스타일 가져오기
-	LONG style = ::GetWindowLong(_window.hwnd, GWL_STYLE);
-	style &= ~WS_OVERLAPPEDWINDOW;
-	style |= WS_POPUP;
-	::SetWindowLong(_window.hwnd, GWL_STYLE, style);
-
-	// 전체 화면으로 전환
-	MONITORINFO monitorInfo = { sizeof(MONITORINFO) };
-	if (::GetMonitorInfo(MonitorFromWindow(_window.hwnd, MONITOR_DEFAULTTOPRIMARY), &monitorInfo))
+	if (!FULL_SCREEN)
 	{
-		const RECT& rc = monitorInfo.rcMonitor;
-		::SetWindowPos(_window.hwnd, HWND_TOP,
-			rc.left, rc.top,
-			rc.right - rc.left,
-			rc.bottom - rc.top,
-			SWP_NOZORDER | SWP_FRAMECHANGED);
+		// 창모드 -> 전체화면
+		// 스타일 변경: 테두리 제거하고 팝업 스타일로
+		LONG currentStyle = ::GetWindowLong(_window.hwnd, GWL_STYLE);
+		currentStyle &= ~WS_OVERLAPPEDWINDOW;
+		currentStyle |= WS_POPUP;
+		::SetWindowLong(_window.hwnd, GWL_STYLE, currentStyle);
+
+		// 모니터 정보 가져와서 전체화면 크기로 설정
+		MONITORINFO monitorInfo = { sizeof(MONITORINFO) };
+		if (::GetMonitorInfo(MonitorFromWindow(_window.hwnd, MONITOR_DEFAULTTOPRIMARY), &monitorInfo))
+		{
+			const RECT& rc = monitorInfo.rcMonitor;
+			::SetWindowPos(_window.hwnd, HWND_TOP,
+				rc.left, rc.top,
+				rc.right - rc.left,
+				rc.bottom - rc.top,
+				SWP_NOZORDER | SWP_FRAMECHANGED);
+		}
+
+		SET_FULL_SCREEN(true);
+	}
+	else
+	{
+		// 전체화면 -> 창모드
+		// 스타일을 원래대로 복원
+		LONG currentStyle = ::GetWindowLong(_window.hwnd, GWL_STYLE);
+		currentStyle &= ~WS_POPUP;
+		currentStyle |= WS_OVERLAPPEDWINDOW;
+		::SetWindowLong(_window.hwnd, GWL_STYLE, currentStyle);
+
+		// 저장된 창 위치와 크기로 복원
+		::SetWindowPos(_window.hwnd, 0, 100, 100, _window.width, _window.height,
+			SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+
+		SET_FULL_SCREEN(false);
 	}
 }
 
@@ -234,6 +253,13 @@ void Framework::CreateConstantBuffer(CBV_REGISTER reg, uint32 bufferSize, uint32
 	shared_ptr<ConstantBuffer> buffer = make_shared<ConstantBuffer>();
 	buffer->Init(reg, bufferSize, count);
 	_constantBuffers.push_back(buffer);
+}
+
+void Framework::CreateConstantBuffers()
+{
+	CreateConstantBuffer(CBV_REGISTER::b0, sizeof(LightParams), 1);
+	CreateConstantBuffer(CBV_REGISTER::b1, sizeof(TransformParams), 5120);
+	CreateConstantBuffer(CBV_REGISTER::b2, sizeof(MaterialParams), 5120);
 }
 
 void Framework::CreateRenderTargetGroups()

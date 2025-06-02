@@ -53,6 +53,7 @@ private:
 	void CreateGraphicsRootSignature();
 	void CreateComputeRootSignature();
 	void CreateConstantBuffer(CBV_REGISTER reg, uint32 bufferSize, uint32 count);
+	void CreateConstantBuffers();
 	void CreateRenderTargetGroups();
 	void CreateD3D11On12Device();
 

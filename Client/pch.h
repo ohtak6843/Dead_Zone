@@ -165,6 +165,9 @@ struct Vertex
 	Vec4 indices;
 };
 
+#define WINDOW_WIDTH		1280
+#define WINDOW_HEIGHT		800
+
 #define DECLARE_SINGLE(type)		\
 private:							\
 	type() {}						\
@@ -191,6 +194,9 @@ public:								\
 
 #define DEBUG_MODE				GET_SINGLE(SceneMgr)->IsDebugMode()
 #define SET_DEBUG_MODE(mode)	GET_SINGLE(SceneMgr)->SetDebugMode(mode)
+
+#define FULL_SCREEN				GET_SINGLE(SceneMgr)->IsFullScreen()
+#define SET_FULL_SCREEN(flag)	GET_SINGLE(SceneMgr)->SetFullScreen(flag)
 
 #define CONST_BUFFER(type)	gameFramework->GetConstantBuffer(type)
 

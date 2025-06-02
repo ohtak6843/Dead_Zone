@@ -35,6 +35,7 @@ enum class KEY_TYPE
 
 	KEY_F4 = DIK_F4,
 	KEY_F5 = DIK_F5,
+	KEY_F6 = DIK_F6,
 
 	SPACE = DIK_SPACE,
 };

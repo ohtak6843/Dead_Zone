@@ -65,7 +65,7 @@ void SceneMgr::RenderUI()
 	static float elapsedTime = 0.f;
 	if(DELTA_TIME < 1.f)
 		elapsedTime += DELTA_TIME;
-	if (_activeScene)
+	if (_activeScene && GET_SINGLE(SceneMgr)->GetSceneType() != SCENE_TYPE::LOADING)
 	{
 		// 총알 UI
 		Vec2 pivot = {
@@ -157,10 +157,14 @@ void SceneMgr::RenderUI()
 
 void SceneMgr::LoadScene(wstring sceneName)
 {
-	// TODO : 기존 Scene 정리
-	// TODO : 파일에서 Scene 정보 로드
+	GET_SINGLE(SceneMgr)->SetSceneType(SCENE_TYPE::LOADING);
+	_activeScene = LoadLoadingScene();
+	_activeScene->Awake();
+	_activeScene->Start();
+	gameFramework->Update();
 
-	_activeScene = LoadTestScene();
+	GET_SINGLE(SceneMgr)->SetSceneType(SCENE_TYPE::STAGE01);
+	_activeScene = LoadStage01();
 
 	_activeScene->Awake();
 	_activeScene->Start();
@@ -185,7 +189,60 @@ uint8 SceneMgr::LayerNameToIndex(const wstring& name)
 	return findIt->second;
 }
 
-shared_ptr<Scene> SceneMgr::LoadTestScene()
+shared_ptr<Scene> SceneMgr::LoadLoadingScene()
+{
+#pragma region LayerMask
+	SetLayerName(0, L"Default");
+	SetLayerName(1, L"UI");
+#pragma endregion
+
+	shared_ptr<Scene> scene = make_shared<Scene>();
+
+#pragma region Camera
+	{
+		shared_ptr<GameObject> camera = make_shared<GameObject>();
+		camera->SetName(L"TitleCamera");
+		camera->AddComponent(make_shared<Transform>());
+		camera->AddComponent(make_shared<Camera>());
+		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 0.f));
+		camera->GetCamera()->SetProjectionType(PROJECTION_TYPE::ORTHOGRAPHIC);
+		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
+		camera->GetCamera()->SetCullingMaskAll();
+		camera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, false); // UI
+		scene->AddGameObject(camera);
+	}
+#pragma endregion
+
+#pragma region LoadingImage
+	{
+		shared_ptr<GameObject> loadingImage = make_shared<GameObject>();
+		loadingImage->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
+		loadingImage->AddComponent(make_shared<Transform>());
+		loadingImage->GetTransform()->SetLocalScale(Vec3(1280.f, 800.f, 1.f));
+		loadingImage->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 1.f));
+		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
+		{
+			shared_ptr<Mesh> mesh = GET_SINGLE(Resources)->LoadRectangleMesh();
+			meshRenderer->SetMesh(mesh);
+		}
+		{
+			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"AlphaTexture");
+			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"Loading", L"..\\Resources\\Texture\\LoadingImage.jpg");
+			shared_ptr<Material> material = make_shared<Material>();
+			material->SetShader(shader);
+			material->SetTexture(0, texture);
+			meshRenderer->SetMaterial(material);
+		}
+
+		loadingImage->AddComponent(meshRenderer);
+		scene->AddGameObject(loadingImage);
+	}	
+#pragma endregion
+
+	return scene;
+}
+
+shared_ptr<Scene> SceneMgr::LoadStage01()
 {
 #pragma region LayerMask
 	SetLayerName(0, L"Default");
@@ -396,73 +453,7 @@ shared_ptr<Scene> SceneMgr::LoadTestScene()
 	}
 #pragma endregion
 
-
-//#pragma region MAP
-//	// 임시 맵 제작 ( 나중에 수정할 예정 )
-//	shared_ptr<Container> container = make_shared<Container>();
-//
-//	const float cx = 806.f; // 컨테이너 크기
-//	const float cy = 273.f;
-//	const float cz = 298.f;
-//
-//	for (int y = 0; y < 2; ++y)
-//	{
-//		for (int x = 0; x < 1; ++x)
-//		{
-//			for (int z = -10; z < 20; ++z)
-//			{
-//				container->createContainer(scene, static_cast<uint8>(ContainerType::Container1),
-//					Vec3(2000.f + cx*x, cy/2 +cy*y, cz*z), Vec3(100.f, 100.f, 100.f), Vec3(-90.f, 0.f, 0.f));
-//
-//				container->createContainer(scene, static_cast<uint8>(ContainerType::Container1),
-//					Vec3(-2000.f + cx * x, cy / 2 + cy * y, cz* z), Vec3(100.f, 100.f, 100.f), Vec3(-90.f, 180.f, 0.f));
-//			}
-//		}
-//	}
-//
-//	for (int x = 1; x < 5; ++x)
-//	{
-//		container->createContainer(scene, static_cast<uint8>(ContainerType::Container1),
-//			Vec3(-2000.f + cx * x , cy / 2, cz * -10), Vec3(100.f, 100.f, 100.f), Vec3(-90.f, 0.f, 0.f));
-//
-//		container->createContainer(scene, static_cast<uint8>(ContainerType::Container1),
-//			Vec3(-2000.f + cx * x, cy / 2 + cy, cz * -10), Vec3(100.f, 100.f, 100.f), Vec3(-90.f, 0.f, 0.f));
-//	}
-//	
-//	container->createContainer(scene, static_cast<uint8>(ContainerType::Container1),
-//		Vec3(-500, cy / 2, 2300), Vec3(100.f, 100.f, 100.f), Vec3(-90.f, -120.f, 0.f));
-//
-//	container->createContainer(scene, static_cast<uint8>(ContainerType::Container1),
-//		Vec3(-500, cy / 2, -1800), Vec3(100.f, 100.f, 100.f), Vec3(-90.f, -120.f, 0.f));
-//
-//	container->createContainer(scene, static_cast<uint8>(ContainerType::Container1),
-//		Vec3(500, cy / 2, 5300), Vec3(100.f, 100.f, 100.f), Vec3(-90.f, 120.f, 0.f));
-//
-//#pragma endregion
-
-#pragma region Zombie
-	//{
-	//	shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
-
-	//	for (int i = 0; i < 10; i++)
-	//	{
-	//		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate();
-
-	//		for (auto& gameObject : gameObjects)
-	//		{
-	//			gameObject->SetName(L"Zombie");
-	//			gameObject->SetCheckFrustum(false);
-	//			gameObject->GetTransform()->SetLocalPosition(Vec3(-800.f + (160.f * i), 70.f, 2000.f));
-	//			gameObject->GetTransform()->SetLocalScale(Vec3(2.f, 2.f, 2.f));
-	//			gameObject->GetTransform()->SetLocalRotation(Vec3(-90.f, 0.f, 0.f));
-	//			scene->AddGameObject(gameObject);
-	//			gameObject->AddComponent(make_shared<Zombie>());
-	//		}
-	//	}
-	//}
-#pragma endregion
-
-#pragma region TestFBX
+#pragma region Map
 	{
 		shared_ptr<GameObject> t = make_shared<GameObject>();
 		t->AddComponent(make_shared<Transform>());

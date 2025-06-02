@@ -186,6 +186,7 @@
     <ClInclude Include="InputMgr.h" />
     <ClInclude Include="InstancingMgr.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="LoadingScene.h" />
     <ClInclude Include="M4A1.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
@@ -241,6 +242,7 @@
     <ClCompile Include="InputMgr.cpp" />
     <ClCompile Include="InstancingMgr.cpp" />
     <ClCompile Include="Light.cpp" />
+    <ClCompile Include="LoadingScene.cpp" />
     <ClCompile Include="M4A1.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />

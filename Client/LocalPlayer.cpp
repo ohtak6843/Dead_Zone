@@ -177,11 +177,15 @@ void LocalPlayer::LateUpdate()
 void LocalPlayer::ProcessKeyInput()
 {
 	// 콜라이더 출력 여부
-	if (INPUT->GetButton(KEY_TYPE::KEY_F5))
+	if (INPUT->GetButtonDown(KEY_TYPE::KEY_F6))
+		gameFramework->ToggleFullScreen();
+
+	// 콜라이더 출력 여부
+	if (INPUT->GetButtonDown(KEY_TYPE::KEY_F5))
 		SET_DEBUG_MODE(!DEBUG_MODE);
 
 	// 커서 출력 여부
-	if (INPUT->GetButton(KEY_TYPE::KEY_F4))
+	if (INPUT->GetButtonDown(KEY_TYPE::KEY_F4))
 		INPUT->LockCursor(!INPUT->IsCursorLocked());
 
 	if (INPUT->GetButton(KEY_TYPE::W))
