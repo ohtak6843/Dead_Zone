@@ -28,9 +28,6 @@ public:
 	const wstring& IndexToLayerName(uint8 index) { return _layerNames[index]; }
 	uint8 LayerNameToIndex(const wstring& name);
 
-	shared_ptr<class GameObject> Pick(int32 screenX, int32 screenY);
-	bool PickZombie(int32 screenX, int32 screenY, Vec3& hitPos, shared_ptr<GameObject>& pickedZombie);
-
 	SCENE_TYPE GetSceneType() { return _sceneType; }
 	void SetSceneType(SCENE_TYPE type) { _sceneType = type; }
 
@@ -58,4 +55,3 @@ private:
 	bool _debugMode = false;
 	bool _fullScreen = false;
 };
-

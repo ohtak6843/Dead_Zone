@@ -63,7 +63,7 @@ void SceneMgr::RenderUI()
 	//	_activeScene->RenderUI();
 
 	static float elapsedTime = 0.f;
-	if(DELTA_TIME < 1.f)
+	if (DELTA_TIME < 1.f)
 		elapsedTime += DELTA_TIME;
 	if (_activeScene && GET_SINGLE(SceneMgr)->GetSceneType() != SCENE_TYPE::LOADING)
 	{
@@ -73,13 +73,13 @@ void SceneMgr::RenderUI()
 			static_cast<float>(gameFramework->GetWindow().height - 50) };
 		D2D1_RECT_F textRect = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
 		int32 currentAmmo = 0;
-		
+
 		int32 gunType = static_pointer_cast<LocalPlayer>(_activeScene->FindGameObject(L"Main_Camera")->GetMonoBehaviour(L"MainCamera"))->getGunType();
 		if (gunType == 0)
 			currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"M4A1")->GetMonoBehaviour(L"M4A1"))->GetCurrentAmmo();
 		else if (gunType == 1)
 			currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"AK47")->GetMonoBehaviour(L"AK47"))->GetCurrentAmmo();
-		
+
 		std::wstringstream wss1;
 		wss1 << std::fixed << std::setprecision(2) << currentAmmo;
 		wstring text = L"탄창: ";
@@ -106,7 +106,7 @@ void SceneMgr::RenderUI()
 			&textRect2,
 			device->GetSolidColorBrush().Get());*/
 
-		// 체력 UI
+			// 체력 UI
 		pivot = { 100.f, static_cast<float>(gameFramework->GetWindow().height - 50) };
 		D2D1_RECT_F textRect3 = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
 
@@ -118,31 +118,31 @@ void SceneMgr::RenderUI()
 			&textRect3,
 			device->GetSolidColorBrush().Get());
 
-	/*	pivot = { 100.f, static_cast<float>(GEngine->GetWindow().height / 2) };
-		D2D1_RECT_F textRect4 = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
+		/*	pivot = { 100.f, static_cast<float>(GEngine->GetWindow().height / 2) };
+			D2D1_RECT_F textRect4 = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
 
-		wstring text4 = L"X : ";
-		Vec3 mainCameraPos = _activeScene->GetMainCamera()->GetTransform()->GetWorldPosition();
-		wss.str(L"");
-		wss.clear();
-		wss << std::fixed << std::setprecision(2) << mainCameraPos.x;
-		text4 += wss.str();
-		text4 += L"\nY : ";
-		wss.str(L"");
-		wss.clear();
-		wss << std::fixed << std::setprecision(2) << mainCameraPos.y;
-		text4 += wss.str();
-		text4 += L"\nZ : ";
-		wss.str(L"");
-		wss.clear();
-		wss << std::fixed << std::setprecision(2) << mainCameraPos.z;
-		text4 += wss.str();
-		device->GetD2DDeviceContext()->DrawTextW(
-			text4.c_str(),
-			static_cast<uint32>(text4.size()),
-			device->GetTextFormat().Get(),
-			&textRect4,
-			device->GetSolidColorBrush().Get());*/
+			wstring text4 = L"X : ";
+			Vec3 mainCameraPos = _activeScene->GetMainCamera()->GetTransform()->GetWorldPosition();
+			wss.str(L"");
+			wss.clear();
+			wss << std::fixed << std::setprecision(2) << mainCameraPos.x;
+			text4 += wss.str();
+			text4 += L"\nY : ";
+			wss.str(L"");
+			wss.clear();
+			wss << std::fixed << std::setprecision(2) << mainCameraPos.y;
+			text4 += wss.str();
+			text4 += L"\nZ : ";
+			wss.str(L"");
+			wss.clear();
+			wss << std::fixed << std::setprecision(2) << mainCameraPos.z;
+			text4 += wss.str();
+			device->GetD2DDeviceContext()->DrawTextW(
+				text4.c_str(),
+				static_cast<uint32>(text4.size()),
+				device->GetTextFormat().Get(),
+				&textRect4,
+				device->GetSolidColorBrush().Get());*/
 	}
 
 	device->GetD2DDeviceContext()->EndDraw();
@@ -212,7 +212,7 @@ shared_ptr<Scene> SceneMgr::LoadLoadingScene()
 		scene->AddGameObject(camera);
 	}
 #pragma endregion
-	// WorldSpace에서의 Ray 정의
+
 #pragma region LoadingImage
 	{
 		shared_ptr<GameObject> loadingImage = make_shared<GameObject>();
@@ -233,17 +233,13 @@ shared_ptr<Scene> SceneMgr::LoadLoadingScene()
 			material->SetTexture(0, texture);
 			meshRenderer->SetMaterial(material);
 		}
-			else
+
 		loadingImage->AddComponent(meshRenderer);
 		scene->AddGameObject(loadingImage);
-	}	
-#pragma endregion
-				break;
-	return scene;
-		}
 	}
+#pragma endregion
 
-	return picked;
+	return scene;
 }
 
 shared_ptr<Scene> SceneMgr::LoadStage01()
@@ -282,11 +278,11 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 		camera->SetName(L"Main_Camera");
 		camera->AddComponent(make_shared<Transform>());
 		camera->AddComponent(make_shared<Camera>()); // Near=1, Far=1000, FOV=45도
-		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
+		camera->AddComponent(make_shared<LocalPlayer>());
+		camera->GetCamera()->SetFar(10000.f);
 		camera->GetCamera()->SetFOV(90.f); // 90도
 		camera->GetTransform()->SetLocalPosition(Vec3(1185.f, 140.f, 473.f));
->>>>>>>>> Temporary merge branch 2
-		uint8 layerIndex = GET_SINGLE(SceneManager)->LayerNameToIndex(L"UI");
+		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
 		camera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, true); // UI는 안 찍음
 
 		layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"Gun");
@@ -318,7 +314,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 
 		gunCamera->AddComponent(make_shared<Transform>());
 		gunCamera->AddComponent(make_shared<Camera>());
-		
+
 		gunCamera->GetCamera()->SetFOV(60.f);
 		gunCamera->GetCamera()->SetFar(1000.f);
 
@@ -403,7 +399,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 			gameObject->SetLayerIndex(gunLayer);
 			gameObject->SetCheckFrustum(false);
 			gameObject->SetActive(false);
-			
+
 			scene->AddGameObject(gameObject);
 			gameObject->AddComponent(make_shared<M4A1>());
 		}
@@ -453,11 +449,11 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 		light->GetLight()->SetAmbient(Vec3(0.1f, 0.1f, 0.1f));
 		light->GetLight()->SetSpecular(Vec3(0.1f, 0.1f, 0.1f));
 
-#pragma region Map
-	//}
+		scene->AddGameObject(light);
+	}
 #pragma endregion
 
-#pragma region TestFBX
+#pragma region Map
 	{
 		shared_ptr<GameObject> t = make_shared<GameObject>();
 		t->AddComponent(make_shared<Transform>());
@@ -465,9 +461,9 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 		scene->AddGameObject(t);
 
 		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Factory1Items.fbx");
-	
+
 		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate(ColliderType::OBB);
-		
+
 		for (auto& gameObject : gameObjects)
 		{
 			gameObject->SetName(L"Map");
@@ -478,86 +474,8 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 	}
 #pragma endregion
 
-GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Soldado.fbx");
-GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Soldado.fbx");
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
 
 	return scene;
 }
-
-	bool SceneManager::PickZombie(int32 screenX, int32 screenY, Vec3& hitPos, shared_ptr<GameObject>& pickedZombie)
-	{
-		shared_ptr<Camera> camera = GetActiveScene()->GetMainCamera();
-
-		float width = static_cast<float>(GEngine->GetWindow().width);
-		float height = static_cast<float>(GEngine->GetWindow().height);
-
-		Matrix projectionMatrix = camera->GetProjectionMatrix();
-
-		float viewX = (+2.0f * screenX / width - 1.0f) / projectionMatrix(0, 0);
-		float viewY = (-2.0f * screenY / height + 1.0f) / projectionMatrix(1, 1);
-
-		Matrix viewMatrix = camera->GetViewMatrix();
-		Matrix viewMatrixInv = viewMatrix.Invert();
-
-		auto& zombies = GET_SINGLE(SceneManager)->GetActiveScene()->GetZombies();
-
-		// Ray 정의 (world space)
-		Vec4 rayOrigin = Vec4(0.0f, 0.0f, 0.0f, 1.0f);
-		Vec4 rayDir = Vec4(viewX, viewY, 1.0f, 0.0f);
-
-		rayOrigin = XMVector3TransformCoord(rayOrigin, viewMatrixInv);
-		rayDir = XMVector3TransformNormal(rayDir, viewMatrixInv);
-		rayDir.Normalize();
-
-		float minDistance = FLT_MAX;
-		bool hit = false;
-		Vec3 closestHitPos;
-		shared_ptr<GameObject> closestZombie = nullptr;
-
-		for (auto& zombieGroup : zombies)
-		{
-			for (auto& zombiePart : zombieGroup)
-			{
-				if (zombiePart->GetCollider() == nullptr)
-					continue;
-
-				float distance = 0.f;
-				bool intersected = false;
-
-				auto colliderType = zombiePart->GetCollider()->GetColliderType();
-				if (colliderType == ColliderType::SPHERE)
-				{
-					auto sphere = static_pointer_cast<SphereCollider>(zombiePart->GetCollider());
-					intersected = sphere->Intersects(rayOrigin, rayDir, OUT distance);
-				}
-				else if (colliderType == ColliderType::OBB)
-				{
-					auto obb = static_pointer_cast<OrientedBoxCollider>(zombiePart->GetCollider());
-					intersected = obb->Intersects(rayOrigin, rayDir, OUT distance);
-				}
-
-				if (!intersected)
-					continue;
-
-				if (distance < minDistance)
-				{
-					minDistance = distance;
-					Vec3 origin3 = Vec3(rayOrigin.x, rayOrigin.y, rayOrigin.z);
-					Vec3 dir3 = Vec3(rayDir.x, rayDir.y, rayDir.z);
-					closestHitPos = origin3 + dir3 * distance;
-					closestZombie = zombieGroup[0]; // 대표 좀비 저장
-					hit = true;
-					break; // 하나의 파트라도 맞으면 그 좀비 그룹은 더 안 검사
-				}
-			}
-		}
-
-		if (hit)
-		{
-			hitPos = closestHitPos;
-			pickedZombie = closestZombie;
-			return true;
-		}
-
-		return false;
-	}

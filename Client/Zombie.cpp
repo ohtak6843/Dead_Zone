@@ -6,8 +6,8 @@
 #include "Animator.h"
 
 #include "Scene.h"
-#include "SceneManager.h"
-#include "EnginePch.h"
+#include "SceneMgr.h"
+#include "Pch.h"
 
 #include "BloodParticle.h"
 #include "GameObject.h"
@@ -43,7 +43,7 @@ void Zombie::Awake()
 	//_particle->GetTransform()->SetLocalPosition(Vec3(0.f, 13.f, 100.f));
 	_particle->SetCheckFrustum(false);
 
-	GET_SINGLE(SceneManager)->GetActiveScene()->AddGameObject(_particle);
+	GET_SINGLE(SceneMgr)->GetActiveScene()->AddGameObject(_particle);
 	_blood->SetActive(false);
 }
 
