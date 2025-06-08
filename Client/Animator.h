@@ -50,6 +50,6 @@ private:
 	int32							_blendFrame = 0;
 
 	shared_ptr<Material>			_computeMaterial;
-	shared_ptr<UploadBuffer>	_boneFinalMatrix;  // 특정 프레임의 최종 행렬
+	shared_ptr<UploadBuffer>		_boneFinalMatrix;  // 특정 프레임의 최종 행렬
 	bool							_boneFinalUpdated = false;
 };
