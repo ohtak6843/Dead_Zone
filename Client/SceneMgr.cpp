@@ -22,11 +22,10 @@
 #include "M4A1.h"
 #include "AK47.h"
 
-
-
 // TODO: 나중에 삭제
 #include "Timer.h"
 #include <sstream>
+#include "TestLightScript.h"
 
 void SceneMgr::Update()
 {
@@ -281,7 +280,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 		camera->AddComponent(make_shared<LocalPlayer>());
 		camera->GetCamera()->SetFar(10000.f);
 		camera->GetCamera()->SetFOV(90.f); // 90도
-		camera->GetTransform()->SetLocalPosition(Vec3(1185.f, 140.f, 473.f));
+		camera->GetTransform()->SetLocalPosition(Vec3(1185.f, 1100.f, 473.f));
 		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
 		camera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, true); // UI는 안 찍음
 
@@ -349,6 +348,40 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 		}
 		skybox->AddComponent(meshRenderer);
 		scene->AddGameObject(skybox);
+	}
+#pragma endregion
+
+#pragma region UI_Test
+	for (int32 i = 0; i < 6; i++)
+	{
+		shared_ptr<GameObject> obj = make_shared<GameObject>();
+		obj->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI")); // UI
+		obj->AddComponent(make_shared<Transform>());
+		obj->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
+		obj->GetTransform()->SetLocalPosition(Vec3(-350.f + (i * 120), 250.f, 500.f));
+		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
+		{
+			shared_ptr<Mesh> mesh = GET_SINGLE(Resources)->LoadRectangleMesh();
+			meshRenderer->SetMesh(mesh);
+		}
+		{
+			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"Texture");
+
+			shared_ptr<Texture> texture;
+			if (i < 3)
+				texture = gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::G_BUFFER)->GetRTTexture(i);
+			else if (i < 5)
+				texture = gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::LIGHTING)->GetRTTexture(i - 3);
+			else
+				texture = gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SHADOW)->GetRTTexture(0);
+
+			shared_ptr<Material> material = make_shared<Material>();
+			material->SetShader(shader);
+			material->SetTexture(0, texture);
+			meshRenderer->SetMaterial(material);
+		}
+		obj->AddComponent(meshRenderer);
+		scene->AddGameObject(obj);
 	}
 #pragma endregion
 
@@ -441,13 +474,14 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 	{
 		shared_ptr<GameObject> light = make_shared<GameObject>();
 		light->AddComponent(make_shared<Transform>());
-		light->GetTransform()->SetLocalPosition(Vec3(0, 1000, 500));
+		light->GetTransform()->SetLocalPosition(Vec3(1185.f, 4000.f, 473.f));
 		light->AddComponent(make_shared<Light>());
-		light->GetLight()->SetLightDirection(Vec3(0, -1, 1.f));
+		light->GetLight()->SetLightDirection(Vec3(0.f, -1.f, 0.f));
 		light->GetLight()->SetLightType(LIGHT_TYPE::DIRECTIONAL_LIGHT);
 		light->GetLight()->SetDiffuse(Vec3(1.f, 1.f, 1.f));
 		light->GetLight()->SetAmbient(Vec3(0.1f, 0.1f, 0.1f));
 		light->GetLight()->SetSpecular(Vec3(0.1f, 0.1f, 0.1f));
+		light->AddComponent(make_shared<TestLightScript>());
 
 		scene->AddGameObject(light);
 	}
@@ -467,7 +501,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 		for (auto& gameObject : gameObjects)
 		{
 			gameObject->SetName(L"Map");
-			gameObject->SetStatic(true);
+			//gameObject->SetStatic(true);
 			gameObject->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
 			gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 0.f, 0.f));
 			//gameObject->GetTransform()->SetParent(t->GetTransform());

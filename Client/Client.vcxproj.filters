@@ -230,6 +230,15 @@
     <ClInclude Include="LoadingScene.h">
       <Filter>Game\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="TestLightScript.h">
+      <Filter>Game\Object\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="JsonMgr.h">
+      <Filter>Game\Framework\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="json.hpp">
+      <Filter>Game\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc">
@@ -400,6 +409,12 @@
     </ClCompile>
     <ClCompile Include="LoadingScene.cpp">
       <Filter>Game\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="TestLightScript.cpp">
+      <Filter>Game\Object\Script</Filter>
+    </ClCompile>
+    <ClCompile Include="JsonMgr.cpp">
+      <Filter>Game\Framework\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
