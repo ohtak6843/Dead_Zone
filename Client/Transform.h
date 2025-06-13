@@ -1,13 +1,13 @@
 #pragma once
 #include "Component.h"
 
-class Transform : public Component
+class Transform
 {
 public:
 	Transform();
 	virtual ~Transform();
 
-	virtual void FinalUpdate() override;
+	void FinalUpdate();
 	void PushData();
 
 public:
@@ -25,9 +25,6 @@ public:
 		return localRotation;
 	}
 	const Vec3& GetLocalScale() { return _localScale; }
-
-	// TEMP
-	float GetBoundingSphereRadius() { return max(max(_localScale.x, _localScale.y), _localScale.z); }
 
 	const Matrix& GetLocalToWorldMatrix() { return _matWorld; }
 	const Matrix& GetWorldMatrix() { return _matWorld; }
@@ -88,6 +85,14 @@ public:
 		
 		return euler;
 	}
+
+public:
+	shared_ptr<GameObject> GetGameObject() { return _gameObject.lock(); }
+
+private:
+	friend class GameObject;
+	void SetGameObject(shared_ptr<GameObject> gameObject) { _gameObject = gameObject; }
+	weak_ptr<GameObject> _gameObject;
 
 private:
 	// Parent ±‚¡ÿ

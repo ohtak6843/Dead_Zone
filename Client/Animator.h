@@ -1,12 +1,12 @@
 #pragma once
-#include "Component.h"
 #include "Mesh.h"
 
+class GameObject;
 class Material;
 class UploadBuffer;
 class Mesh;
 
-class Animator : public Component
+class Animator
 {
 public:
 	Animator();
@@ -32,7 +32,15 @@ public:
 	}
 
 public:
-	virtual void FinalUpdate() override;
+	void FinalUpdate();
+
+public:
+	shared_ptr<GameObject> GetGameObject() { return _gameObject.lock(); }
+
+private:
+	friend class GameObject;
+	void SetGameObject(shared_ptr<GameObject> gameObject) { _gameObject = gameObject; }
+	weak_ptr<GameObject> _gameObject;
 
 private:
 	const vector<BoneInfo>* _bones;

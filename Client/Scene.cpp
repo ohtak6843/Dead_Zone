@@ -171,7 +171,7 @@ void Scene::AddPlayer(sc_packet_player_info* packet)
 	for (auto& gameObject : gameObjects)
 	{
 		gameObject->SetName(L"Player");
-		gameObject->AddComponent(make_shared<MultiPlayer>());
+		gameObject->AddScript(make_shared<MultiPlayer>());
 		shared_ptr<MultiPlayer> playerScript = static_pointer_cast<MultiPlayer>(gameObject->GetMonoBehaviour(L"MultiPlayer"));
 		playerScript->SetState(PLAYER_STATE::IDLE);
 		AddGameObject(gameObject);
@@ -196,7 +196,7 @@ void Scene::AddPlayer(sc_packet_player_info* packet)
 		gunObject->SetName(L"AK47");
 		shared_ptr<TP_AK47> script = make_shared<TP_AK47>();
 		script->SetParentObject(gameObjects[0]);
-		gunObject->AddComponent(script);
+		gunObject->AddScript(script);
 		AddGameObject(gunObject);
 	}
 }
@@ -384,7 +384,7 @@ void Scene::AddZombie(sc_packet_spawn_zombie* packet)
 	for (auto& gameObject : gameObjects)
 	{
 		gameObject->SetName(L"Zombie");
-		gameObject->AddComponent(make_shared<Zombie>());
+		gameObject->AddScript(make_shared<Zombie>());
 		shared_ptr<Zombie> playerScript = static_pointer_cast<Zombie>(gameObject->GetMonoBehaviour(L"Zombie"));
 		playerScript->SetState(ZOMBIE_STATE::IDLE);
 		AddGameObject(gameObject);

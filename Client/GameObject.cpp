@@ -21,11 +21,26 @@ GameObject::~GameObject()
 
 void GameObject::Awake()
 {
-	for (shared_ptr<Component>& component : _components)
-	{
-		if (component)
-			component->Awake();
-	}
+	if (_transform != nullptr)
+		_transform->Awake();
+
+	if (_meshRenderer != nullptr)
+		_meshRenderer->Awake();
+
+	if (_camera != nullptr)
+		_camera->Awake();
+
+	if (_light != nullptr)
+		_light->Awake();
+
+	if (_particle != nullptr)
+		_particle->Awake();
+
+	if (_collider != nullptr)
+		_collider->Awake();
+
+	if (_animator != nullptr)
+		_animator->Awake();
 
 	for (shared_ptr<MonoBehaviour>& script : _scripts)
 	{
@@ -35,11 +50,26 @@ void GameObject::Awake()
 
 void GameObject::Start()
 {
-	for (shared_ptr<Component>& component : _components)
-	{
-		if (component)
-			component->Start();
-	}
+	if (_transform != nullptr)
+		_transform->Start();
+
+	if (_meshRenderer != nullptr)
+		_meshRenderer->Start();
+
+	if (_camera != nullptr)
+		_camera->Start();
+
+	if (_light != nullptr)
+		_light->Start();
+
+	if (_particle != nullptr)
+		_particle->Start();
+
+	if (_collider != nullptr)
+		_collider->Start();
+
+	if (_animator != nullptr)
+		_animator->Start();
 
 	for (shared_ptr<MonoBehaviour>& script : _scripts)
 	{
@@ -49,11 +79,26 @@ void GameObject::Start()
 
 void GameObject::Update()
 {
-	for (shared_ptr<Component>& component : _components)
-	{
-		if (component)
-			component->Update();
-	}
+	if (_transform != nullptr)
+		_transform->Update();
+
+	if (_meshRenderer != nullptr)
+		_meshRenderer->Update();
+
+	if (_camera != nullptr)
+		_camera->Update();
+
+	if (_light != nullptr)
+		_light->Update();
+
+	if (_particle != nullptr)
+		_particle->Update();
+
+	if (_collider != nullptr)
+		_collider->Update();
+
+	if (_animator != nullptr)
+		_animator->Update();
 
 	for (shared_ptr<MonoBehaviour>& script : _scripts)
 	{
@@ -63,11 +108,26 @@ void GameObject::Update()
 
 void GameObject::LateUpdate()
 {
-	for (shared_ptr<Component>& component : _components)
-	{
-		if (component)
-			component->LateUpdate();
-	}
+	if (_transform != nullptr)
+		_transform->LateUpdate();
+
+	if (_meshRenderer != nullptr)
+		_meshRenderer->LateUpdate();
+
+	if (_camera != nullptr)
+		_camera->LateUpdate();
+
+	if (_light != nullptr)
+		_light->LateUpdate();
+
+	if (_particle != nullptr)
+		_particle->LateUpdate();
+
+	if (_collider != nullptr)
+		_collider->LateUpdate();
+
+	if (_animator != nullptr)
+		_animator->LateUpdate();
 
 	for (shared_ptr<MonoBehaviour>& script : _scripts)
 	{
@@ -77,60 +137,26 @@ void GameObject::LateUpdate()
 
 void GameObject::FinalUpdate()
 {
-	for (shared_ptr<Component>& component : _components)
-	{
-		if (component)
-			component->FinalUpdate();
-	}
-}
+	if (_transform != nullptr)
+		_transform->FinalUpdate();
 
-shared_ptr<Component> GameObject::GetFixedComponent(COMPONENT_TYPE type)
-{
-	uint8 index = static_cast<uint8>(type);
-	assert(index < FIXED_COMPONENT_COUNT);
-	return _components[index];
-}
+	if (_meshRenderer != nullptr)
+		_meshRenderer->FinalUpdate();
 
-shared_ptr<Transform> GameObject::GetTransform()
-{
-	shared_ptr<Component> component = GetFixedComponent(COMPONENT_TYPE::TRANSFORM);
-	return static_pointer_cast<Transform>(component);
-}
+	if (_camera != nullptr)
+		_camera->FinalUpdate();
 
-shared_ptr<MeshRenderer> GameObject::GetMeshRenderer()
-{
-	shared_ptr<Component> component = GetFixedComponent(COMPONENT_TYPE::MESH_RENDERER);
-	return static_pointer_cast<MeshRenderer>(component);
-}
+	if (_light != nullptr)
+		_light->FinalUpdate();
 
-shared_ptr<Camera> GameObject::GetCamera()
-{
-	shared_ptr<Component> component = GetFixedComponent(COMPONENT_TYPE::CAMERA);
-	return static_pointer_cast<Camera>(component);
-}
+	if (_particle != nullptr)
+		_particle->FinalUpdate();
 
-shared_ptr<Light> GameObject::GetLight()
-{
-	shared_ptr<Component> component = GetFixedComponent(COMPONENT_TYPE::LIGHT);
-	return static_pointer_cast<Light>(component);
-}
+	if (_collider != nullptr)
+		_collider->FinalUpdate();
 
-shared_ptr<Particle> GameObject::GetParticle()
-{
-	shared_ptr<Component> component = GetFixedComponent(COMPONENT_TYPE::PARTICLE);
-	return static_pointer_cast<Particle>(component);
-}
-
-shared_ptr<BaseCollider> GameObject::GetCollider()
-{
-	shared_ptr<Component> component = GetFixedComponent(COMPONENT_TYPE::COLLIDER);
-	return static_pointer_cast<BaseCollider>(component);
-}
-
-shared_ptr<Animator> GameObject::GetAnimator()
-{
-	shared_ptr<Component> component = GetFixedComponent(COMPONENT_TYPE::ANIMATOR);
-	return static_pointer_cast<Animator>(component);
+	if (_animator != nullptr)
+		_animator->FinalUpdate();
 }
 
 shared_ptr<MonoBehaviour> GameObject::GetMonoBehaviour(const wstring& name)
@@ -144,17 +170,13 @@ shared_ptr<MonoBehaviour> GameObject::GetMonoBehaviour(const wstring& name)
 	return nullptr;
 }
 
-void GameObject::AddComponent(shared_ptr<Component> component)
+void GameObject::SetTransform(shared_ptr<Transform> transform)
 {
-	component->SetGameObject(shared_from_this());
+	transform->SetGameObject(shared_from_this());
+	_transform = transform;
+}
 
-	uint8 index = static_cast<uint8>(component->GetType());
-	if (index < FIXED_COMPONENT_COUNT)
-	{
-		_components[index] = component;
-	}
-	else
-	{
-		_scripts.push_back(dynamic_pointer_cast<MonoBehaviour>(component));
-	}
+void GameObject::AddScript(shared_ptr<MonoBehaviour> script)
+{
+	_scripts.push_back(script);
 }

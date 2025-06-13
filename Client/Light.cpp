@@ -11,8 +11,8 @@
 Light::Light() : Component(COMPONENT_TYPE::LIGHT)
 {
 	_shadowCamera = make_shared<GameObject>();
-	_shadowCamera->AddComponent(make_shared<Transform>());
-	_shadowCamera->AddComponent(make_shared<Camera>());
+	_shadowCamera->SetTransform(make_shared<Transform>());
+	_shadowCamera->SetCamera(make_shared<Camera>());
 	uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
 	_shadowCamera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, true); // UI´Â ¾È ÂïÀ½
 }

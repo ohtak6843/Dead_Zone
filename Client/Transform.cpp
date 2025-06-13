@@ -3,7 +3,7 @@
 #include "Framework.h"
 #include "Camera.h"
 
-Transform::Transform() : Component(COMPONENT_TYPE::TRANSFORM)
+Transform::Transform()
 {
 
 }

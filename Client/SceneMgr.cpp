@@ -201,8 +201,8 @@ shared_ptr<Scene> SceneMgr::LoadLoadingScene()
 	{
 		shared_ptr<GameObject> camera = make_shared<GameObject>();
 		camera->SetName(L"TitleCamera");
-		camera->AddComponent(make_shared<Transform>());
-		camera->AddComponent(make_shared<Camera>());
+		camera->SetTransform(make_shared<Transform>());
+		camera->SetCamera(make_shared<Camera>());
 		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 0.f));
 		camera->GetCamera()->SetProjectionType(PROJECTION_TYPE::ORTHOGRAPHIC);
 		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
@@ -216,7 +216,7 @@ shared_ptr<Scene> SceneMgr::LoadLoadingScene()
 	{
 		shared_ptr<GameObject> loadingImage = make_shared<GameObject>();
 		loadingImage->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
-		loadingImage->AddComponent(make_shared<Transform>());
+		loadingImage->SetTransform(make_shared<Transform>());
 		loadingImage->GetTransform()->SetLocalScale(Vec3(1280.f, 800.f, 1.f));
 		loadingImage->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 1.f));
 		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
@@ -233,7 +233,7 @@ shared_ptr<Scene> SceneMgr::LoadLoadingScene()
 			meshRenderer->SetMaterial(material);
 		}
 
-		loadingImage->AddComponent(meshRenderer);
+		loadingImage->SetMeshRenderer(meshRenderer);
 		scene->AddGameObject(loadingImage);
 	}	
 #pragma endregion
@@ -275,9 +275,9 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 	{
 		shared_ptr<GameObject> camera = make_shared<GameObject>();
 		camera->SetName(L"Main_Camera");
-		camera->AddComponent(make_shared<Transform>());
-		camera->AddComponent(make_shared<Camera>()); // Near=1, Far=1000, FOV=45µµ
-		camera->AddComponent(make_shared<LocalPlayer>());
+		camera->SetTransform(make_shared<Transform>());
+		camera->SetCamera(make_shared<Camera>()); // Near=1, Far=1000, FOV=45µµ
+		camera->AddScript(make_shared<LocalPlayer>());
 		camera->GetCamera()->SetFar(10000.f);
 		camera->GetCamera()->SetFOV(90.f); // 90µµ
 		camera->GetTransform()->SetLocalPosition(Vec3(1185.f, 1100.f, 473.f));
@@ -295,8 +295,8 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 	{
 		shared_ptr<GameObject> camera = make_shared<GameObject>();
 		camera->SetName(L"Orthographic_Camera");
-		camera->AddComponent(make_shared<Transform>());
-		camera->AddComponent(make_shared<Camera>()); // Near=1, Far=1000, 800*600
+		camera->SetTransform(make_shared<Transform>());
+		camera->SetCamera(make_shared<Camera>()); // Near=1, Far=1000, 800*600
 		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 0.f));
 		camera->GetCamera()->SetProjectionType(PROJECTION_TYPE::ORTHOGRAPHIC);
 		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
@@ -311,8 +311,8 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 		shared_ptr<GameObject> gunCamera = make_shared<GameObject>();
 		gunCamera->SetName(L"Gun_Camera");
 
-		gunCamera->AddComponent(make_shared<Transform>());
-		gunCamera->AddComponent(make_shared<Camera>());
+		gunCamera->SetTransform(make_shared<Transform>());
+		gunCamera->SetCamera(make_shared<Camera>());
 		
 		gunCamera->GetCamera()->SetFOV(60.f);
 		gunCamera->GetCamera()->SetFar(1000.f);
@@ -331,7 +331,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 #pragma region SkyBox
 	{
 		shared_ptr<GameObject> skybox = make_shared<GameObject>();
-		skybox->AddComponent(make_shared<Transform>());
+		skybox->SetTransform(make_shared<Transform>());
 		skybox->SetCheckFrustum(false);
 		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
 		{
@@ -346,7 +346,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 			material->SetTexture(0, texture);
 			meshRenderer->SetMaterial(material);
 		}
-		skybox->AddComponent(meshRenderer);
+		skybox->SetMeshRenderer(meshRenderer);
 		scene->AddGameObject(skybox);
 	}
 #pragma endregion
@@ -356,7 +356,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 	{
 		shared_ptr<GameObject> obj = make_shared<GameObject>();
 		obj->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI")); // UI
-		obj->AddComponent(make_shared<Transform>());
+		obj->SetTransform(make_shared<Transform>());
 		obj->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
 		obj->GetTransform()->SetLocalPosition(Vec3(-350.f + (i * 120), 250.f, 500.f));
 		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
@@ -380,7 +380,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 			material->SetTexture(0, texture);
 			meshRenderer->SetMaterial(material);
 		}
-		obj->AddComponent(meshRenderer);
+		obj->SetMeshRenderer(meshRenderer);
 		scene->AddGameObject(obj);
 	}
 #pragma endregion
@@ -389,7 +389,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 	{
 		shared_ptr<GameObject> crosshair = make_shared<GameObject>();
 		crosshair->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
-		crosshair->AddComponent(make_shared<Transform>());
+		crosshair->SetTransform(make_shared<Transform>());
 		crosshair->GetTransform()->SetLocalScale(Vec3(50.f, 50.f, 50.f));
 		crosshair->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 300.f));
 
@@ -407,7 +407,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 			meshRenderer->SetMaterial(material);
 		}
 		crosshair->SetName(L"Crosshair");
-		crosshair->AddComponent(meshRenderer);
+		crosshair->SetMeshRenderer(meshRenderer);
 		scene->AddGameObject(crosshair);
 	}
 #pragma endregion
@@ -434,7 +434,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 			gameObject->SetActive(false);
 			
 			scene->AddGameObject(gameObject);
-			gameObject->AddComponent(make_shared<M4A1>());
+			gameObject->AddScript(make_shared<M4A1>());
 		}
 
 		gameObjects[0]->SetName(L"M4A1");
@@ -463,7 +463,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 			gameObject->SetActive(true);
 
 			scene->AddGameObject(gameObject);
-			gameObject->AddComponent(make_shared<AK47>());
+			gameObject->AddScript(make_shared<AK47>());
 		}
 
 		gameObjects[0]->SetName(L"AK47");
@@ -473,15 +473,15 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 #pragma region Directional Light
 	{
 		shared_ptr<GameObject> light = make_shared<GameObject>();
-		light->AddComponent(make_shared<Transform>());
+		light->SetTransform(make_shared<Transform>());
 		light->GetTransform()->SetLocalPosition(Vec3(1185.f, 4000.f, 473.f));
-		light->AddComponent(make_shared<Light>());
+		light->SetLight(make_shared<Light>());
 		light->GetLight()->SetLightDirection(Vec3(0.f, -1.f, 0.f));
 		light->GetLight()->SetLightType(LIGHT_TYPE::DIRECTIONAL_LIGHT);
 		light->GetLight()->SetDiffuse(Vec3(1.f, 1.f, 1.f));
 		light->GetLight()->SetAmbient(Vec3(0.1f, 0.1f, 0.1f));
 		light->GetLight()->SetSpecular(Vec3(0.1f, 0.1f, 0.1f));
-		light->AddComponent(make_shared<TestLightScript>());
+		light->AddScript(make_shared<TestLightScript>());
 
 		scene->AddGameObject(light);
 	}
@@ -489,13 +489,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 
 #pragma region Map
 	{
-		shared_ptr<GameObject> t = make_shared<GameObject>();
-		t->AddComponent(make_shared<Transform>());
-		t->GetTransform()->SetLocalRotation(Vec3(-90.f, 0.f, 0.f));
-		scene->AddGameObject(t);
-
 		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Factory1Items.fbx");
-	
 		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate(ColliderType::OBB);
 		
 		for (auto& gameObject : gameObjects)

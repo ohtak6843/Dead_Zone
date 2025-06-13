@@ -24,19 +24,24 @@ public:
 	void LateUpdate();
 	void FinalUpdate();
 
-	shared_ptr<Component> GetFixedComponent(COMPONENT_TYPE type);
-
-	shared_ptr<Transform> GetTransform();
-	shared_ptr<MeshRenderer> GetMeshRenderer();
-	shared_ptr<Camera> GetCamera();
-	shared_ptr<Light> GetLight();
-	shared_ptr<Particle> GetParticle();
-	shared_ptr<BaseCollider> GetCollider();
-	shared_ptr<Animator> GetAnimator();
-	
+	shared_ptr<Transform> GetTransform() { return _transform; }
+	shared_ptr<MeshRenderer> GetMeshRenderer() { return _meshRenderer; }
+	shared_ptr<Camera> GetCamera() { return _camera; }
+	shared_ptr<Light> GetLight() { return _light; }
+	shared_ptr<Particle> GetParticle() { return _particle; }
+	shared_ptr<BaseCollider> GetCollider() { return _collider; }
+	shared_ptr<Animator> GetAnimator() { return _animator; }
 	shared_ptr<MonoBehaviour> GetMonoBehaviour(const wstring& name);
 
-	void AddComponent(shared_ptr<Component> component);
+	void SetTransform(shared_ptr<Transform> transform);
+	void SetMeshRenderer(shared_ptr<MeshRenderer> meshRenderer) { _meshRenderer = meshRenderer; }
+	void SetCamera(shared_ptr<Camera> camera) { _camera = camera; }
+	void SetLight(shared_ptr<Light> light) { _light = light; }
+	void SetParticle(shared_ptr<Particle> particle) { _particle = particle; }
+	void SetCollider(shared_ptr<BaseCollider> collider) { _collider = collider; }
+	void SetAnimator(shared_ptr<Animator> animator) { _animator = animator; }
+
+	void AddScript(shared_ptr<MonoBehaviour> script);
 
 	void SetCheckFrustum(bool checkFrustum) { _checkFrustum = checkFrustum; }
 	bool GetCheckFrustum() { return _checkFrustum; }
@@ -52,7 +57,13 @@ public:
 	bool IsActive() const { return _isActive; }
 
 private:
-	array<shared_ptr<Component>, FIXED_COMPONENT_COUNT> _components;
+	shared_ptr<Transform> _transform;
+	shared_ptr<MeshRenderer> _meshRenderer;
+	shared_ptr<Camera> _camera;
+	shared_ptr<Light> _light;
+	shared_ptr<Particle> _particle;
+	shared_ptr<BaseCollider> _collider;
+	shared_ptr<Animator> _animator;
 	vector<shared_ptr<MonoBehaviour>> _scripts;
 
 	bool _isActive = true;

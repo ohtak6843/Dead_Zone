@@ -12,7 +12,7 @@ SphereCollider::SphereCollider() : BaseCollider(ColliderType::SPHERE)
 
 	// 디버그용 콜라이더 생성
 	_debugCollider = make_shared<GameObject>();
-	_debugCollider->AddComponent(make_shared<Transform>());
+	_debugCollider->SetTransform(make_shared<Transform>());
 	shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
 	{
 		shared_ptr<Mesh> sphereMesh = GET_SINGLE(Resources)->LoadSphereMesh();
@@ -24,7 +24,7 @@ SphereCollider::SphereCollider() : BaseCollider(ColliderType::SPHERE)
 		material->SetShader(shader);
 		meshRenderer->SetMaterial(material);
 	}
-	_debugCollider->AddComponent(meshRenderer);
+	_debugCollider->SetMeshRenderer(meshRenderer);
 
 	_debugCollider->Awake();
 	_debugCollider->Start();

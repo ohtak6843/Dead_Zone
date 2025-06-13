@@ -133,9 +133,9 @@ void Gun::InitializeParticle()
 {
 	// 파티클 생성
 	_particle = make_shared<GameObject>();
-	_particle->AddComponent(make_shared<Transform>());
+	_particle->SetTransform(make_shared<Transform>());
 	_muzzle = make_shared<MuzzleFlashParticle>();
-	_particle->AddComponent(_muzzle);
+	_particle->SetParticle(_muzzle);
 	_particle->GetTransform()->SetLocalPosition(Vec3(0.f,0.f,0.f));
 	uint8 gunLayer = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"Gun");
 	_particle->SetLayerIndex(gunLayer);
