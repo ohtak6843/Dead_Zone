@@ -3,46 +3,37 @@
 #include "MeshData.h"
 #include "Resources.h"
 
+#include "MeshRenderer.h"
+
 #include "BaseCollider.h"
 #include "SphereCollider.h"
 #include "OrientedBoxCollider.h"
 
-void JsonMgr::to_json(json& j, const shared_ptr<GameObject>& gameObject)
+void to_json(ordered_json& j, const shared_ptr<GameObject>& gameObject)
 {
-	//shared_ptr<BaseCollider> collider = gameObject->GetCollider();
-	//if (collider == nullptr)
-	//	return;
+	shared_ptr<BaseCollider> collider = gameObject->GetCollider();
+	if (collider == nullptr)
+		return;
 
-	//ColliderType type = collider->GetColliderType();
-	//switch (type)
-	//{
-	//case ColliderType::SPHERE:
-	//	collider = static_pointer_cast<SphereCollider>(collider);
-	//	break;
-	//case ColliderType::AABB:
-	//	// AABB는 안 만들었음
-	//	return;
-	//	//break;
-	//case ColliderType::OBB:
-	//	collider = static_pointer_cast<OrientedBoxCollider>(collider);
-	//	break;
-	//case ColliderType::NONE:
-	//	// NONE은 처리 안함
-	//	return;
-	//	//break;
-	//}
+	ColliderType type = collider->GetColliderType();
+	if (type != ColliderType::OBB)
+		return;
 
-	//j = json{
-	//	{"Name", gameObject->GetName()},
-	//	{"ColliderType", type},
-	//	{"Center", {collider->GetCenter().x, collider->GetCenter().y, collider->GetCenter().z}},
-	//	{"Radius", collider->GetRadius()},
-	//	{"Extents", {collider->GetExtents().x, collider->GetExtents().y, collider->GetExtents().z}},
-	//	{"Orientation", {collider->GetRotation().x, collider->GetRotation().y, collider->GetRotation().z}},
-	//}
+	shared_ptr<BoundingOrientedBox> obbCollider = static_pointer_cast<OrientedBoxCollider>(collider)->GetBoundingOrientedBox();
+
+	wstring name = gameObject->GetMeshRenderer()->GetMesh()->GetName();
+	string nameStr = ws2s(name);
+	nameStr.erase(std::remove(nameStr.begin(), nameStr.end(), '\0'), nameStr.end());
+
+	j = ordered_json{
+		{"name", nameStr},
+		{"position", {obbCollider->Center.x, obbCollider->Center.y, obbCollider->Center.z}},
+		{"orientation", {obbCollider->Orientation.x, obbCollider->Orientation.y, obbCollider->Orientation.z, obbCollider->Orientation.w}},
+		{"extents", {obbCollider->Extents.x, obbCollider->Extents.y, obbCollider->Extents.z}},
+	};
 }
 
-void JsonMgr::SaveMapCollider(vector<shared_ptr<GameObject>> gameObjects, const wstring& fileName)
+void JsonMgr::SaveMapCollider(const wstring& fileName, vector<shared_ptr<GameObject>> gameObjects)
 {
 	for (auto& gameObject : gameObjects)
 		gameObject->Awake();
@@ -60,20 +51,12 @@ void JsonMgr::SaveMapCollider(vector<shared_ptr<GameObject>> gameObjects, const 
 		gameObject->FinalUpdate();
 
 
-	json j;
+	ordered_json j = gameObjects;
 	ofstream file(fileName);
 	if (file.is_open())
 	{
-
-	}
-
-	// 콜라이더 저장
-	for (auto& gameObject : gameObjects)
-	{
-		shared_ptr<BaseCollider> collider = gameObject->GetCollider();
-		if (collider == nullptr)
-			continue;
-
+		file << j.dump(4);
+		file.close();
 	}
 }
 

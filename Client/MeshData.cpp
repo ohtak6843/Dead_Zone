@@ -128,10 +128,9 @@ vector<shared_ptr<GameObject>> MeshData::Instantiate(ColliderType colliderType)
 #pragma endregion
 
 #pragma region Set Transform
-		gameObject->GetTransform()->SetLocalPosition(info.position);
-		gameObject->GetTransform()->SetLocalRotation(info.rotation);
-		gameObject->GetTransform()->SetLocalScale(info.scale);
-
+		//gameObject->GetTransform()->SetLocalPosition(info.position);
+		//gameObject->GetTransform()->SetLocalRotation(info.rotation);
+		//gameObject->GetTransform()->SetLocalScale(info.scale);
 #pragma endregion
 
 		v.push_back(gameObject);

@@ -1,5 +1,5 @@
 #pragma once
-#include "Component.h"
+#include "GameObject.h"
 
 class Transform
 {
@@ -7,6 +7,7 @@ public:
 	Transform();
 	virtual ~Transform();
 
+public:
 	void FinalUpdate();
 	void PushData();
 

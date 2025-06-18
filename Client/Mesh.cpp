@@ -65,6 +65,7 @@ shared_ptr<Mesh> Mesh::CreateFromFBX(const FbxMeshInfo* meshInfo, FBXLoader& loa
 	if (meshInfo->hasAnimation)
 		mesh->CreateBonesAndAnimations(loader);
 
+	mesh->SetName(meshInfo->name);
 	return mesh;
 }
 

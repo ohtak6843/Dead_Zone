@@ -21,27 +21,6 @@ GameObject::~GameObject()
 
 void GameObject::Awake()
 {
-	if (_transform != nullptr)
-		_transform->Awake();
-
-	if (_meshRenderer != nullptr)
-		_meshRenderer->Awake();
-
-	if (_camera != nullptr)
-		_camera->Awake();
-
-	if (_light != nullptr)
-		_light->Awake();
-
-	if (_particle != nullptr)
-		_particle->Awake();
-
-	if (_collider != nullptr)
-		_collider->Awake();
-
-	if (_animator != nullptr)
-		_animator->Awake();
-
 	for (shared_ptr<MonoBehaviour>& script : _scripts)
 	{
 		script->Awake();
@@ -50,27 +29,6 @@ void GameObject::Awake()
 
 void GameObject::Start()
 {
-	if (_transform != nullptr)
-		_transform->Start();
-
-	if (_meshRenderer != nullptr)
-		_meshRenderer->Start();
-
-	if (_camera != nullptr)
-		_camera->Start();
-
-	if (_light != nullptr)
-		_light->Start();
-
-	if (_particle != nullptr)
-		_particle->Start();
-
-	if (_collider != nullptr)
-		_collider->Start();
-
-	if (_animator != nullptr)
-		_animator->Start();
-
 	for (shared_ptr<MonoBehaviour>& script : _scripts)
 	{
 		script->Start();
@@ -79,27 +37,6 @@ void GameObject::Start()
 
 void GameObject::Update()
 {
-	if (_transform != nullptr)
-		_transform->Update();
-
-	if (_meshRenderer != nullptr)
-		_meshRenderer->Update();
-
-	if (_camera != nullptr)
-		_camera->Update();
-
-	if (_light != nullptr)
-		_light->Update();
-
-	if (_particle != nullptr)
-		_particle->Update();
-
-	if (_collider != nullptr)
-		_collider->Update();
-
-	if (_animator != nullptr)
-		_animator->Update();
-
 	for (shared_ptr<MonoBehaviour>& script : _scripts)
 	{
 		script->Update();
@@ -108,27 +45,6 @@ void GameObject::Update()
 
 void GameObject::LateUpdate()
 {
-	if (_transform != nullptr)
-		_transform->LateUpdate();
-
-	if (_meshRenderer != nullptr)
-		_meshRenderer->LateUpdate();
-
-	if (_camera != nullptr)
-		_camera->LateUpdate();
-
-	if (_light != nullptr)
-		_light->LateUpdate();
-
-	if (_particle != nullptr)
-		_particle->LateUpdate();
-
-	if (_collider != nullptr)
-		_collider->LateUpdate();
-
-	if (_animator != nullptr)
-		_animator->LateUpdate();
-
 	for (shared_ptr<MonoBehaviour>& script : _scripts)
 	{
 		script->LateUpdate();
@@ -139,9 +55,6 @@ void GameObject::FinalUpdate()
 {
 	if (_transform != nullptr)
 		_transform->FinalUpdate();
-
-	if (_meshRenderer != nullptr)
-		_meshRenderer->FinalUpdate();
 
 	if (_camera != nullptr)
 		_camera->FinalUpdate();
@@ -176,7 +89,44 @@ void GameObject::SetTransform(shared_ptr<Transform> transform)
 	_transform = transform;
 }
 
+void GameObject::SetMeshRenderer(shared_ptr<MeshRenderer> meshRenderer)
+{
+	meshRenderer->SetGameObject(shared_from_this());
+	_meshRenderer = meshRenderer;
+}
+
+void GameObject::SetCamera(shared_ptr<Camera> camera)
+{
+	camera->SetGameObject(shared_from_this());
+	_camera = camera;
+}
+
+void GameObject::SetLight(shared_ptr<Light> light)
+{
+	light->SetGameObject(shared_from_this());
+	_light = light;
+}
+
+void GameObject::SetParticle(shared_ptr<Particle> particle)
+{
+	particle->SetGameObject(shared_from_this());
+	_particle = particle;
+}
+
+void GameObject::SetCollider(shared_ptr<BaseCollider> collider)
+{
+	collider->SetGameObject(shared_from_this());
+	_collider = collider;
+}
+
+void GameObject::SetAnimator(shared_ptr<Animator> animator)
+{
+	animator->SetGameObject(shared_from_this());
+	_animator = animator;
+}
+
 void GameObject::AddScript(shared_ptr<MonoBehaviour> script)
 {
+	script->SetGameObject(shared_from_this());
 	_scripts.push_back(script);
 }

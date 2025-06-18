@@ -1,4 +1,5 @@
 #pragma once
+#include "GameObject.h"
 #include "Mesh.h"
 
 class GameObject;
@@ -11,6 +12,9 @@ class Animator
 public:
 	Animator();
 	virtual ~Animator();
+
+public:
+	void FinalUpdate();
 
 public:
 	void SetBones(const vector<BoneInfo>* bones) { _bones = bones; }
@@ -32,10 +36,8 @@ public:
 	}
 
 public:
-	void FinalUpdate();
-
-public:
 	shared_ptr<GameObject> GetGameObject() { return _gameObject.lock(); }
+	shared_ptr<Transform> GetTransform() { return _gameObject.lock()->GetTransform(); }
 
 private:
 	friend class GameObject;

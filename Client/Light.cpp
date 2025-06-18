@@ -8,7 +8,7 @@
 #include "Texture.h"
 #include "SceneMgr.h"
 
-Light::Light() : Component(COMPONENT_TYPE::LIGHT)
+Light::Light()
 {
 	_shadowCamera = make_shared<GameObject>();
 	_shadowCamera->SetTransform(make_shared<Transform>());

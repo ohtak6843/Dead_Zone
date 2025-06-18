@@ -1,5 +1,4 @@
 #pragma once
-#include "Component.h"
 #include "Object.h"
 
 class Transform;
@@ -34,12 +33,12 @@ public:
 	shared_ptr<MonoBehaviour> GetMonoBehaviour(const wstring& name);
 
 	void SetTransform(shared_ptr<Transform> transform);
-	void SetMeshRenderer(shared_ptr<MeshRenderer> meshRenderer) { _meshRenderer = meshRenderer; }
-	void SetCamera(shared_ptr<Camera> camera) { _camera = camera; }
-	void SetLight(shared_ptr<Light> light) { _light = light; }
-	void SetParticle(shared_ptr<Particle> particle) { _particle = particle; }
-	void SetCollider(shared_ptr<BaseCollider> collider) { _collider = collider; }
-	void SetAnimator(shared_ptr<Animator> animator) { _animator = animator; }
+	void SetMeshRenderer(shared_ptr<MeshRenderer> meshRenderer);
+	void SetCamera(shared_ptr<Camera> camera);
+	void SetLight(shared_ptr<Light> light);
+	void SetParticle(shared_ptr<Particle> particle);
+	void SetCollider(shared_ptr<BaseCollider> collider);
+	void SetAnimator(shared_ptr<Animator> animator);
 
 	void AddScript(shared_ptr<MonoBehaviour> script);
 

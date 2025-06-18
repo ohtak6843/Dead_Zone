@@ -174,7 +174,6 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="CommandQueue.h" />
-    <ClInclude Include="Component.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="D3D11On12Device.h" />
     <ClInclude Include="d3dx12.h" />
@@ -234,7 +233,6 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="CommandQueue.cpp" />
-    <ClCompile Include="Component.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="D3D11On12Device.cpp" />
     <ClCompile Include="Framework.cpp" />

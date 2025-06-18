@@ -1,8 +1,10 @@
 #pragma once
-#include "Component.h"
+#include "GameObject.h"
 
+class GameObject;
 class Mesh;
 class Material;
+class MeshRenderer;
 
 // [32][32]
 union InstanceID
@@ -15,7 +17,7 @@ union InstanceID
 	uint64 id;
 };
 
-class MeshRenderer : public Component
+class MeshRenderer
 {
 public:
 	MeshRenderer();
@@ -32,6 +34,16 @@ public:
 	void RenderShadow();
 
 	uint64 GetInstanceID();
+
+public:
+	shared_ptr<GameObject> GetGameObject() { return _gameObject.lock(); }
+	shared_ptr<Transform> GetTransform() { return _gameObject.lock()->GetTransform(); }
+	shared_ptr<Animator> GetAnimator() { return _gameObject.lock()->GetAnimator(); }
+
+private:
+	friend class GameObject;
+	void SetGameObject(shared_ptr<GameObject> gameObject) { _gameObject = gameObject; }
+	weak_ptr<GameObject> _gameObject;
 
 private:
 	shared_ptr<Mesh> _mesh;

@@ -1,12 +1,13 @@
 #include "pch.h"
 #include "Particle.h"
+#include "GameObject.h"
 #include "UploadBuffer.h"
 #include "Mesh.h"
 #include "Resources.h"
 #include "Transform.h"
 #include "Timer.h"
 
-Particle::Particle() : Component(COMPONENT_TYPE::PARTICLE)
+Particle::Particle()
 {
 	_particleBuffer = make_shared<UploadBuffer>();
 	_particleBuffer->Init(sizeof(ParticleInfo), _maxParticle);

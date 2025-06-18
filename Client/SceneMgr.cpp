@@ -27,6 +27,8 @@
 #include <sstream>
 #include "TestLightScript.h"
 
+#include "JsonMgr.h"
+
 void SceneMgr::Update()
 {
 	if (_activeScene == nullptr)
@@ -501,6 +503,8 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 			//gameObject->GetTransform()->SetParent(t->GetTransform());
 			scene->AddGameObject(gameObject);
 		}
+
+		GET_SINGLE(JsonMgr)->SaveMapCollider(L"..\\Resources\\Json\\MapCollider.json", gameObjects);
 	}
 #pragma endregion
 

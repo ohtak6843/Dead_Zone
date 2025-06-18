@@ -140,9 +140,6 @@
     <ClInclude Include="Camera.h">
       <Filter>Game\Object\Component</Filter>
     </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>Game\Object\Component</Filter>
-    </ClInclude>
     <ClInclude Include="Light.h">
       <Filter>Game\Object\Component</Filter>
     </ClInclude>
@@ -321,9 +318,6 @@
       <Filter>Game\Object\Component</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
-      <Filter>Game\Object\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.cpp">
       <Filter>Game\Object\Component</Filter>
     </ClCompile>
     <ClCompile Include="Light.cpp">

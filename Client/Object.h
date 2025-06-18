@@ -4,7 +4,6 @@ enum class OBJECT_TYPE : uint8
 {
 	NONE,
 	GAMEOBJECT, // PREFAB
-	COMPONENT,
 	MATERIAL,
 	MESH,
 	MESH_DATA,

@@ -1,5 +1,5 @@
 #pragma once
-#include "Component.h"
+#include "GameObject.h"
 
 enum class PROJECTION_TYPE
 {
@@ -7,13 +7,14 @@ enum class PROJECTION_TYPE
 	ORTHOGRAPHIC, // 직교 투영
 };
 
-class Camera : public Component
+class Camera
 {
 public:
 	Camera();
 	virtual ~Camera();
 
-	virtual void FinalUpdate() override;
+public:
+	void FinalUpdate();
 
 	void SetProjectionType(PROJECTION_TYPE type) { _type = type; }
 	PROJECTION_TYPE GetProjectionType() { return _type; }
@@ -47,6 +48,15 @@ public:
 	Matrix& GetProjectionMatrix() { return _matProjection; }
 
 	ContainmentType FrustumCulling(shared_ptr<class GameObject> gameObject); // 오브젝트가 프러스텀 안에 있는지 검사
+
+public:
+	shared_ptr<GameObject> GetGameObject() { return _gameObject.lock(); }
+	shared_ptr<Transform> GetTransform() { return _gameObject.lock()->GetTransform(); }
+
+private:
+	friend class GameObject;
+	void SetGameObject(shared_ptr<GameObject> gameObject) { _gameObject = gameObject; }
+	weak_ptr<GameObject> _gameObject;
 
 private:
 	PROJECTION_TYPE _type = PROJECTION_TYPE::PERSPECTIVE;

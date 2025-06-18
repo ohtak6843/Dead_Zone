@@ -18,7 +18,7 @@
 Matrix Camera::S_MatView;
 Matrix Camera::S_MatProjection;
 
-Camera::Camera() : Component(COMPONENT_TYPE::CAMERA)
+Camera::Camera()
 {
 	_width = static_cast<float>(gameFramework->GetWindow().width);
 	_height = static_cast<float>(gameFramework->GetWindow().height);

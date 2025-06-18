@@ -7,7 +7,8 @@ public:
 	OrientedBoxCollider();
 	virtual ~OrientedBoxCollider();
 
-	void FinalUpdate();
+	virtual void FinalUpdate() override;
+
 	virtual bool Intersects(Vec4 rayOrigin, Vec4 rayDir, OUT float& distance);
 	virtual bool Intersects(shared_ptr<BoundingSphere> boundingSphere) override;
 	virtual bool Intersects(shared_ptr<BoundingBox> boundingBox) override;
