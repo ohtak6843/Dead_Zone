@@ -19,6 +19,25 @@ GameObject::~GameObject()
 
 }
 
+GameObject& GameObject::operator=(const GameObject& other)
+{
+	_transform = other._transform;
+	_meshRenderer = other._meshRenderer;
+	_camera = other._camera;
+	_light = other._light;
+	_particle = other._particle;
+	_collider = other._collider;
+	_animator = other._animator;
+	_scripts = other._scripts;
+
+	_isActive = other._isActive;
+	_checkFrustum = other._checkFrustum;
+	_layerIndex = other._layerIndex;
+	_static = other._static;
+
+	return *this;
+}
+
 void GameObject::Awake()
 {
 	for (shared_ptr<MonoBehaviour>& script : _scripts)

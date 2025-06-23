@@ -1,5 +1,5 @@
 #pragma once
-#include "MonoBehaviour.h"
+#include "GameObject.h"
 #include "GameInfo.h"
 
 enum class ZOMBIE_STATE
@@ -30,7 +30,7 @@ enum class ZOMBIE_ANIMATION_TYPE
 	END
 };
 
-class Zombie : public MonoBehaviour
+class Zombie : public GameObject
 {
 public:
 	Zombie();
@@ -40,6 +40,7 @@ public:
 	virtual void Start() override;
 	virtual void Update() override;
 	virtual void LateUpdate() override;
+	virtual void FinalUpdate() override;
 
 public:
 	virtual void SetState(ZOMBIE_STATE);

@@ -3,6 +3,7 @@
 #include "Timer.h"
 #include "InputMgr.h"
 #include "Transform.h"
+#include "BaseCollider.h"
 #include "Animator.h"
 
 Zombie::Zombie()
@@ -63,6 +64,18 @@ void Zombie::LateUpdate()
 	{
 		Move();
 	}*/
+}
+
+void Zombie::FinalUpdate()
+{
+	if (_transform != nullptr)
+		_transform->FinalUpdate();
+
+	if (_collider != nullptr)
+		_collider->FinalUpdate();
+
+	if (_animator != nullptr)
+		_animator->FinalUpdate();
 }
 
 void Zombie::SetState(ZOMBIE_STATE playerState)

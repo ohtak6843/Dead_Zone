@@ -4,6 +4,8 @@ class GameObject;
 class Camera;
 class Light;
 
+class Zombie;
+
 struct JumpState {
 	bool  isJumping = false;
 	float verticalVel = 0.0f;
@@ -36,7 +38,7 @@ public:
 	const vector<shared_ptr<GameObject>>& GetGameObjects() { return _gameObjects; }
 
 	const vector<vector<shared_ptr<GameObject>>>& GetPlayers() { return _players; }
-	const vector<vector<shared_ptr<GameObject>>>& GetZombies() { return _zombies; }
+	const vector<vector<shared_ptr<Zombie>>>& GetZombies() { return _zombies; }
 
 public:
 	shared_ptr<GameObject> FindGameObject(const wstring& name);
@@ -69,7 +71,7 @@ private:
 	// 어차피 부모는 게임오브젝트들의 0번일꺼니까
 	// MovePacket으로 적용시킬때, 탐색하는 경우, _player
 	vector<vector<shared_ptr<GameObject>>>	_players;
-	vector<vector<shared_ptr<GameObject>>>	_zombies;
+	vector<vector<shared_ptr<Zombie>>>	_zombies;
 
 	std::unordered_map<uint32_t, JumpState> _jumpStates;
 };

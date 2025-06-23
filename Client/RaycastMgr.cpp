@@ -5,6 +5,7 @@
 #include "Framework.h"
 #include "Scene.h"
 #include "GameObject.h"
+#include "Zombie.h"
 
 #include "BaseCollider.h"
 #include "SphereCollider.h"

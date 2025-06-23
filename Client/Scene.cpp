@@ -239,9 +239,7 @@ void Scene::AnimateZombie(sc_packet_zombie_state* packet)
 		auto& root = group[0];
 		if (root->GetID() == packet->zombieId) {
 			for (auto& part : group) {
-				auto mp = static_pointer_cast<Zombie>(part->GetMonoBehaviour(L"Zombie"));
-				if (mp)
-					mp->SetState(state);
+				part->SetState(state);
 			}
 			return;
 		}
@@ -379,26 +377,29 @@ void Scene::AddZombie(sc_packet_spawn_zombie* packet)
 
 	shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
 
-	vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate(ColliderType::OBB);
+	vector<shared_ptr<Zombie>> zombieObjects = meshData->InstantiateAs<Zombie>(ColliderType::OBB);
 
-	for (auto& gameObject : gameObjects)
+	for (const auto& zombieObject : zombieObjects)
 	{
-		gameObject->SetName(L"Zombie");
-		gameObject->AddScript(make_shared<Zombie>());
-		shared_ptr<Zombie> playerScript = static_pointer_cast<Zombie>(gameObject->GetMonoBehaviour(L"Zombie"));
-		playerScript->SetState(ZOMBIE_STATE::IDLE);
-		AddGameObject(gameObject);
+		zombieObject->SetName(L"Zombie");
+		zombieObject->SetState(ZOMBIE_STATE::IDLE);
 	}
 
-	gameObjects[0]->SetID(static_cast<uint32_t>(packet->zombieId));
-	gameObjects[0]->GetTransform()->SetLocalPosition(position);
-	gameObjects[0]->GetTransform()->SetLocalRotation(Vec3(-90.0f, 180.f, 0.0f));
+	zombieObjects[0]->SetID(static_cast<uint32_t>(packet->zombieId));
+	zombieObjects[0]->GetTransform()->SetLocalPosition(position);
+	zombieObjects[0]->GetTransform()->SetLocalRotation(Vec3(-90.0f, 180.f, 0.0f));
 
-	for (int i = 1; i < gameObjects.size(); i++)
+	for (int i = 1; i < zombieObjects.size(); i++)
 	{
-		gameObjects[i]->GetTransform()->SetParent(gameObjects[0]->GetTransform());
+		zombieObjects[i]->GetTransform()->SetParent(zombieObjects[0]->GetTransform());
 	}
-	_zombies.push_back(gameObjects);
+
+	// 씬에 추가
+	for (auto& zombie : zombieObjects) {
+		AddGameObject(zombie);
+	}
+
+	_zombies.push_back(zombieObjects);
 }
 
 void Scene::DieZombie(sc_packet_zombie_die* pkt)
@@ -412,10 +413,7 @@ void Scene::DieZombie(sc_packet_zombie_die* pkt)
 
 		// 1) 각 파트에 대해 DIE 상태로 전환 → 애니메이션 재생
 		for (auto& part : group) {
-			auto zComp = static_pointer_cast<Zombie>(part->GetMonoBehaviour(L"Zombie"));
-			if (zComp) {
-				zComp->SetState(ZOMBIE_STATE::DIE);
-			}
+			part->SetState(ZOMBIE_STATE::DIE);
 		}
 
 		auto anim = group[0]->GetAnimator();

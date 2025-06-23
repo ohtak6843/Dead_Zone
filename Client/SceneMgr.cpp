@@ -282,7 +282,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 		camera->AddScript(make_shared<LocalPlayer>());
 		camera->GetCamera()->SetFar(10000.f);
 		camera->GetCamera()->SetFOV(90.f); // 90도
-		camera->GetTransform()->SetLocalPosition(Vec3(1185.f, 1100.f, 473.f));
+		camera->GetTransform()->SetLocalPosition(Vec3(1185.f, 140.f, 473.f));
 		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
 		camera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, true); // UI는 안 찍음
 

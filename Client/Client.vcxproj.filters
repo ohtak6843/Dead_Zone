@@ -30,6 +30,9 @@
     <Filter Include="Game\Utils\SimpleMath">
       <UniqueIdentifier>{0018461c-747c-41fc-b670-fce027d95414}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Shader">
+      <UniqueIdentifier>{74f7da78-fbbc-42cc-922e-8223e35b185b}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Game\Object">
       <UniqueIdentifier>{91e1df2a-278f-41da-a2bd-65a0a53c1f12}</UniqueIdentifier>
     </Filter>
@@ -56,9 +59,6 @@
     </Filter>
     <Filter Include="Game\Object\Script\Zombie">
       <UniqueIdentifier>{62c9821c-e1ce-4de3-86b1-581ecc26ac66}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Shader">
-      <UniqueIdentifier>{74f7da78-fbbc-42cc-922e-8223e35b185b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\Object\UI">
       <UniqueIdentifier>{ce0f0708-0557-49a5-b80c-bfecfe1a4345}</UniqueIdentifier>

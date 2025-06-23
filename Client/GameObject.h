@@ -17,11 +17,14 @@ public:
 	GameObject();
 	virtual ~GameObject();
 
-	void Awake();
-	void Start();
-	void Update();
-	void LateUpdate();
-	void FinalUpdate();
+public:
+	GameObject& operator=(const GameObject& other);
+
+	virtual void Awake();
+	virtual void Start();
+	virtual void Update();
+	virtual void LateUpdate();
+	virtual void FinalUpdate();
 
 	shared_ptr<Transform> GetTransform() { return _transform; }
 	shared_ptr<MeshRenderer> GetMeshRenderer() { return _meshRenderer; }
@@ -55,7 +58,7 @@ public:
 	void SetActive(bool active) { _isActive = active; }
 	bool IsActive() const { return _isActive; }
 
-private:
+protected:
 	shared_ptr<Transform> _transform;
 	shared_ptr<MeshRenderer> _meshRenderer;
 	shared_ptr<Camera> _camera;
