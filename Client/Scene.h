@@ -49,6 +49,8 @@ public:
 	shared_ptr<GameObject> FindGameObject(const wstring& name);
 
 public:
+	void SetLocalPlayer(vector<shared_ptr<Player>>& player);
+
 	void AddPlayer(struct sc_packet_player_info* packet);
 	void MovePlayer(struct sc_packet_move* packet);
 	void JumpPlayer(struct sc_packet_jump* packet);
@@ -74,6 +76,8 @@ private:
 	// array<플레이어를 이루는 게임오브젝트들, 플레이어 수> _players
 	// 어차피 부모는 게임오브젝트들의 0번일꺼니까
 	// MovePacket으로 적용시킬때, 탐색하는 경우, _player
+
+	vector<shared_ptr<Player>>		_localPlayer;
 
 	unordered_map<int64, vector<shared_ptr<Player>>> _players;
 	vector<vector<shared_ptr<Zombie>>>	_zombies;

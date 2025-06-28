@@ -196,7 +196,6 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshData.h" />
     <ClInclude Include="MeshRenderer.h" />
-    <ClInclude Include="MonoBehaviour.h" />
     <ClInclude Include="MultiPlayer.h" />
     <ClInclude Include="MuzzleFlashParticle.h" />
     <ClInclude Include="Object.h" />
@@ -218,7 +217,6 @@
     <ClInclude Include="SimpleMath.h" />
     <ClInclude Include="SphereCollider.h" />
     <ClInclude Include="Stage01.h" />
-    <ClInclude Include="TestLightScript.h" />
     <ClInclude Include="UICamera.h" />
     <ClInclude Include="UploadBuffer.h" />
     <ClInclude Include="DescriptorHeap.h" />
@@ -259,7 +257,6 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshData.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />
-    <ClCompile Include="MonoBehaviour.cpp" />
     <ClCompile Include="MultiPlayer.cpp" />
     <ClCompile Include="MuzzleFlashParticle.cpp" />
     <ClCompile Include="Object.cpp" />
@@ -285,7 +282,6 @@
     <ClCompile Include="SimpleMath.cpp" />
     <ClCompile Include="SphereCollider.cpp" />
     <ClCompile Include="Stage01.cpp" />
-    <ClCompile Include="TestLightScript.cpp" />
     <ClCompile Include="UICamera.cpp" />
     <ClCompile Include="UploadBuffer.cpp" />
     <ClCompile Include="DescriptorHeap.cpp" />

@@ -32,7 +32,6 @@
 // TODO: 나중에 삭제
 #include "Timer.h"
 #include <sstream>
-#include "TestLightScript.h"
 
 #include "JsonMgr.h"
 
@@ -86,7 +85,7 @@ void SceneMgr::RenderUI()
 		if (gunType == 0)
 			currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"M4A1"))->GetCurrentAmmo();
 		else if (gunType == 1)
-			currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"AK47"))->GetCurrentAmmo();
+			currentAmmo = static_pointer_cast<AK47>(_activeScene->FindGameObject(L"AK47"))->GetCurrentAmmo();
 		
 		std::wstringstream wss1;
 		wss1 << std::fixed << std::setprecision(2) << currentAmmo;
@@ -100,19 +99,19 @@ void SceneMgr::RenderUI()
 			device->GetSolidColorBrush().Get());
 
 		// 타이머 UI
-		/*pivot = { static_cast<float>(GEngine->GetWindow().width / 2), 50.f };
-		D2D1_RECT_F textRect2 = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
+		//pivot = { static_cast<float>(gameFramework->GetWindow().width / 2), 50.f };
+		//D2D1_RECT_F textRect2 = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
 
-		wstring text2 = L"시간 : ";
-		std::wstringstream wss;
-		wss << std::fixed << std::setprecision(2) << elapsedTime;
-		text2 += wss.str();
-		device->GetD2DDeviceContext()->DrawTextW(
-			text2.c_str(),
-			static_cast<uint32>(text2.size()),
-			device->GetTextFormat().Get(),
-			&textRect2,
-			device->GetSolidColorBrush().Get());*/
+		//wstring text2 = L"시간 : ";
+		//std::wstringstream wss;
+		//wss << std::fixed << std::setprecision(2) << elapsedTime;
+		//text2 += wss.str();
+		//device->GetD2DDeviceContext()->DrawTextW(
+		//	text2.c_str(),
+		//	static_cast<uint32>(text2.size()),
+		//	device->GetTextFormat().Get(),
+		//	&textRect2,
+		//	device->GetSolidColorBrush().Get());
 
 		// 체력 UI
 		pivot = { 100.f, static_cast<float>(gameFramework->GetWindow().height - 50) };
@@ -126,31 +125,32 @@ void SceneMgr::RenderUI()
 			&textRect3,
 			device->GetSolidColorBrush().Get());
 
-	/*	pivot = { 100.f, static_cast<float>(GEngine->GetWindow().height / 2) };
+		pivot = { 100.f, static_cast<float>(gameFramework->GetWindow().height / 2) };
 		D2D1_RECT_F textRect4 = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
 
-		wstring text4 = L"X : ";
-		Vec3 mainCameraPos = _activeScene->GetMainCamera()->GetTransform()->GetWorldPosition();
-		wss.str(L"");
-		wss.clear();
-		wss << std::fixed << std::setprecision(2) << mainCameraPos.x;
-		text4 += wss.str();
-		text4 += L"\nY : ";
-		wss.str(L"");
-		wss.clear();
-		wss << std::fixed << std::setprecision(2) << mainCameraPos.y;
-		text4 += wss.str();
-		text4 += L"\nZ : ";
-		wss.str(L"");
-		wss.clear();
-		wss << std::fixed << std::setprecision(2) << mainCameraPos.z;
-		text4 += wss.str();
-		device->GetD2DDeviceContext()->DrawTextW(
-			text4.c_str(),
-			static_cast<uint32>(text4.size()),
-			device->GetTextFormat().Get(),
-			&textRect4,
-			device->GetSolidColorBrush().Get());*/
+		//std::wstringstream wss;
+		//wstring text4 = L"X : ";
+		//Vec3 mainCameraPos = _activeScene->GetPlayerCamera()->GetTransform()->GetWorldPosition();
+		//wss.str(L"");
+		//wss.clear();
+		//wss << std::fixed << std::setprecision(2) << mainCameraPos.x;
+		//text4 += wss.str();
+		//text4 += L"\nY : ";
+		//wss.str(L"");
+		//wss.clear();
+		//wss << std::fixed << std::setprecision(2) << mainCameraPos.y;
+		//text4 += wss.str();
+		//text4 += L"\nZ : ";
+		//wss.str(L"");
+		//wss.clear();
+		//wss << std::fixed << std::setprecision(2) << mainCameraPos.z;
+		//text4 += wss.str();
+		//device->GetD2DDeviceContext()->DrawTextW(
+		//	text4.c_str(),
+		//	static_cast<uint32>(text4.size()),
+		//	device->GetTextFormat().Get(),
+		//	&textRect4,
+		//	device->GetSolidColorBrush().Get());
 	}
 
 	device->GetD2DDeviceContext()->EndDraw();
@@ -282,13 +282,13 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 
 #pragma region Camera
 	{
-		shared_ptr<CameraObject> camera = make_shared<CameraObject>();
+		shared_ptr<PlayerCamera> camera = make_shared<PlayerCamera>();
 		camera->SetName(L"Player_Camera");
 		camera->SetTransform(make_shared<Transform>());
 		camera->SetCamera(make_shared<Camera>());
 		camera->GetCamera()->SetFar(10000.f);
 		camera->GetCamera()->SetFOV(90.f);
-		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 140.f, 0.f));
+		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 0.f));
 		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
 		camera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, true); // UI는 안 찍음
 
@@ -418,15 +418,30 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 #pragma endregion
 
 #pragma region Local Player
-	shared_ptr<LocalPlayer> localPlayer = make_shared<LocalPlayer>();
-	localPlayer->SetName(L"LocalPlayer");
-	localPlayer->SetTransform(make_shared<Transform>());
-	localPlayer->GetTransform()->SetLocalPosition(Vec3(1185.f, 0.f, 473.f));
-	localPlayer->SetCheckFrustum(false);
+	{
+		vector<shared_ptr<LocalPlayer>> localPlayers;
+		shared_ptr<LocalPlayer> localPlayer = make_shared<LocalPlayer>();
+		localPlayer->SetName(L"LocalPlayer");
+		localPlayer->SetTransform(make_shared<Transform>());
+		localPlayer->GetTransform()->SetLocalPosition(Vec3(1185.f, 140.f, 473.f));
+		localPlayer->SetCheckFrustum(false);
 
-	scene->GetPlayerCamera()->GetTransform()->SetParent(localPlayer->GetTransform());
-	scene->AddGameObject(localPlayer);
+		localPlayers.push_back(localPlayer);
 
+		scene->GetPlayerCamera()->GetTransform()->SetParent(localPlayer->GetTransform());
+		scene->AddGameObject(localPlayer);
+
+		// 로컬 플레이어 설정
+		vector<shared_ptr<Player>> players;
+		players.reserve(localPlayers.size());
+
+		std::transform(localPlayers.begin(), localPlayers.end(), std::back_inserter(players),
+			[](const shared_ptr<LocalPlayer>& mp) {
+				return static_pointer_cast<Player>(mp); // 업캐스팅
+			});
+
+		scene->SetLocalPlayer(players);
+	}
 #pragma endregion
 
 #pragma region M4A1
@@ -514,7 +529,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 			scene->AddGameObject(gameObject);
 		}
 
-		GET_SINGLE(JsonMgr)->SaveMapCollider(L"..\\Resources\\Json\\MapCollider.json", gameObjects);
+		//GET_SINGLE(JsonMgr)->SaveMapCollider(L"..\\Resources\\Json\\MapCollider.json", gameObjects);
 	}
 #pragma endregion
 

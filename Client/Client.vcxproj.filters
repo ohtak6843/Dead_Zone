@@ -202,9 +202,6 @@
     <ClInclude Include="json.hpp">
       <Filter>Game\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="TestLightScript.h">
-      <Filter>Game\GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Game\GameObject</Filter>
     </ClInclude>
@@ -227,9 +224,6 @@
       <Filter>Game\Object</Filter>
     </ClInclude>
     <ClInclude Include="MeshRenderer.h">
-      <Filter>Game\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="MonoBehaviour.h">
       <Filter>Game\Object</Filter>
     </ClInclude>
     <ClInclude Include="Rigidbody.h">
@@ -394,9 +388,6 @@
     <ClCompile Include="JsonMgr.cpp">
       <Filter>Game\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="TestLightScript.cpp">
-      <Filter>Game\GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Game\GameObject</Filter>
     </ClCompile>
@@ -419,9 +410,6 @@
       <Filter>Game\Object</Filter>
     </ClCompile>
     <ClCompile Include="MeshRenderer.cpp">
-      <Filter>Game\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="MonoBehaviour.cpp">
       <Filter>Game\Object</Filter>
     </ClCompile>
     <ClCompile Include="Rigidbody.cpp">

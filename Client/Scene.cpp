@@ -196,6 +196,11 @@ shared_ptr<GameObject> Scene::FindGameObject(const wstring& name)
 	return nullptr;
 }
 
+void Scene::SetLocalPlayer(vector<shared_ptr<Player>>& player)
+{
+	_localPlayer = std::move(player);
+}
+
 void Scene::AddPlayer(sc_packet_player_info* packet)
 {
 	//if (_players.size() >= 2)
@@ -240,7 +245,8 @@ void Scene::AddPlayer(sc_packet_player_info* packet)
 
 	for (auto& gunObject : gunObjects)
 	{
-		gunObject->SetName(L"AK47");
+		gunObject->SetName(L"TP_AK47");
+		gunObject->GetTransform()->SetParent(gameObjects[0]->GetTransform());
 		gunObject->SetParentObject(gameObjects[0]);
 		AddGameObject(gunObject);
 	}
