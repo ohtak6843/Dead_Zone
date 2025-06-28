@@ -11,16 +11,6 @@
     <Filter Include="Game">
       <UniqueIdentifier>{7f368405-e1c6-48f2-8bbf-d545579fe929}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Framework">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Game\Framework\DX12">
-      <UniqueIdentifier>{0f46118c-04fe-47ff-bb3c-62300feb6f60}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Framework\Manager">
-      <UniqueIdentifier>{9bb21940-c36b-4cbd-9678-a9803243f427}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\Scenes">
       <UniqueIdentifier>{36633eb9-4a4a-4ee1-bb1b-4212e111e491}</UniqueIdentifier>
     </Filter>
@@ -36,32 +26,44 @@
     <Filter Include="Game\Object">
       <UniqueIdentifier>{91e1df2a-278f-41da-a2bd-65a0a53c1f12}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Object\Component">
-      <UniqueIdentifier>{5d26a9b6-2ea6-4222-b1c8-bdabb9619c2c}</UniqueIdentifier>
+    <Filter Include="Game\GameObject">
+      <UniqueIdentifier>{ccd21725-cab8-4e4f-94eb-0d2ff25e13c9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Object\Component\Collider">
-      <UniqueIdentifier>{bd07acd7-dd53-4f6d-b027-feb7e46d961a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Object\Component\Particle">
-      <UniqueIdentifier>{b930b226-63e2-4209-a757-b243bb4f831f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Object\Resource">
-      <UniqueIdentifier>{06e0b30b-37d4-4c6b-a489-9d7468c3ce93}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Object\Script">
-      <UniqueIdentifier>{de514a38-e2bd-4f2f-a415-01f1e54c13f2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Object\Script\Gun">
+    <Filter Include="Game\GameObject\Gun">
       <UniqueIdentifier>{4f5c2a86-cd49-4591-af29-fd5636cfe552}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Object\Script\Player">
+    <Filter Include="Game\GameObject\Player">
       <UniqueIdentifier>{b262e5f0-21af-4994-9a0f-bb05df128c0e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Object\Script\Zombie">
+    <Filter Include="Game\GameObject\Zombie">
       <UniqueIdentifier>{62c9821c-e1ce-4de3-86b1-581ecc26ac66}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Object\UI">
+    <Filter Include="Game\GameObject\UI">
       <UniqueIdentifier>{ce0f0708-0557-49a5-b80c-bfecfe1a4345}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\DX12">
+      <UniqueIdentifier>{0f46118c-04fe-47ff-bb3c-62300feb6f60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Manager">
+      <UniqueIdentifier>{9bb21940-c36b-4cbd-9678-a9803243f427}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Resource">
+      <UniqueIdentifier>{06e0b30b-37d4-4c6b-a489-9d7468c3ce93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Object\Collider">
+      <UniqueIdentifier>{bd07acd7-dd53-4f6d-b027-feb7e46d961a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Object\Particle">
+      <UniqueIdentifier>{b930b226-63e2-4209-a757-b243bb4f831f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject\Camera">
+      <UniqueIdentifier>{33fb07b1-a9cd-4ec9-91d8-e112257ab505}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject\Light">
+      <UniqueIdentifier>{040e82ac-c953-4655-81f1-cc7aeab58656}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject\Particle">
+      <UniqueIdentifier>{79f1056d-7383-4c6b-8685-f10805844bf9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -75,118 +77,88 @@
       <Filter>Game\Utils</Filter>
     </ClInclude>
     <ClInclude Include="DescriptorHeap.h">
-      <Filter>Game\Framework\DX12</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="CommandQueue.h">
-      <Filter>Game\Framework\DX12</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="ConstantBuffer.h">
-      <Filter>Game\Framework\DX12</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="Framework.h">
-      <Filter>Game\Framework\DX12</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="RenderTargetGroup.h">
-      <Filter>Game\Framework\DX12</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="UploadBuffer.h">
-      <Filter>Game\Framework\DX12</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClInclude>
     <ClInclude Include="GameInfo.h">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClInclude>
     <ClInclude Include="InputMgr.h">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClInclude>
     <ClInclude Include="InstancingMgr.h">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClInclude>
     <ClInclude Include="Resources.h">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClInclude>
     <ClInclude Include="SceneMgr.h">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClInclude>
     <ClInclude Include="Stage01.h">
       <Filter>Game\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="SphereCollider.h">
-      <Filter>Game\Object\Component\Collider</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseCollider.h">
-      <Filter>Game\Object\Component\Collider</Filter>
-    </ClInclude>
-    <ClInclude Include="OrientedBoxCollider.h">
-      <Filter>Game\Object\Component\Collider</Filter>
-    </ClInclude>
     <ClInclude Include="BloodParticle.h">
-      <Filter>Game\Object\Component\Particle</Filter>
+      <Filter>Game\Object\Particle</Filter>
     </ClInclude>
     <ClInclude Include="MuzzleFlashParticle.h">
-      <Filter>Game\Object\Component\Particle</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>Game\Object\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Animator.h">
-      <Filter>Game\Object\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Game\Object\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>Game\Object\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshRenderer.h">
-      <Filter>Game\Object\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="MonoBehaviour.h">
-      <Filter>Game\Object\Component</Filter>
+      <Filter>Game\Object\Particle</Filter>
     </ClInclude>
     <ClInclude Include="Gun.h">
-      <Filter>Game\Object\Script\Gun</Filter>
+      <Filter>Game\GameObject\Gun</Filter>
     </ClInclude>
     <ClInclude Include="AK47.h">
-      <Filter>Game\Object\Script\Gun</Filter>
+      <Filter>Game\GameObject\Gun</Filter>
     </ClInclude>
     <ClInclude Include="M4A1.h">
-      <Filter>Game\Object\Script\Gun</Filter>
+      <Filter>Game\GameObject\Gun</Filter>
     </ClInclude>
     <ClInclude Include="Zombie.h">
-      <Filter>Game\Object\Script\Zombie</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>Game\Object</Filter>
+      <Filter>Game\GameObject\Zombie</Filter>
     </ClInclude>
     <ClInclude Include="Object.h">
       <Filter>Game\Object</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>Game\Object\Script\Player</Filter>
+      <Filter>Game\GameObject\Player</Filter>
     </ClInclude>
     <ClInclude Include="MultiPlayer.h">
-      <Filter>Game\Object\Script\Player</Filter>
+      <Filter>Game\GameObject\Player</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
-      <Filter>Game\Object\Resource</Filter>
+      <Filter>Game\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Material.h">
-      <Filter>Game\Object\Resource</Filter>
+      <Filter>Game\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h">
-      <Filter>Game\Object\Resource</Filter>
+      <Filter>Game\Resource</Filter>
     </ClInclude>
     <ClInclude Include="MeshData.h">
-      <Filter>Game\Object\Resource</Filter>
+      <Filter>Game\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
-      <Filter>Game\Object\Resource</Filter>
+      <Filter>Game\Resource</Filter>
     </ClInclude>
     <ClInclude Include="FBXLoader.h">
       <Filter>Game\Utils</Filter>
@@ -201,40 +173,88 @@
       <Filter>Game\Utils\SimpleMath</Filter>
     </ClInclude>
     <ClInclude Include="LocalPlayer.h">
-      <Filter>Game\Object\Script\Player</Filter>
+      <Filter>Game\GameObject\Player</Filter>
     </ClInclude>
     <ClInclude Include="D3D11On12Device.h">
-      <Filter>Game\Framework\DX12</Filter>
+      <Filter>Game\DX12</Filter>
     </ClInclude>
     <ClInclude Include="RaycastMgr.h">
-      <Filter>Game\Framework\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Rigidbody.h">
-      <Filter>Game\Object\Component</Filter>
+      <Filter>Game\Manager</Filter>
     </ClInclude>
     <ClInclude Include="TextUI.h">
-      <Filter>Game\Object\UI</Filter>
+      <Filter>Game\GameObject\UI</Filter>
     </ClInclude>
     <ClInclude Include="TP_AK47.h">
-      <Filter>Game\Object\Script\Gun</Filter>
+      <Filter>Game\GameObject\Gun</Filter>
     </ClInclude>
     <ClInclude Include="Particle.h">
-      <Filter>Game\Object\Component\Particle</Filter>
+      <Filter>Game\Object\Particle</Filter>
     </ClInclude>
     <ClInclude Include="RenderPass.h">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClInclude>
     <ClInclude Include="LoadingScene.h">
       <Filter>Game\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="TestLightScript.h">
-      <Filter>Game\Object\Script</Filter>
-    </ClInclude>
     <ClInclude Include="JsonMgr.h">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClInclude>
     <ClInclude Include="json.hpp">
       <Filter>Game\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="TestLightScript.h">
+      <Filter>Game\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Game\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseCollider.h">
+      <Filter>Game\Object\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="OrientedBoxCollider.h">
+      <Filter>Game\Object\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="SphereCollider.h">
+      <Filter>Game\Object\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="Animator.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshRenderer.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="MonoBehaviour.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Rigidbody.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Game\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraObject.h">
+      <Filter>Game\GameObject\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="LightObject.h">
+      <Filter>Game\GameObject\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="UICamera.h">
+      <Filter>Game\GameObject\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerCamera.h">
+      <Filter>Game\GameObject\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="GunCamera.h">
+      <Filter>Game\GameObject\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleObject.h">
+      <Filter>Game\GameObject\Particle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -255,118 +275,88 @@
       <Filter>Game\Utils</Filter>
     </ClCompile>
     <ClCompile Include="DescriptorHeap.cpp">
-      <Filter>Game\Framework\DX12</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="CommandQueue.cpp">
-      <Filter>Game\Framework\DX12</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="ConstantBuffer.cpp">
-      <Filter>Game\Framework\DX12</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="Framework.cpp">
-      <Filter>Game\Framework\DX12</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="RenderTargetGroup.cpp">
-      <Filter>Game\Framework\DX12</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="UploadBuffer.cpp">
-      <Filter>Game\Framework\DX12</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClCompile>
     <ClCompile Include="GameInfo.cpp">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClCompile>
     <ClCompile Include="InputMgr.cpp">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClCompile>
     <ClCompile Include="InstancingMgr.cpp">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClCompile>
     <ClCompile Include="Resources.cpp">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClCompile>
     <ClCompile Include="Scene.cpp">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClCompile>
     <ClCompile Include="SceneMgr.cpp">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClCompile>
     <ClCompile Include="Stage01.cpp">
       <Filter>Game\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="SphereCollider.cpp">
-      <Filter>Game\Object\Component\Collider</Filter>
-    </ClCompile>
-    <ClCompile Include="BaseCollider.cpp">
-      <Filter>Game\Object\Component\Collider</Filter>
-    </ClCompile>
-    <ClCompile Include="OrientedBoxCollider.cpp">
-      <Filter>Game\Object\Component\Collider</Filter>
-    </ClCompile>
     <ClCompile Include="BloodParticle.cpp">
-      <Filter>Game\Object\Component\Particle</Filter>
+      <Filter>Game\Object\Particle</Filter>
     </ClCompile>
     <ClCompile Include="MuzzleFlashParticle.cpp">
-      <Filter>Game\Object\Component\Particle</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Game\Object\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Animator.cpp">
-      <Filter>Game\Object\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Game\Object\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>Game\Object\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="MeshRenderer.cpp">
-      <Filter>Game\Object\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="MonoBehaviour.cpp">
-      <Filter>Game\Object\Component</Filter>
+      <Filter>Game\Object\Particle</Filter>
     </ClCompile>
     <ClCompile Include="Gun.cpp">
-      <Filter>Game\Object\Script\Gun</Filter>
+      <Filter>Game\GameObject\Gun</Filter>
     </ClCompile>
     <ClCompile Include="AK47.cpp">
-      <Filter>Game\Object\Script\Gun</Filter>
+      <Filter>Game\GameObject\Gun</Filter>
     </ClCompile>
     <ClCompile Include="M4A1.cpp">
-      <Filter>Game\Object\Script\Gun</Filter>
+      <Filter>Game\GameObject\Gun</Filter>
     </ClCompile>
     <ClCompile Include="Zombie.cpp">
-      <Filter>Game\Object\Script\Zombie</Filter>
+      <Filter>Game\GameObject\Zombie</Filter>
     </ClCompile>
     <ClCompile Include="Object.cpp">
       <Filter>Game\Object</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Game\Object</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
-      <Filter>Game\Object\Script\Player</Filter>
+      <Filter>Game\GameObject\Player</Filter>
     </ClCompile>
     <ClCompile Include="MultiPlayer.cpp">
-      <Filter>Game\Object\Script\Player</Filter>
+      <Filter>Game\GameObject\Player</Filter>
     </ClCompile>
     <ClCompile Include="Texture.cpp">
-      <Filter>Game\Object\Resource</Filter>
+      <Filter>Game\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Material.cpp">
-      <Filter>Game\Object\Resource</Filter>
+      <Filter>Game\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
-      <Filter>Game\Object\Resource</Filter>
+      <Filter>Game\Resource</Filter>
     </ClCompile>
     <ClCompile Include="MeshData.cpp">
-      <Filter>Game\Object\Resource</Filter>
+      <Filter>Game\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Shader.cpp">
-      <Filter>Game\Object\Resource</Filter>
+      <Filter>Game\Resource</Filter>
     </ClCompile>
     <ClCompile Include="FBXLoader.cpp">
       <Filter>Game\Utils</Filter>
@@ -378,37 +368,85 @@
       <Filter>Game\Utils\SimpleMath</Filter>
     </ClCompile>
     <ClCompile Include="LocalPlayer.cpp">
-      <Filter>Game\Object\Script\Player</Filter>
+      <Filter>Game\GameObject\Player</Filter>
     </ClCompile>
     <ClCompile Include="D3D11On12Device.cpp">
-      <Filter>Game\Framework\DX12</Filter>
+      <Filter>Game\DX12</Filter>
     </ClCompile>
     <ClCompile Include="RaycastMgr.cpp">
-      <Filter>Game\Framework\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Rigidbody.cpp">
-      <Filter>Game\Object\Component</Filter>
+      <Filter>Game\Manager</Filter>
     </ClCompile>
     <ClCompile Include="TextUI.cpp">
-      <Filter>Game\Object\UI</Filter>
+      <Filter>Game\GameObject\UI</Filter>
     </ClCompile>
     <ClCompile Include="TP_AK47.cpp">
-      <Filter>Game\Object\Script\Gun</Filter>
+      <Filter>Game\GameObject\Gun</Filter>
     </ClCompile>
     <ClCompile Include="Particle.cpp">
-      <Filter>Game\Object\Component\Particle</Filter>
+      <Filter>Game\Object\Particle</Filter>
     </ClCompile>
     <ClCompile Include="RenderPass.cpp">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
     </ClCompile>
     <ClCompile Include="LoadingScene.cpp">
       <Filter>Game\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="TestLightScript.cpp">
-      <Filter>Game\Object\Script</Filter>
-    </ClCompile>
     <ClCompile Include="JsonMgr.cpp">
-      <Filter>Game\Framework\Manager</Filter>
+      <Filter>Game\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="TestLightScript.cpp">
+      <Filter>Game\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Game\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseCollider.cpp">
+      <Filter>Game\Object\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="OrientedBoxCollider.cpp">
+      <Filter>Game\Object\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="SphereCollider.cpp">
+      <Filter>Game\Object\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="Animator.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshRenderer.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="MonoBehaviour.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Rigidbody.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Game\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraObject.cpp">
+      <Filter>Game\GameObject\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="LightObject.cpp">
+      <Filter>Game\GameObject\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="UICamera.cpp">
+      <Filter>Game\GameObject\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerCamera.cpp">
+      <Filter>Game\GameObject\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="GunCamera.cpp">
+      <Filter>Game\GameObject\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleObject.cpp">
+      <Filter>Game\GameObject\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

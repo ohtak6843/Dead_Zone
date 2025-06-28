@@ -14,7 +14,7 @@ enum class ZOMBIE_STATE
 	END
 };
 
-enum class ZOMBIE_ANIMATION_TYPE
+enum class NORMAL_ZOMBIE_ANIMATION
 {
 	ATTACK1,
 	DIE1,
@@ -40,7 +40,6 @@ public:
 	virtual void Start() override;
 	virtual void Update() override;
 	virtual void LateUpdate() override;
-	virtual void FinalUpdate() override;
 
 public:
 	virtual void SetState(ZOMBIE_STATE);

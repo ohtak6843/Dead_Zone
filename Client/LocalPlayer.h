@@ -1,7 +1,7 @@
 #pragma once
-#include "MonoBehaviour.h"
+#include "Player.h"
 
-class LocalPlayer : public MonoBehaviour
+class LocalPlayer : public Player
 {
 public:
 	LocalPlayer();
@@ -9,6 +9,7 @@ public:
 
 	virtual void LateUpdate() override;
 
+public:
 	void ProcessKeyInput();
 	void ProcessMouseInput();
 
@@ -33,6 +34,5 @@ private:
 	// ¿”Ω√
 	int32 _GunType = 1; // √—±‚ ≈∏¿‘
 	const int32 _MaxGunType = 2; // √—±‚ ≈∏¿‘
-
 };
 

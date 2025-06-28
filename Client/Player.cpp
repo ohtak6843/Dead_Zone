@@ -3,6 +3,8 @@
 
 Player::Player()
 {
+	_type = GAMEOBJECT_TYPE::PLAYER;
+
 	_name = L"Player";
 
 	shared_ptr<PlayerInfo> info = GET_SINGLE(GameInfo)->Get<PlayerInfo>(L"Player");
@@ -12,21 +14,5 @@ Player::Player()
 }
 
 Player::~Player()
-{
-}
-
-void Player::Awake()
-{
-}
-
-void Player::Start()
-{
-}
-
-void Player::Update()
-{
-}
-
-void Player::LateUpdate()
 {
 }

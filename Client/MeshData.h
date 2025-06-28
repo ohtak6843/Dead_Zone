@@ -1,5 +1,6 @@
 #pragma once
 #include "Object.h"
+#include "GameObject.h"
 #include "Mesh.h"
 #include "Material.h"
 #include "Animator.h"
@@ -80,6 +81,7 @@ inline vector<shared_ptr<T>> MeshData::InstantiateAs(ColliderType colliderType)
 		switch (colliderType)
 		{
 		case ColliderType::NONE:
+			gameObject->SetCheckFrustum(false);
 			break;
 		case ColliderType::SPHERE:
 		{

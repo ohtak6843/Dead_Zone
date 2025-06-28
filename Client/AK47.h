@@ -8,7 +8,7 @@ public:
 	virtual ~AK47();
 
 	virtual void Awake() override;
-	//virtual void Start() override;
+	virtual void Start() override;
 	virtual void Update() override;
 	virtual void LateUpdate() override;
 

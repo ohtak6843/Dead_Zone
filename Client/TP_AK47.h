@@ -1,8 +1,8 @@
 #pragma once
-#include "MonoBehaviour.h"
+#include "GameObject.h"
 
 
-class TP_AK47 : public MonoBehaviour
+class TP_AK47 : public GameObject
 {
 public:
 	TP_AK47();

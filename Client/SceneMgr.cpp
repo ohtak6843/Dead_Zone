@@ -18,6 +18,13 @@
 #include "OrientedBoxCollider.h"
 #include "MeshData.h"
 
+#include "CameraObject.h"
+#include "UICamera.h"
+#include "PlayerCamera.h"
+#include "GunCamera.h"
+
+#include "LightObject.h"
+
 #include "Zombie.h"
 #include "M4A1.h"
 #include "AK47.h"
@@ -75,11 +82,11 @@ void SceneMgr::RenderUI()
 		D2D1_RECT_F textRect = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
 		int32 currentAmmo = 0;
 		
-		int32 gunType = static_pointer_cast<LocalPlayer>(_activeScene->FindGameObject(L"Main_Camera")->GetMonoBehaviour(L"MainCamera"))->getGunType();
+		int32 gunType = static_pointer_cast<LocalPlayer>(_activeScene->FindGameObject(L"LocalPlayer"))->getGunType();
 		if (gunType == 0)
-			currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"M4A1")->GetMonoBehaviour(L"M4A1"))->GetCurrentAmmo();
+			currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"M4A1"))->GetCurrentAmmo();
 		else if (gunType == 1)
-			currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"AK47")->GetMonoBehaviour(L"AK47"))->GetCurrentAmmo();
+			currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"AK47"))->GetCurrentAmmo();
 		
 		std::wstringstream wss1;
 		wss1 << std::fixed << std::setprecision(2) << currentAmmo;
@@ -201,7 +208,7 @@ shared_ptr<Scene> SceneMgr::LoadLoadingScene()
 
 #pragma region Camera
 	{
-		shared_ptr<GameObject> camera = make_shared<GameObject>();
+		shared_ptr<UICamera> camera = make_shared<UICamera>();
 		camera->SetName(L"TitleCamera");
 		camera->SetTransform(make_shared<Transform>());
 		camera->SetCamera(make_shared<Camera>());
@@ -275,14 +282,13 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 
 #pragma region Camera
 	{
-		shared_ptr<GameObject> camera = make_shared<GameObject>();
-		camera->SetName(L"Main_Camera");
+		shared_ptr<CameraObject> camera = make_shared<CameraObject>();
+		camera->SetName(L"Player_Camera");
 		camera->SetTransform(make_shared<Transform>());
-		camera->SetCamera(make_shared<Camera>()); // Near=1, Far=1000, FOV=45도
-		camera->AddScript(make_shared<LocalPlayer>());
+		camera->SetCamera(make_shared<Camera>());
 		camera->GetCamera()->SetFar(10000.f);
-		camera->GetCamera()->SetFOV(90.f); // 90도
-		camera->GetTransform()->SetLocalPosition(Vec3(1185.f, 140.f, 473.f));
+		camera->GetCamera()->SetFOV(90.f);
+		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 140.f, 0.f));
 		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
 		camera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, true); // UI는 안 찍음
 
@@ -295,10 +301,10 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 
 #pragma region UI_Camera
 	{
-		shared_ptr<GameObject> camera = make_shared<GameObject>();
-		camera->SetName(L"Orthographic_Camera");
+		shared_ptr<UICamera> camera = make_shared<UICamera>();
+		camera->SetName(L"UI_Camera");
 		camera->SetTransform(make_shared<Transform>());
-		camera->SetCamera(make_shared<Camera>()); // Near=1, Far=1000, 800*600
+		camera->SetCamera(make_shared<Camera>());
 		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 0.f));
 		camera->GetCamera()->SetProjectionType(PROJECTION_TYPE::ORTHOGRAPHIC);
 		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
@@ -310,21 +316,18 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 
 #pragma region GunCamera
 	{
-		shared_ptr<GameObject> gunCamera = make_shared<GameObject>();
+		shared_ptr<GunCamera> gunCamera = make_shared<GunCamera>();
 		gunCamera->SetName(L"Gun_Camera");
-
 		gunCamera->SetTransform(make_shared<Transform>());
 		gunCamera->SetCamera(make_shared<Camera>());
-		
 		gunCamera->GetCamera()->SetFOV(60.f);
 		gunCamera->GetCamera()->SetFar(1000.f);
-
 		gunCamera->GetCamera()->SetCullingMaskAll(); // 다 끄고
 		gunCamera->GetCamera()->SetCullingMaskLayerOnOff(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"Gun"), false); // Gun만 찍음
 
 		// Main_Camera의 Transform을 따라가도록 설정
-		shared_ptr<GameObject> mainCam = scene->FindGameObject(L"Main_Camera");
-		gunCamera->GetTransform()->SetParent(mainCam->GetTransform());
+		shared_ptr<GameObject> mainCamera = scene->GetPlayerCamera()->GetGameObject();
+		gunCamera->GetTransform()->SetParent(mainCamera->GetTransform());
 
 		scene->AddGameObject(gunCamera);
 	}
@@ -414,11 +417,23 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 	}
 #pragma endregion
 
+#pragma region Local Player
+	shared_ptr<LocalPlayer> localPlayer = make_shared<LocalPlayer>();
+	localPlayer->SetName(L"LocalPlayer");
+	localPlayer->SetTransform(make_shared<Transform>());
+	localPlayer->GetTransform()->SetLocalPosition(Vec3(1185.f, 0.f, 473.f));
+	localPlayer->SetCheckFrustum(false);
+
+	scene->GetPlayerCamera()->GetTransform()->SetParent(localPlayer->GetTransform());
+	scene->AddGameObject(localPlayer);
+
+#pragma endregion
+
 #pragma region M4A1
 	{
 		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\M4A1.fbx");
 
-		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate();
+		vector<shared_ptr<M4A1>> gameObjects = meshData->InstantiateAs<M4A1>();
 		uint8 gunLayer = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"Gun");
 
 		for (auto& gameObject : gameObjects)
@@ -432,11 +447,9 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 				gameObject->GetMeshRenderer()->SetMaterial(mat);
 			}
 			gameObject->SetLayerIndex(gunLayer);
-			gameObject->SetCheckFrustum(false);
 			gameObject->SetActive(false);
 			
 			scene->AddGameObject(gameObject);
-			gameObject->AddScript(make_shared<M4A1>());
 		}
 
 		gameObjects[0]->SetName(L"M4A1");
@@ -447,7 +460,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 	{
 		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\AK74.fbx");
 
-		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate();
+		vector<shared_ptr<AK47>> gameObjects = meshData->InstantiateAs<AK47>();
 		uint8 gunLayer = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"Gun");
 
 		for (auto& gameObject : gameObjects)
@@ -461,11 +474,9 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 				gameObject->GetMeshRenderer()->SetMaterial(mat);
 			}
 			gameObject->SetLayerIndex(gunLayer);
-			gameObject->SetCheckFrustum(false);
 			gameObject->SetActive(true);
 
 			scene->AddGameObject(gameObject);
-			gameObject->AddScript(make_shared<AK47>());
 		}
 
 		gameObjects[0]->SetName(L"AK47");
@@ -474,7 +485,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 
 #pragma region Directional Light
 	{
-		shared_ptr<GameObject> light = make_shared<GameObject>();
+		shared_ptr<LightObject> light = make_shared<LightObject>();
 		light->SetTransform(make_shared<Transform>());
 		light->GetTransform()->SetLocalPosition(Vec3(1185.f, 4000.f, 473.f));
 		light->SetLight(make_shared<Light>());
@@ -483,7 +494,6 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 		light->GetLight()->SetDiffuse(Vec3(1.f, 1.f, 1.f));
 		light->GetLight()->SetAmbient(Vec3(0.1f, 0.1f, 0.1f));
 		light->GetLight()->SetSpecular(Vec3(0.1f, 0.1f, 0.1f));
-		light->AddScript(make_shared<TestLightScript>());
 
 		scene->AddGameObject(light);
 	}

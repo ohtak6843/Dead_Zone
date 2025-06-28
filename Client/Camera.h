@@ -54,7 +54,7 @@ public:
 	shared_ptr<Transform> GetTransform() { return _gameObject.lock()->GetTransform(); }
 
 private:
-	friend class GameObject;
+	friend class CameraObject;
 	void SetGameObject(shared_ptr<GameObject> gameObject) { _gameObject = gameObject; }
 	weak_ptr<GameObject> _gameObject;
 

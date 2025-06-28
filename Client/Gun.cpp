@@ -12,8 +12,10 @@
 #include "Timer.h"
 #include "LocalPlayer.h"
 
+#include "ParticleObject.h"
+
 bool Gun::_initialized = true;
-shared_ptr<GameObject> Gun::_particle = nullptr;
+shared_ptr<ParticleObject> Gun::_particle = nullptr;
 shared_ptr<MuzzleFlashParticle> Gun::_muzzle = nullptr;
 
 Gun::Gun()
@@ -21,6 +23,22 @@ Gun::Gun()
 }
 
 Gun::~Gun()
+{
+}
+
+void Gun::Awake()
+{
+}
+
+void Gun::Start()
+{
+}
+
+void Gun::Update()
+{
+}
+
+void Gun::LateUpdate()
 {
 }
 
@@ -72,7 +90,7 @@ void Gun::Reload()
 void Gun::Recoil(float pitchAmount, float yawAmount)
 {
 	shared_ptr<Camera> camera = GET_SINGLE(SceneMgr)->GetActiveScene()->GetMainCamera();
-	static_pointer_cast<LocalPlayer>(camera->GetGameObject()->GetMonoBehaviour(L"MainCamera"))->Recoil(pitchAmount, yawAmount); // 카메라 반동 처리
+	static_pointer_cast<LocalPlayer>(camera->GetGameObject())->Recoil(pitchAmount, yawAmount); // 카메라 반동 처리
 }
 
 void Gun::Aiming(float aimFov, Vec3 aimPos)
@@ -132,7 +150,7 @@ void Gun::input()
 void Gun::InitializeParticle()
 {
 	// 파티클 생성
-	_particle = make_shared<GameObject>();
+	_particle = make_shared<ParticleObject>();
 	_particle->SetTransform(make_shared<Transform>());
 	_muzzle = make_shared<MuzzleFlashParticle>();
 	_particle->SetParticle(_muzzle);
@@ -144,7 +162,7 @@ void Gun::InitializeParticle()
 	_initialized = false;
 }
 
-void Gun::setParticlePos(Vec3 pos)
+void Gun::SetParticlePos(Vec3 pos)
 {
 	_particle->GetTransform()->SetParent(GetTransform());
 	_particle->GetTransform()->SetLocalPosition(pos);

@@ -4,6 +4,8 @@ class GameObject;
 class Camera;
 class Light;
 
+class ParticleObject;
+
 
 class RenderPass
 {
@@ -24,6 +26,7 @@ public:
 	void RemoveLight(shared_ptr<Light> light);
 
 	shared_ptr<Camera> GetMainCamera();
+	shared_ptr<Camera> GetPlayerCamera();
 	shared_ptr<Camera> GetGunCamera();
 
 public:
@@ -47,7 +50,7 @@ private:
 
 	vector<shared_ptr<GameObject>> _vecDeferred;
 	vector<shared_ptr<GameObject>> _vecForward;
-	vector<shared_ptr<GameObject>> _vecParticle;
+	vector<shared_ptr<ParticleObject>> _vecParticle;
 	vector<shared_ptr<GameObject>> _vecShadow;
 };
 

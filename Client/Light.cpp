@@ -7,10 +7,11 @@
 #include "Transform.h"
 #include "Texture.h"
 #include "SceneMgr.h"
+#include "CameraObject.h"
 
 Light::Light()
 {
-	_shadowCamera = make_shared<GameObject>();
+	_shadowCamera = make_shared<CameraObject>();
 	_shadowCamera->SetTransform(make_shared<Transform>());
 	_shadowCamera->SetCamera(make_shared<Camera>());
 	uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");

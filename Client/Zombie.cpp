@@ -8,6 +8,7 @@
 
 Zombie::Zombie()
 {
+	_type = GAMEOBJECT_TYPE::ZOMBIE;
 	_name = L"Zombie";
 
 	shared_ptr<ZombieInfo> info = GET_SINGLE(GameInfo)->Get<ZombieInfo>(L"NormalZombie");
@@ -26,56 +27,22 @@ Zombie::~Zombie()
 
 void Zombie::Awake()
 {
+
 }
 
 void Zombie::Start()
 {
+
 }
 
 void Zombie::Update()
 {
-	/*if (DELTA_TIME < 1.f)
-		_elapsedTime += DELTA_TIME;
 
-	if (_moving && _elapsedTime >= 5.0f)
-	{
-		_moving = false;
-		_elapsedTime = 0.0f;
-
-		SetPauseDuration();
-
-		uint32 index = static_cast<uint32>(ZOMBIE_ANIMATION_TYPE::IDLE1);
-		GetAnimator()->Play(index);
-	}
-
-	if (!_moving && _elapsedTime >= _pauseDuration)
-	{
-		_moving = true;
-		_elapsedTime = 0.0f;
-
-		uint32 index = static_cast<uint32>(ZOMBIE_ANIMATION_TYPE::WALK);
-		GetAnimator()->Play(index);
-	}*/
 }
 
 void Zombie::LateUpdate()
 {
-	/*if (_moving)
-	{
-		Move();
-	}*/
-}
 
-void Zombie::FinalUpdate()
-{
-	if (_transform != nullptr)
-		_transform->FinalUpdate();
-
-	if (_collider != nullptr)
-		_collider->FinalUpdate();
-
-	if (_animator != nullptr)
-		_animator->FinalUpdate();
 }
 
 void Zombie::SetState(ZOMBIE_STATE playerState)
@@ -89,37 +56,37 @@ void Zombie::SetState(ZOMBIE_STATE playerState)
 	{
 	case ZOMBIE_STATE::T_POSE:
 	{
-		uint32 index = static_cast<uint32>(ZOMBIE_ANIMATION_TYPE::T_POSE);
+		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::T_POSE);
 		GetAnimator()->Play(index);
 		break;
 	}
 	case ZOMBIE_STATE::IDLE:
 	{
-		uint32 index = static_cast<uint32>(ZOMBIE_ANIMATION_TYPE::IDLE1);
+		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::IDLE1);
 		GetAnimator()->Play(index);
 		break;
 	}
 	case ZOMBIE_STATE::WALK:
 	{
-		uint32 index = static_cast<uint32>(ZOMBIE_ANIMATION_TYPE::RUN);
+		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::RUN);
 		GetAnimator()->Play(index);
 		break;
 	}
 	case ZOMBIE_STATE::RUN:
 	{
-		uint32 index = static_cast<uint32>(ZOMBIE_ANIMATION_TYPE::RUN);
+		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::RUN);
 		GetAnimator()->Play(index);
 		break;
 	}
 	case ZOMBIE_STATE::ATTACK:
 	{
-		uint32 index = static_cast<uint32>(ZOMBIE_ANIMATION_TYPE::ATTACK1);
+		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::ATTACK1);
 		GetAnimator()->Play(index);
 		break;
 	}
 	case ZOMBIE_STATE::DIE:
 	{
-		uint32 index = static_cast<uint32>(ZOMBIE_ANIMATION_TYPE::DIE1);
+		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::DIE1);
 		GetAnimator()->Play(index);
 		break;
 	}

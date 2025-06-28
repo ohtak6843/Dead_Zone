@@ -17,6 +17,9 @@
 #include "SphereCollider.h"
 #include "OrientedBoxCollider.h"
 
+#include "CameraObject.h"
+#include "ParticleObject.h"
+
 RenderPass::RenderPass()
 {
 }
@@ -62,6 +65,17 @@ shared_ptr<class Camera> RenderPass::GetMainCamera()
 	return _cameras[0];
 }
 
+shared_ptr<Camera> RenderPass::GetPlayerCamera()
+{
+	for (const shared_ptr<Camera>& camera : _cameras)
+	{
+		if (camera->GetGameObject()->GetName() == L"Player_Camera")
+			return camera;
+	}
+
+	return nullptr;
+}
+
 shared_ptr<class Camera> RenderPass::GetGunCamera()
 {
 	for (const shared_ptr<Camera>& camera : _cameras)
@@ -92,7 +106,7 @@ void RenderPass::SortGameObjects(shared_ptr<Camera> camera)
 
 	for (auto& gameObject : gameObjects)
 	{
-		if (gameObject->GetMeshRenderer() == nullptr && gameObject->GetParticle() == nullptr)
+		if (gameObject->GetMeshRenderer() == nullptr && gameObject->GetGameObjectType() != GAMEOBJECT_TYPE::PARTICLE)
 			continue;
 
 		if (camera->IsCulled(gameObject->GetLayerIndex()))
@@ -128,7 +142,7 @@ void RenderPass::SortGameObjects(shared_ptr<Camera> camera)
 		}
 		else
 		{
-			_vecParticle.push_back(gameObject);
+			_vecParticle.push_back(static_pointer_cast<ParticleObject>(gameObject));
 		}
 	}
 }

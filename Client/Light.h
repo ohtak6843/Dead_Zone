@@ -5,6 +5,8 @@ class GameObject;
 class Mesh;
 class Material;
 
+class CameraObject;
+
 enum class LIGHT_TYPE : uint8
 {
 	DIRECTIONAL_LIGHT,
@@ -70,14 +72,14 @@ public:
 	shared_ptr<Mesh> GetVolumeMesh() { return _volumeMesh; }
 	shared_ptr<Material> GetLightMaterial() { return _lightMaterial; }
 
-	shared_ptr<GameObject> GetShadowCamera() { return _shadowCamera; }
+	shared_ptr<CameraObject> GetShadowCamera() { return _shadowCamera; }
 
 public:
 	shared_ptr<GameObject> GetGameObject() { return _gameObject.lock(); }
 	shared_ptr<Transform> GetTransform() { return _gameObject.lock()->GetTransform(); }
 
 private:
-	friend class GameObject;
+	friend class LightObject;
 	void SetGameObject(shared_ptr<GameObject> gameObject) { _gameObject = gameObject; }
 	weak_ptr<GameObject> _gameObject;
 
@@ -88,6 +90,6 @@ private:
 	shared_ptr<Mesh> _volumeMesh;
 	shared_ptr<Material> _lightMaterial;
 
-	shared_ptr<GameObject> _shadowCamera;
+	shared_ptr<CameraObject> _shadowCamera;
 };
 
