@@ -263,7 +263,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // 게임 프레임워크 초기화
     gameFramework->Init(GWindowInfo);
-    GET_SINGLE(SceneMgr)->LoadScene(L"TestScene");
+    GET_SINGLE(SceneMgr)->SwitchScene(SCENE_TYPE::STAGE01); // TODO: 나중에 타이틀 씬으로 시작하도록 변경
 
     std::thread recvThread(ReceiverThread, g_clientSocket);
     // 자동 로그인: cs_packet_login 패킷 전송

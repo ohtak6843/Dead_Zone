@@ -1,26 +1,23 @@
 #include "pch.h"
-#include "LoadingScene.h"
-#include "SceneMgr.h"
-#include "Resources.h"
-#include "UICamera.h"
-#include "Camera.h"
+#include "TitleScene.h"
 #include "Transform.h"
 #include "MeshRenderer.h"
-#include "Material.h"
-#include "Texture.h"
+#include "Mesh.h"
+#include "Camera.h"
+#include "UICamera.h"
 
-#include "TitleScene.h"
-#include "Stage01.h"
+#include "SceneMgr.h"
+#include "Resources.h"
 
-LoadingScene::LoadingScene()
+TitleScene::TitleScene()
 {
 }
 
-LoadingScene::~LoadingScene()
+TitleScene::~TitleScene()
 {
 }
 
-void LoadingScene::Init()
+void TitleScene::Init()
 {
 #pragma region Camera
 	{

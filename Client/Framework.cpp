@@ -43,6 +43,10 @@ void Framework::Init(const WindowInfo& info)
 	GET_SINGLE(Timer)->Init();
 	GET_SINGLE(Resources)->Init();
 	GET_SINGLE(GameInfo)->Init();
+
+	GET_SINGLE(SceneMgr)->SetLayerName(0, L"Default");
+	GET_SINGLE(SceneMgr)->SetLayerName(1, L"Gun"); // ÃÑ UI º°µµ Ã³¸®
+	GET_SINGLE(SceneMgr)->SetLayerName(2, L"UI");
 }
 
 void Framework::Update()

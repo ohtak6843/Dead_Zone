@@ -250,6 +250,9 @@
     <ClInclude Include="ParticleObject.h">
       <Filter>Game\GameObject\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="TitleScene.h">
+      <Filter>Game\Scenes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc">
@@ -435,6 +438,9 @@
     </ClCompile>
     <ClCompile Include="ParticleObject.cpp">
       <Filter>Game\GameObject\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleScene.cpp">
+      <Filter>Game\Scenes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -29,6 +29,11 @@
 #include "M4A1.h"
 #include "AK47.h"
 
+#include "Scene.h"
+#include "LoadingScene.h"
+#include "TitleScene.h"
+#include "Stage01.h"
+
 // TODO: 나중에 삭제
 #include "Timer.h"
 #include <sstream>
@@ -72,7 +77,7 @@ void SceneMgr::RenderUI()
 	static float elapsedTime = 0.f;
 	if(DELTA_TIME < 1.f)
 		elapsedTime += DELTA_TIME;
-	if (_activeScene && GET_SINGLE(SceneMgr)->GetSceneType() != SCENE_TYPE::LOADING)
+	if (_activeScene && GET_SINGLE(SceneMgr)->GetSceneType() == SCENE_TYPE::STAGE01)
 	{
 		// 총알 UI
 		Vec2 pivot = {
@@ -163,19 +168,37 @@ void SceneMgr::RenderUI()
 	device->GetD3D11DeviceContext()->Flush();
 }
 
-void SceneMgr::LoadScene(wstring sceneName)
+void SceneMgr::LoadScene(SCENE_TYPE type)
+{
+	switch (type)
+	{
+	case SCENE_TYPE::TITLE:
+		GET_SINGLE(SceneMgr)->SetSceneType(SCENE_TYPE::TITLE);
+		_activeScene = make_shared<TitleScene>();
+		break;
+	case SCENE_TYPE::STAGE01:
+		GET_SINGLE(SceneMgr)->SetSceneType(SCENE_TYPE::STAGE01);
+		_activeScene = make_shared<Stage01>();
+		break;
+	}
+
+	_activeScene->LoadResources();
+	_activeScene->Init();
+	_activeScene->Awake();
+	_activeScene->Start();
+}
+
+void SceneMgr::SwitchScene(SCENE_TYPE type)
 {
 	GET_SINGLE(SceneMgr)->SetSceneType(SCENE_TYPE::LOADING);
-	_activeScene = LoadLoadingScene();
+	_activeScene = make_shared<TitleScene>();
+	_activeScene->LoadResources();
+	_activeScene->Init();
 	_activeScene->Awake();
 	_activeScene->Start();
 	gameFramework->Update();
 
-	GET_SINGLE(SceneMgr)->SetSceneType(SCENE_TYPE::STAGE01);
-	_activeScene = LoadStage01();
-
-	_activeScene->Awake();
-	_activeScene->Start();
+	LoadScene(type);
 }
 
 void SceneMgr::SetLayerName(uint8 index, const wstring& name)
@@ -254,8 +277,8 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 {
 #pragma region LayerMask
 	SetLayerName(0, L"Default");
-	SetLayerName(1, L"Gun"); // 총 UI 별도 처리
-	SetLayerName(2, L"UI");
+	SetLayerName(1, L"UI");
+	SetLayerName(2, L"Gun"); // 총 UI 별도 처리
 #pragma endregion
 
 #pragma region ComputeShader
@@ -525,7 +548,6 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 			//gameObject->SetStatic(true);
 			gameObject->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
 			gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 0.f, 0.f));
-			//gameObject->GetTransform()->SetParent(t->GetTransform());
 			scene->AddGameObject(gameObject);
 		}
 

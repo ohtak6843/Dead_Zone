@@ -4,6 +4,7 @@ class Scene;
 
 enum SCENE_TYPE
 {
+	TITLE,
 	LOADING,
 	STAGE01,
 	END,
@@ -22,7 +23,9 @@ public:
 	void Update();
 	void Render();
 	void RenderUI();
-	void LoadScene(wstring sceneName);
+	
+	void LoadScene(SCENE_TYPE type);
+	void SwitchScene(SCENE_TYPE type);
 
 	void SetLayerName(uint8 index, const wstring& name);
 	const wstring& IndexToLayerName(uint8 index) { return _layerNames[index]; }
