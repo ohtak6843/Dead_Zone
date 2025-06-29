@@ -29,6 +29,8 @@
 #include "M4A1.h"
 #include "AK47.h"
 
+#include "UIMgr.h"
+
 // TODO: 나중에 삭제
 #include "Timer.h"
 #include <sstream>
@@ -392,28 +394,13 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 
 #pragma region Crosshair
 	{
-		shared_ptr<GameObject> crosshair = make_shared<GameObject>();
-		crosshair->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
-		crosshair->SetTransform(make_shared<Transform>());
-		crosshair->GetTransform()->SetLocalScale(Vec3(50.f, 50.f, 50.f));
-		crosshair->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 300.f));
-
-		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
-		{
-			shared_ptr<Mesh> mesh = GET_SINGLE(Resources)->LoadRectangleMesh();
-			meshRenderer->SetMesh(mesh);
-		}
-		{
-			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"AlphaTexture");
-			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"Crosshair", L"..\\Resources\\Texture\\Crosshair\\crosshair01.png");
-			shared_ptr<Material> material = make_shared<Material>();
-			material->SetShader(shader);
-			material->SetTexture(0, texture);
-			meshRenderer->SetMaterial(material);
-		}
-		crosshair->SetName(L"Crosshair");
-		crosshair->SetMeshRenderer(meshRenderer);
-		scene->AddGameObject(crosshair);
+		GET_SINGLE(UIMgr)->CreateImageUI(
+			L"Crosshair",
+			L"..\\Resources\\Texture\\Crosshair\\crosshair01.png",
+			Vec2(0.f, 0.f), // 화면 중앙
+			Vec2(50.f, 50.f), // 크기
+			scene
+		);
 	}
 #pragma endregion
 
