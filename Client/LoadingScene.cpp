@@ -51,7 +51,7 @@ void LoadingScene::Init()
 		}
 		{
 			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"AlphaTexture");
-			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"LoadingImage", L"..\\Resources\\Texture\\LoadingImage.png");
+			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"LoadingImage", L"..\\Resources\\Texture\\LoadingScene\\LoadingImage.png");
 			shared_ptr<Material> material = make_shared<Material>();
 			material->SetShader(shader);
 			material->SetTexture(0, texture);

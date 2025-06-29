@@ -48,7 +48,7 @@ void TitleScene::Init()
 		}
 		{
 			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"AlphaTexture");
-			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"TitleImage", L"..\\Resources\\Texture\\TitleImage.png");
+			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"TitleImage", L"..\\Resources\\Texture\\TitleScene\\TitleImage.png");
 			shared_ptr<Material> material = make_shared<Material>();
 			material->SetShader(shader);
 			material->SetTexture(0, texture);
@@ -57,6 +57,32 @@ void TitleScene::Init()
 
 		titleImage->SetMeshRenderer(meshRenderer);
 		AddGameObject(titleImage);
+	}
+#pragma endregion
+
+#pragma region 
+	{
+		shared_ptr<GameObject> gameStartButton = make_shared<GameObject>();
+		gameStartButton->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
+		gameStartButton->SetTransform(make_shared<Transform>());
+		gameStartButton->GetTransform()->SetLocalScale(Vec3(400.f, 200.f, 1.f));
+		gameStartButton->GetTransform()->SetLocalPosition(Vec3(380.f, -280.f, 1.f));
+		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
+		{
+			shared_ptr<Mesh> mesh = GET_SINGLE(Resources)->LoadRectangleMesh();
+			meshRenderer->SetMesh(mesh);
+		}
+		{
+			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"AlphaTexture");
+			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"GameStartButton", L"..\\Resources\\Texture\\TitleScene\\GameStartButton.png");
+			shared_ptr<Material> material = make_shared<Material>();
+			material->SetShader(shader);
+			material->SetTexture(0, texture);
+			meshRenderer->SetMaterial(material);
+		}
+
+		gameStartButton->SetMeshRenderer(meshRenderer);
+		AddGameObject(gameStartButton);
 	}
 #pragma endregion
 }
