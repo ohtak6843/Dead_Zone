@@ -18,6 +18,7 @@ struct MaterialParams
 			SetInt(i, 0);
 			SetFloat(i, 0.f);
 			SetTexOn(i, 0);
+			SetVec4(i, Vec4(1.f, 1.f, 1.f, 1.f));
 		}
 	}
 
@@ -55,6 +56,7 @@ public:
 
 	void SetVec2(uint8 index, Vec2 value) { _params.SetVec2(index, value); }
 	void SetVec4(uint8 index, Vec4 value) { _params.SetVec4(index, value); }
+	void SetColor(uint8 index, Vec4 value) { _params.SetVec4(index, value); }
 	void SetMatrix(uint8 index, Matrix& value) { _params.SetMatrix(index, value); }
 
 	void PushGraphicsData();
