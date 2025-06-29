@@ -25,7 +25,7 @@ void LoadingScene::Init()
 #pragma region Camera
 	{
 		shared_ptr<UICamera> camera = make_shared<UICamera>();
-		camera->SetName(L"TitleCamera");
+		camera->SetName(L"UICamera");
 		camera->SetTransform(make_shared<Transform>());
 		camera->SetCamera(make_shared<Camera>());
 		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 0.f));
@@ -51,7 +51,7 @@ void LoadingScene::Init()
 		}
 		{
 			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"AlphaTexture");
-			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"Loading", L"..\\Resources\\Texture\\LoadingImage.jpg");
+			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"LoadingImage", L"..\\Resources\\Texture\\LoadingImage.png");
 			shared_ptr<Material> material = make_shared<Material>();
 			material->SetShader(shader);
 			material->SetTexture(0, texture);

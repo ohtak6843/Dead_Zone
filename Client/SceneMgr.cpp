@@ -63,9 +63,7 @@ void SceneMgr::RenderUI()
 	D2D1_SIZE_F rtSize = device->GetD3D11On12RT(backbufferindex)->GetSize();
 	//D2D1_RECT_F textRect = D2D1::RectF(0, 0, rtSize.width, rtSize.height);
 
-	// Acquire our wrapped render target resource for the current back buffer.
 	device->GetD3D11on12Device()->AcquireWrappedResources(device->GetWrappedBackBuffer(backbufferindex).GetAddressOf(), 1);
-	// Render text directly to the back buffer.
 	device->GetD2DDeviceContext()->SetTarget(device->GetD3D11On12RT(backbufferindex).Get());
 	device->GetSolidColorBrush()->SetColor(D2D1::ColorF(D2D1::ColorF::White));
 	device->GetD2DDeviceContext()->BeginDraw();
@@ -159,12 +157,7 @@ void SceneMgr::RenderUI()
 	}
 
 	device->GetD2DDeviceContext()->EndDraw();
-	// Release our wrapped render target resource. Releasing 
-	// transitions the back buffer resource to the state specified
-	// as the OutState when the wrapped resource was created.
 	device->GetD3D11on12Device()->ReleaseWrappedResources(device->GetWrappedBackBuffer(backbufferindex).GetAddressOf(), 1);
-
-	// Flush to submit the 11 command list to the shared command queue.
 	device->GetD3D11DeviceContext()->Flush();
 }
 
@@ -191,7 +184,7 @@ void SceneMgr::LoadScene(SCENE_TYPE type)
 void SceneMgr::SwitchScene(SCENE_TYPE type)
 {
 	GET_SINGLE(SceneMgr)->SetSceneType(SCENE_TYPE::LOADING);
-	_activeScene = make_shared<TitleScene>();
+	_activeScene = make_shared<LoadingScene>();
 	_activeScene->LoadResources();
 	_activeScene->Init();
 	_activeScene->Awake();

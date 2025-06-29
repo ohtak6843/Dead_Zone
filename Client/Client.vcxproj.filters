@@ -253,6 +253,9 @@
     <ClInclude Include="TitleScene.h">
       <Filter>Game\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="TitleCamera.h">
+      <Filter>Game\GameObject\Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc">
@@ -441,6 +444,9 @@
     </ClCompile>
     <ClCompile Include="TitleScene.cpp">
       <Filter>Game\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleCamera.cpp">
+      <Filter>Game\GameObject\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
