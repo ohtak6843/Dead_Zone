@@ -1,5 +1,5 @@
 #pragma once
-#include "MonoBehaviour.h"
+#include "GameObject.h"
 #include "GameInfo.h"
 
 enum class ZOMBIE_STATE
@@ -14,7 +14,7 @@ enum class ZOMBIE_STATE
 	END
 };
 
-enum class ZOMBIE_ANIMATION_TYPE
+enum class NORMAL_ZOMBIE_ANIMATION
 {
 	ATTACK1,
 	DIE1,
@@ -30,7 +30,7 @@ enum class ZOMBIE_ANIMATION_TYPE
 	END
 };
 
-class Zombie : public MonoBehaviour
+class Zombie : public GameObject
 {
 public:
 	Zombie();
@@ -48,12 +48,12 @@ public:
 	void SetRandomDirection();
 	void SetPauseDuration();
 	void Move();
-	shared_ptr<class GameObject> GetParticle() { return _particle; }
+	shared_ptr<class ParticleObject> GetParticle() { return _particle; }
 
 private:
 	ZOMBIE_STATE _state;
 	ZombieInfo _info;
-	shared_ptr<class GameObject> _particle;
+	shared_ptr<class ParticleObject> _particle;
 	shared_ptr<class BloodParticle> _blood;
 
 private:

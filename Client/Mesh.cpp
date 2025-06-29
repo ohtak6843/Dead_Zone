@@ -65,6 +65,7 @@ shared_ptr<Mesh> Mesh::CreateFromFBX(const FbxMeshInfo* meshInfo, FBXLoader& loa
 	if (meshInfo->hasAnimation)
 		mesh->CreateBonesAndAnimations(loader);
 
+	mesh->SetName(meshInfo->name);
 	return mesh;
 }
 
@@ -240,7 +241,6 @@ void Mesh::CreateBonesAndAnimations(class FBXLoader& loader)
 				}
 			}
 
-			// StructuredBuffer ¼¼ÆÃ
 			_frameBuffer.push_back(make_shared<UploadBuffer>());
 			_frameBuffer.back()->Init(sizeof(AnimFrameParams), static_cast<uint32>(frameParams.size()), frameParams.data());
 		}

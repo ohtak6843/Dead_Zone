@@ -18,15 +18,22 @@
 #include "OrientedBoxCollider.h"
 #include "MeshData.h"
 
+#include "CameraObject.h"
+#include "UICamera.h"
+#include "PlayerCamera.h"
+#include "GunCamera.h"
+
+#include "LightObject.h"
+
 #include "Zombie.h"
 #include "M4A1.h"
 #include "AK47.h"
 
-
-
 // TODO: 나중에 삭제
 #include "Timer.h"
 #include <sstream>
+
+#include "JsonMgr.h"
 
 void SceneMgr::Update()
 {
@@ -73,13 +80,13 @@ void SceneMgr::RenderUI()
 			static_cast<float>(gameFramework->GetWindow().height - 50) };
 		D2D1_RECT_F textRect = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
 		int32 currentAmmo = 0;
-
-		int32 gunType = static_pointer_cast<LocalPlayer>(_activeScene->FindGameObject(L"Main_Camera")->GetMonoBehaviour(L"MainCamera"))->getGunType();
+		
+		int32 gunType = static_pointer_cast<LocalPlayer>(_activeScene->FindGameObject(L"LocalPlayer"))->getGunType();
 		if (gunType == 0)
-			currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"M4A1")->GetMonoBehaviour(L"M4A1"))->GetCurrentAmmo();
+			currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"M4A1"))->GetCurrentAmmo();
 		else if (gunType == 1)
-			currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"AK47")->GetMonoBehaviour(L"AK47"))->GetCurrentAmmo();
-
+			currentAmmo = static_pointer_cast<AK47>(_activeScene->FindGameObject(L"AK47"))->GetCurrentAmmo();
+		
 		std::wstringstream wss1;
 		wss1 << std::fixed << std::setprecision(2) << currentAmmo;
 		wstring text = L"탄창: ";
@@ -92,21 +99,21 @@ void SceneMgr::RenderUI()
 			device->GetSolidColorBrush().Get());
 
 		// 타이머 UI
-		/*pivot = { static_cast<float>(GEngine->GetWindow().width / 2), 50.f };
-		D2D1_RECT_F textRect2 = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
+		//pivot = { static_cast<float>(gameFramework->GetWindow().width / 2), 50.f };
+		//D2D1_RECT_F textRect2 = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
 
-		wstring text2 = L"시간 : ";
-		std::wstringstream wss;
-		wss << std::fixed << std::setprecision(2) << elapsedTime;
-		text2 += wss.str();
-		device->GetD2DDeviceContext()->DrawTextW(
-			text2.c_str(),
-			static_cast<uint32>(text2.size()),
-			device->GetTextFormat().Get(),
-			&textRect2,
-			device->GetSolidColorBrush().Get());*/
+		//wstring text2 = L"시간 : ";
+		//std::wstringstream wss;
+		//wss << std::fixed << std::setprecision(2) << elapsedTime;
+		//text2 += wss.str();
+		//device->GetD2DDeviceContext()->DrawTextW(
+		//	text2.c_str(),
+		//	static_cast<uint32>(text2.size()),
+		//	device->GetTextFormat().Get(),
+		//	&textRect2,
+		//	device->GetSolidColorBrush().Get());
 
-			// 체력 UI
+		// 체력 UI
 		pivot = { 100.f, static_cast<float>(gameFramework->GetWindow().height - 50) };
 		D2D1_RECT_F textRect3 = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
 
@@ -118,31 +125,32 @@ void SceneMgr::RenderUI()
 			&textRect3,
 			device->GetSolidColorBrush().Get());
 
-		/*	pivot = { 100.f, static_cast<float>(GEngine->GetWindow().height / 2) };
-			D2D1_RECT_F textRect4 = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
+		pivot = { 100.f, static_cast<float>(gameFramework->GetWindow().height / 2) };
+		D2D1_RECT_F textRect4 = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
 
-			wstring text4 = L"X : ";
-			Vec3 mainCameraPos = _activeScene->GetMainCamera()->GetTransform()->GetWorldPosition();
-			wss.str(L"");
-			wss.clear();
-			wss << std::fixed << std::setprecision(2) << mainCameraPos.x;
-			text4 += wss.str();
-			text4 += L"\nY : ";
-			wss.str(L"");
-			wss.clear();
-			wss << std::fixed << std::setprecision(2) << mainCameraPos.y;
-			text4 += wss.str();
-			text4 += L"\nZ : ";
-			wss.str(L"");
-			wss.clear();
-			wss << std::fixed << std::setprecision(2) << mainCameraPos.z;
-			text4 += wss.str();
-			device->GetD2DDeviceContext()->DrawTextW(
-				text4.c_str(),
-				static_cast<uint32>(text4.size()),
-				device->GetTextFormat().Get(),
-				&textRect4,
-				device->GetSolidColorBrush().Get());*/
+		//std::wstringstream wss;
+		//wstring text4 = L"X : ";
+		//Vec3 mainCameraPos = _activeScene->GetPlayerCamera()->GetTransform()->GetWorldPosition();
+		//wss.str(L"");
+		//wss.clear();
+		//wss << std::fixed << std::setprecision(2) << mainCameraPos.x;
+		//text4 += wss.str();
+		//text4 += L"\nY : ";
+		//wss.str(L"");
+		//wss.clear();
+		//wss << std::fixed << std::setprecision(2) << mainCameraPos.y;
+		//text4 += wss.str();
+		//text4 += L"\nZ : ";
+		//wss.str(L"");
+		//wss.clear();
+		//wss << std::fixed << std::setprecision(2) << mainCameraPos.z;
+		//text4 += wss.str();
+		//device->GetD2DDeviceContext()->DrawTextW(
+		//	text4.c_str(),
+		//	static_cast<uint32>(text4.size()),
+		//	device->GetTextFormat().Get(),
+		//	&textRect4,
+		//	device->GetSolidColorBrush().Get());
 	}
 
 	device->GetD2DDeviceContext()->EndDraw();
@@ -200,10 +208,10 @@ shared_ptr<Scene> SceneMgr::LoadLoadingScene()
 
 #pragma region Camera
 	{
-		shared_ptr<GameObject> camera = make_shared<GameObject>();
+		shared_ptr<UICamera> camera = make_shared<UICamera>();
 		camera->SetName(L"TitleCamera");
-		camera->AddComponent(make_shared<Transform>());
-		camera->AddComponent(make_shared<Camera>());
+		camera->SetTransform(make_shared<Transform>());
+		camera->SetCamera(make_shared<Camera>());
 		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 0.f));
 		camera->GetCamera()->SetProjectionType(PROJECTION_TYPE::ORTHOGRAPHIC);
 		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
@@ -217,7 +225,7 @@ shared_ptr<Scene> SceneMgr::LoadLoadingScene()
 	{
 		shared_ptr<GameObject> loadingImage = make_shared<GameObject>();
 		loadingImage->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
-		loadingImage->AddComponent(make_shared<Transform>());
+		loadingImage->SetTransform(make_shared<Transform>());
 		loadingImage->GetTransform()->SetLocalScale(Vec3(1280.f, 800.f, 1.f));
 		loadingImage->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 1.f));
 		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
@@ -234,9 +242,9 @@ shared_ptr<Scene> SceneMgr::LoadLoadingScene()
 			meshRenderer->SetMaterial(material);
 		}
 
-		loadingImage->AddComponent(meshRenderer);
+		loadingImage->SetMeshRenderer(meshRenderer);
 		scene->AddGameObject(loadingImage);
-	}
+	}	
 #pragma endregion
 
 	return scene;
@@ -274,14 +282,13 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 
 #pragma region Camera
 	{
-		shared_ptr<GameObject> camera = make_shared<GameObject>();
-		camera->SetName(L"Main_Camera");
-		camera->AddComponent(make_shared<Transform>());
-		camera->AddComponent(make_shared<Camera>()); // Near=1, Far=1000, FOV=45도
-		camera->AddComponent(make_shared<LocalPlayer>());
+		shared_ptr<PlayerCamera> camera = make_shared<PlayerCamera>();
+		camera->SetName(L"Player_Camera");
+		camera->SetTransform(make_shared<Transform>());
+		camera->SetCamera(make_shared<Camera>());
 		camera->GetCamera()->SetFar(10000.f);
-		camera->GetCamera()->SetFOV(90.f); // 90도
-		camera->GetTransform()->SetLocalPosition(Vec3(1185.f, 140.f, 473.f));
+		camera->GetCamera()->SetFOV(90.f);
+		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 0.f));
 		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
 		camera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, true); // UI는 안 찍음
 
@@ -294,10 +301,10 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 
 #pragma region UI_Camera
 	{
-		shared_ptr<GameObject> camera = make_shared<GameObject>();
-		camera->SetName(L"Orthographic_Camera");
-		camera->AddComponent(make_shared<Transform>());
-		camera->AddComponent(make_shared<Camera>()); // Near=1, Far=1000, 800*600
+		shared_ptr<UICamera> camera = make_shared<UICamera>();
+		camera->SetName(L"UI_Camera");
+		camera->SetTransform(make_shared<Transform>());
+		camera->SetCamera(make_shared<Camera>());
 		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 0.f));
 		camera->GetCamera()->SetProjectionType(PROJECTION_TYPE::ORTHOGRAPHIC);
 		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
@@ -309,21 +316,18 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 
 #pragma region GunCamera
 	{
-		shared_ptr<GameObject> gunCamera = make_shared<GameObject>();
+		shared_ptr<GunCamera> gunCamera = make_shared<GunCamera>();
 		gunCamera->SetName(L"Gun_Camera");
-
-		gunCamera->AddComponent(make_shared<Transform>());
-		gunCamera->AddComponent(make_shared<Camera>());
-
+		gunCamera->SetTransform(make_shared<Transform>());
+		gunCamera->SetCamera(make_shared<Camera>());
 		gunCamera->GetCamera()->SetFOV(60.f);
 		gunCamera->GetCamera()->SetFar(1000.f);
-
 		gunCamera->GetCamera()->SetCullingMaskAll(); // 다 끄고
 		gunCamera->GetCamera()->SetCullingMaskLayerOnOff(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"Gun"), false); // Gun만 찍음
 
 		// Main_Camera의 Transform을 따라가도록 설정
-		shared_ptr<GameObject> mainCam = scene->FindGameObject(L"Main_Camera");
-		gunCamera->GetTransform()->SetParent(mainCam->GetTransform());
+		shared_ptr<GameObject> mainCamera = scene->GetPlayerCamera()->GetGameObject();
+		gunCamera->GetTransform()->SetParent(mainCamera->GetTransform());
 
 		scene->AddGameObject(gunCamera);
 	}
@@ -332,7 +336,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 #pragma region SkyBox
 	{
 		shared_ptr<GameObject> skybox = make_shared<GameObject>();
-		skybox->AddComponent(make_shared<Transform>());
+		skybox->SetTransform(make_shared<Transform>());
 		skybox->SetCheckFrustum(false);
 		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
 		{
@@ -347,8 +351,42 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 			material->SetTexture(0, texture);
 			meshRenderer->SetMaterial(material);
 		}
-		skybox->AddComponent(meshRenderer);
+		skybox->SetMeshRenderer(meshRenderer);
 		scene->AddGameObject(skybox);
+	}
+#pragma endregion
+
+#pragma region UI_Test
+	for (int32 i = 0; i < 6; i++)
+	{
+		shared_ptr<GameObject> obj = make_shared<GameObject>();
+		obj->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI")); // UI
+		obj->SetTransform(make_shared<Transform>());
+		obj->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
+		obj->GetTransform()->SetLocalPosition(Vec3(-350.f + (i * 120), 250.f, 500.f));
+		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
+		{
+			shared_ptr<Mesh> mesh = GET_SINGLE(Resources)->LoadRectangleMesh();
+			meshRenderer->SetMesh(mesh);
+		}
+		{
+			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"Texture");
+
+			shared_ptr<Texture> texture;
+			if (i < 3)
+				texture = gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::G_BUFFER)->GetRTTexture(i);
+			else if (i < 5)
+				texture = gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::LIGHTING)->GetRTTexture(i - 3);
+			else
+				texture = gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SHADOW)->GetRTTexture(0);
+
+			shared_ptr<Material> material = make_shared<Material>();
+			material->SetShader(shader);
+			material->SetTexture(0, texture);
+			meshRenderer->SetMaterial(material);
+		}
+		obj->SetMeshRenderer(meshRenderer);
+		scene->AddGameObject(obj);
 	}
 #pragma endregion
 
@@ -356,7 +394,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 	{
 		shared_ptr<GameObject> crosshair = make_shared<GameObject>();
 		crosshair->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
-		crosshair->AddComponent(make_shared<Transform>());
+		crosshair->SetTransform(make_shared<Transform>());
 		crosshair->GetTransform()->SetLocalScale(Vec3(50.f, 50.f, 50.f));
 		crosshair->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 300.f));
 
@@ -374,8 +412,35 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 			meshRenderer->SetMaterial(material);
 		}
 		crosshair->SetName(L"Crosshair");
-		crosshair->AddComponent(meshRenderer);
+		crosshair->SetMeshRenderer(meshRenderer);
 		scene->AddGameObject(crosshair);
+	}
+#pragma endregion
+
+#pragma region Local Player
+	{
+		vector<shared_ptr<LocalPlayer>> localPlayers;
+		shared_ptr<LocalPlayer> localPlayer = make_shared<LocalPlayer>();
+		localPlayer->SetName(L"LocalPlayer");
+		localPlayer->SetTransform(make_shared<Transform>());
+		localPlayer->GetTransform()->SetLocalPosition(Vec3(1185.f, 140.f, 473.f));
+		localPlayer->SetCheckFrustum(false);
+
+		localPlayers.push_back(localPlayer);
+
+		scene->GetPlayerCamera()->GetTransform()->SetParent(localPlayer->GetTransform());
+		scene->AddGameObject(localPlayer);
+
+		// 로컬 플레이어 설정
+		vector<shared_ptr<Player>> players;
+		players.reserve(localPlayers.size());
+
+		std::transform(localPlayers.begin(), localPlayers.end(), std::back_inserter(players),
+			[](const shared_ptr<LocalPlayer>& mp) {
+				return static_pointer_cast<Player>(mp); // 업캐스팅
+			});
+
+		scene->SetLocalPlayer(players);
 	}
 #pragma endregion
 
@@ -383,7 +448,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 	{
 		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\M4A1.fbx");
 
-		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate();
+		vector<shared_ptr<M4A1>> gameObjects = meshData->InstantiateAs<M4A1>();
 		uint8 gunLayer = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"Gun");
 
 		for (auto& gameObject : gameObjects)
@@ -397,11 +462,9 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 				gameObject->GetMeshRenderer()->SetMaterial(mat);
 			}
 			gameObject->SetLayerIndex(gunLayer);
-			gameObject->SetCheckFrustum(false);
 			gameObject->SetActive(false);
 
 			scene->AddGameObject(gameObject);
-			gameObject->AddComponent(make_shared<M4A1>());
 		}
 
 		gameObjects[0]->SetName(L"M4A1");
@@ -412,7 +475,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 	{
 		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\AK74.fbx");
 
-		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate();
+		vector<shared_ptr<AK47>> gameObjects = meshData->InstantiateAs<AK47>();
 		uint8 gunLayer = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"Gun");
 
 		for (auto& gameObject : gameObjects)
@@ -426,11 +489,9 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 				gameObject->GetMeshRenderer()->SetMaterial(mat);
 			}
 			gameObject->SetLayerIndex(gunLayer);
-			gameObject->SetCheckFrustum(false);
 			gameObject->SetActive(true);
 
 			scene->AddGameObject(gameObject);
-			gameObject->AddComponent(make_shared<AK47>());
 		}
 
 		gameObjects[0]->SetName(L"AK47");
@@ -439,11 +500,11 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 
 #pragma region Directional Light
 	{
-		shared_ptr<GameObject> light = make_shared<GameObject>();
-		light->AddComponent(make_shared<Transform>());
-		light->GetTransform()->SetLocalPosition(Vec3(0, 1000, 500));
-		light->AddComponent(make_shared<Light>());
-		light->GetLight()->SetLightDirection(Vec3(0, -1, 1.f));
+		shared_ptr<LightObject> light = make_shared<LightObject>();
+		light->SetTransform(make_shared<Transform>());
+		light->GetTransform()->SetLocalPosition(Vec3(1185.f, 4000.f, 473.f));
+		light->SetLight(make_shared<Light>());
+		light->GetLight()->SetLightDirection(Vec3(0.f, -1.f, 0.f));
 		light->GetLight()->SetLightType(LIGHT_TYPE::DIRECTIONAL_LIGHT);
 		light->GetLight()->SetDiffuse(Vec3(1.f, 1.f, 1.f));
 		light->GetLight()->SetAmbient(Vec3(0.1f, 0.1f, 0.1f));
@@ -455,22 +516,20 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 
 #pragma region Map
 	{
-		shared_ptr<GameObject> t = make_shared<GameObject>();
-		t->AddComponent(make_shared<Transform>());
-		t->GetTransform()->SetLocalRotation(Vec3(-90.f, 0.f, 0.f));
-		scene->AddGameObject(t);
-
 		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Factory1Items.fbx");
-
 		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate(ColliderType::OBB);
 
 		for (auto& gameObject : gameObjects)
 		{
 			gameObject->SetName(L"Map");
-			gameObject->SetStatic(true);
-			gameObject->GetTransform()->SetParent(t->GetTransform());
+			//gameObject->SetStatic(true);
+			gameObject->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
+			gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 0.f, 0.f));
+			//gameObject->GetTransform()->SetParent(t->GetTransform());
 			scene->AddGameObject(gameObject);
 		}
+
+		//GET_SINGLE(JsonMgr)->SaveMapCollider(L"..\\Resources\\Json\\MapCollider.json", gameObjects);
 	}
 #pragma endregion
 

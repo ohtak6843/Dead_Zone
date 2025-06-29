@@ -1,5 +1,4 @@
 #pragma once
-#include "Component.h"
 #include "Object.h"
 
 class Transform;
@@ -12,31 +11,44 @@ class Terrain;
 class BaseCollider;
 class Animator;
 
+enum class GAMEOBJECT_TYPE
+{
+	DEFAULT,
+	CAMERA,
+	LIGHT,
+	PARTICLE,
+	PLAYER,
+	ZOMBIE,
+
+	END
+};
+
 class GameObject : public Object, public enable_shared_from_this<GameObject>
 {
 public:
 	GameObject();
 	virtual ~GameObject();
 
-	void Awake();
-	void Start();
-	void Update();
-	void LateUpdate();
-	void FinalUpdate();
+public:
+	GameObject& operator=(const GameObject& other);
 
-	shared_ptr<Component> GetFixedComponent(COMPONENT_TYPE type);
+	virtual void Awake() {}
+	virtual void Start() {}
+	virtual void Update() {}
+	virtual void LateUpdate() {}
+	virtual void FinalUpdate();
 
-	shared_ptr<Transform> GetTransform();
-	shared_ptr<MeshRenderer> GetMeshRenderer();
-	shared_ptr<Camera> GetCamera();
-	shared_ptr<Light> GetLight();
-	shared_ptr<Particle> GetParticle();
-	shared_ptr<BaseCollider> GetCollider();
-	shared_ptr<Animator> GetAnimator();
-	
-	shared_ptr<MonoBehaviour> GetMonoBehaviour(const wstring& name);
+	shared_ptr<Transform> GetTransform() { return _transform; }
+	shared_ptr<MeshRenderer> GetMeshRenderer() { return _meshRenderer; }
+	shared_ptr<BaseCollider> GetCollider() { return _collider; }
+	shared_ptr<Animator> GetAnimator() { return _animator; }
 
-	void AddComponent(shared_ptr<Component> component);
+	void SetTransform(shared_ptr<Transform> transform);
+	void SetMeshRenderer(shared_ptr<MeshRenderer> meshRenderer);
+	void SetCollider(shared_ptr<BaseCollider> collider);
+	void SetAnimator(shared_ptr<Animator> animator);
+
+	GAMEOBJECT_TYPE GetGameObjectType() const { return _type; }
 
 	void SetCheckFrustum(bool checkFrustum) { _checkFrustum = checkFrustum; }
 	bool GetCheckFrustum() { return _checkFrustum; }
@@ -51,22 +63,13 @@ public:
 	void SetActive(bool active) { _isActive = active; }
 	bool IsActive() const { return _isActive; }
 
-public:
-	template<typename T>
-	shared_ptr<T> GetScript()
-	{
-		for (auto& script : _scripts)
-		{
-			shared_ptr<T> casted = dynamic_pointer_cast<T>(script);
-			if (casted)
-				return casted;
-		}
-		return nullptr;
-	}
+protected:
+	GAMEOBJECT_TYPE _type;
 
-private:
-	array<shared_ptr<Component>, FIXED_COMPONENT_COUNT> _components;
-	vector<shared_ptr<MonoBehaviour>> _scripts;
+	shared_ptr<Transform> _transform;
+	shared_ptr<MeshRenderer> _meshRenderer;
+	shared_ptr<BaseCollider> _collider;
+	shared_ptr<Animator> _animator;
 
 	bool _isActive = true;
 	bool _checkFrustum = true;

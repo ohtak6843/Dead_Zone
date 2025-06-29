@@ -16,10 +16,6 @@ MultiPlayer::~MultiPlayer()
 {
 }
 
-void MultiPlayer::LateUpdate()
-{
-}
-
 void MultiPlayer::SetState(PLAYER_STATE playerState)
 {
 	// 현재 상태와 패킷의 상태가 같으면 아무것도 하지 않음

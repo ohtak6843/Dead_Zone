@@ -19,14 +19,8 @@ TP_AK47::~TP_AK47()
 
 void TP_AK47::LateUpdate()
 {
-	if (_parentObject == nullptr)
-		return;
-
 	int32 rightHandBoneIndex = _parentObject->GetMeshRenderer()->GetMesh()->GetRightHandBoneIndex();
 	Matrix rightHandBoneMatrix = _parentObject->GetAnimator()->GetBoneMatrix(rightHandBoneIndex);
-	Matrix parentMatrix = _parentObject->GetTransform()->GetWorldMatrix();
-
-	rightHandBoneMatrix = rightHandBoneMatrix * parentMatrix;
 
 	// Base 행렬 계산
 	Matrix matScale = Matrix::CreateScale(_baseScale);
@@ -52,13 +46,14 @@ void TP_AK47::LateUpdate()
 
 	Matrix matLocal = matScale * matRotation * matTranslation;
 
-	matLocal *= rightHandBoneMatrix;
+	Matrix matFinal = matLocal * rightHandBoneMatrix;
 
 	Vec3 scale{};
 	Vec3 rotation{};
 	Vec3 translation{};
 	SimpleMath::Quaternion orientation{};
-	matLocal.Decompose(scale, orientation, translation);
+
+	matFinal.Decompose(scale, orientation, translation);
 
 	rotation = Transform::QuaternionToEuler(orientation);
 	rotation.x = RadianToDegree(rotation.x);

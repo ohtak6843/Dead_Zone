@@ -7,12 +7,13 @@
 #include "Transform.h"
 #include "Texture.h"
 #include "SceneMgr.h"
+#include "CameraObject.h"
 
-Light::Light() : Component(COMPONENT_TYPE::LIGHT)
+Light::Light()
 {
-	_shadowCamera = make_shared<GameObject>();
-	_shadowCamera->AddComponent(make_shared<Transform>());
-	_shadowCamera->AddComponent(make_shared<Camera>());
+	_shadowCamera = make_shared<CameraObject>();
+	_shadowCamera->SetTransform(make_shared<Transform>());
+	_shadowCamera->SetCamera(make_shared<Camera>());
 	uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
 	_shadowCamera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, true); // UI´Â ¾È ÂïÀ½
 }
@@ -53,8 +54,8 @@ void Light::SetLightType(LIGHT_TYPE type)
 
 		_shadowCamera->GetCamera()->SetScale(1.f);
 		_shadowCamera->GetCamera()->SetFar(10000.f);
-		_shadowCamera->GetCamera()->SetWidth(4096);
-		_shadowCamera->GetCamera()->SetHeight(4096);
+		_shadowCamera->GetCamera()->SetWidth(40960);
+		_shadowCamera->GetCamera()->SetHeight(40960);
 
 		break;
 	case LIGHT_TYPE::POINT_LIGHT:

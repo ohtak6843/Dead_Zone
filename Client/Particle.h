@@ -1,7 +1,9 @@
 #pragma once
-#include "Component.h"
+#include "GameObject.h"
 #include "Material.h"
 
+class GameObject;
+class Transform;
 class Material;
 class Mesh;
 class UploadBuffer;
@@ -32,7 +34,7 @@ struct ComputeSharedInfo
 	int32 padding[3];
 };
 
-class Particle : public Component
+class Particle
 {
 public:
 	Particle();
@@ -54,6 +56,15 @@ public:
 	void SetParticleType(int32 type) { _type = type; }
 
 	void SetActive(bool active) { _isActive = active; _elapsedTime = 0.0f; _accTime = 0.f; }
+
+public:
+	shared_ptr<GameObject> GetGameObject() { return _gameObject.lock(); }
+	shared_ptr<Transform> GetTransform() { return GetGameObject()->GetTransform(); }
+
+private:
+	friend class ParticleObject;
+	void SetGameObject(shared_ptr<GameObject> gameObject) { _gameObject = gameObject; }
+	weak_ptr<GameObject> _gameObject;
 
 protected:
 	shared_ptr<UploadBuffer>	_particleBuffer;

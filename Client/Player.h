@@ -1,5 +1,5 @@
 #pragma once
-#include "MonoBehaviour.h"
+#include "GameObject.h"
 #include "GameInfo.h"
 
 enum class PLAYER_STATE
@@ -26,19 +26,14 @@ enum class PLAYER_ANIMATION_TYPE
 	END,
 };
 
-class Player : public MonoBehaviour
+class Player : public GameObject
 {
 public:
 	Player();
 	virtual ~Player();
 
-	virtual void LateUpdate() override;
-
-	virtual void SetState(PLAYER_STATE state) {}
-
-	void Awake();
-	void Start();
-	void Update();
+public:
+	virtual void SetState(PLAYER_STATE state) { _state = state; }
 	
 protected:
 	PLAYER_STATE _state;

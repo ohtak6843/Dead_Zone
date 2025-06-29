@@ -7,7 +7,7 @@
 #include "MeshRenderer.h"
 #include "UploadBuffer.h"
 
-Animator::Animator() : Component(COMPONENT_TYPE::ANIMATOR)
+Animator::Animator()
 {
 	_computeMaterial = GET_SINGLE(Resources)->Get<Material>(L"ComputeAnimation");
 	_boneFinalMatrix = make_shared<UploadBuffer>();

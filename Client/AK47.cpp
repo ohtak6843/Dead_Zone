@@ -49,11 +49,15 @@ void AK47::Awake()
 	}
 
 	// 파티클 위치 설정
-	setParticlePos(_ParticlePosition);
+	SetParticlePos(_ParticlePosition);
 
 	//TODO
 	/*_startFov = camera->GetNormalFOV();
 	_startPos = _basePosition;*/
+}
+
+void AK47::Start()
+{
 }
 
 void AK47::Update()

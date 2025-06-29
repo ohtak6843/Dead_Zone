@@ -5,6 +5,7 @@
 #include "Framework.h"
 #include "Scene.h"
 #include "GameObject.h"
+#include "Zombie.h"
 
 #include "BaseCollider.h"
 #include "SphereCollider.h"
@@ -81,7 +82,7 @@ shared_ptr<class GameObject> RaycastMgr::Pick(int32 screenX, int32 screenY)
 	return pickedObject;
 }
 
-bool RaycastMgr::PickZombie(int32 screenX, int32 screenY, Vec3& hitPos, shared_ptr<GameObject>& pickedZombie)
+bool RaycastMgr::PickZombie(int32 screenX, int32 screenY, Vec3& hitPos, shared_ptr<Zombie>& pickedZombie)
 {
 	SetRayOriginAndDir(screenX, screenY);
 
@@ -90,7 +91,7 @@ bool RaycastMgr::PickZombie(int32 screenX, int32 screenY, Vec3& hitPos, shared_p
 	float minDistance = FLT_MAX;
 	bool hit = false;
 	Vec3 closestHitPos;
-	shared_ptr<GameObject> closestZombie = nullptr;
+	shared_ptr<Zombie> closestZombie = nullptr;
 
 	for (auto& zombieGroup : zombies)
 	{

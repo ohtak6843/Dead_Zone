@@ -17,6 +17,7 @@
 #include "M4A1.h"
 #include "AK47.h"
 #include "Zombie.h"
+#include "ParticleObject.h"
 
 LocalPlayer::LocalPlayer()
 {
@@ -221,8 +222,8 @@ void LocalPlayer::ProcessKeyInput()
 
 			auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1");
 			gun->SetActive(true);
-			Vec3 pos = static_pointer_cast<M4A1>(gun->GetMonoBehaviour(L"M4A1"))->GetNomalParticlePos();
-			static_pointer_cast<M4A1>(gun->GetMonoBehaviour(L"M4A1"))->setParticlePos(pos);
+			Vec3 pos = static_pointer_cast<M4A1>(gun)->GetNomalParticlePos();
+			static_pointer_cast<M4A1>(gun)->SetParticlePos(pos);
 
 		}
 		else if (_GunType == 1)
@@ -230,8 +231,8 @@ void LocalPlayer::ProcessKeyInput()
 			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1")->SetActive(false);
 			auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47");
 			gun->SetActive(true);
-			Vec3 pos = static_pointer_cast<AK47>(gun->GetMonoBehaviour(L"AK47"))->GetNomalParticlePos();
-			static_pointer_cast<AK47>(gun->GetMonoBehaviour(L"AK47"))->setParticlePos(pos);
+			Vec3 pos = static_pointer_cast<AK47>(gun)->GetNomalParticlePos();
+			static_pointer_cast<AK47>(gun)->SetParticlePos(pos);
 		}
 	}
 }
@@ -241,7 +242,7 @@ void LocalPlayer::ProcessMouseInput()
 	if (INPUT->GetButton(MOUSE_TYPE::LBUTTON))
 	{
 		Vec3 hitPos;
-		shared_ptr<GameObject> zombie;
+		shared_ptr<Zombie> zombie;
 
 		if (GET_SINGLE(RaycastMgr)->PickZombie(gameFramework->GetWindow().width / 2, gameFramework->GetWindow().height / 2, OUT hitPos, OUT zombie)) {
 			cs_packet_attack atkPkt{};
@@ -253,16 +254,11 @@ void LocalPlayer::ProcessMouseInput()
 				sizeof(atkPkt),
 				0);
 
-			// 파티클 출력
-			auto zombieObj = zombie->GetScript<Zombie>();
-			
-			if (zombieObj != nullptr)
-			{
-				auto particle = zombieObj->GetParticle();
-				if (particle != nullptr)
-				{
-					particle->GetParticle()->SetActive(true);
-					particle->GetTransform()->SetLocalPosition(hitPos);
+			if (zombie) {
+				shared_ptr<ParticleObject> particleObj = zombie->GetParticle();
+				if (particleObj) {
+					particleObj->GetTransform()->SetLocalPosition(hitPos);
+					particleObj->GetParticle()->SetActive(true);
 				}
 			}
 		}

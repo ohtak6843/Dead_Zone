@@ -49,11 +49,15 @@ void M4A1::Awake()
 	}
 
 	// 파티클 위치 설정
-	setParticlePos(_ParticlePosition);
+	SetParticlePos(_ParticlePosition);
 
 	//TODO
 	/*_startFov = camera->GetNormalFOV();
 	_startPos = _basePosition;*/
+}
+
+void M4A1::Start()
+{
 }
 
 void M4A1::Update()

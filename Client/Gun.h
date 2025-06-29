@@ -1,17 +1,19 @@
 #pragma once
-#include "MonoBehaviour.h"
+#include "GameObject.h"
 #include "GameInfo.h"
 
-class Gun : public MonoBehaviour
+class ParticleObject;
+
+class Gun : public GameObject
 {
 public:
 	Gun();
 	virtual ~Gun();
 
-	virtual void Awake() override {};
-	//virtual void Start() override {}
-	virtual void Update() override {}
-	virtual void LateUpdate() override {}
+	virtual void Awake() override;
+	virtual void Start() override;
+	virtual void Update() override;
+	virtual void LateUpdate() override;
 
 	void Fire();
 	void Reload();
@@ -24,7 +26,7 @@ public:
 	
 	// 파티클 관련 함수
 	void InitializeParticle();
-	void setParticlePos(Vec3 pos);
+	void SetParticlePos(Vec3 pos);
 
 	bool GetInitialized() { return _initialized; }
 
@@ -41,7 +43,7 @@ private:
 
 protected:
 	GunInfo _info;
-	static shared_ptr<GameObject> _particle;
+	static shared_ptr<ParticleObject> _particle;
 	float _gunRecoilTime; // 총기 반동 시간
 	float _cameraRecoilTime; // 카메라 반동 시간
 

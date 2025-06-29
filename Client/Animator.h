@@ -1,16 +1,20 @@
 #pragma once
-#include "Component.h"
+#include "GameObject.h"
 #include "Mesh.h"
 
+class GameObject;
 class Material;
 class UploadBuffer;
 class Mesh;
 
-class Animator : public Component
+class Animator
 {
 public:
 	Animator();
 	virtual ~Animator();
+
+public:
+	void FinalUpdate();
 
 public:
 	void SetBones(const vector<BoneInfo>* bones) { _bones = bones; }
@@ -32,7 +36,13 @@ public:
 	}
 
 public:
-	virtual void FinalUpdate() override;
+	shared_ptr<GameObject> GetGameObject() { return _gameObject.lock(); }
+	shared_ptr<Transform> GetTransform() { return _gameObject.lock()->GetTransform(); }
+
+private:
+	friend class GameObject;
+	void SetGameObject(shared_ptr<GameObject> gameObject) { _gameObject = gameObject; }
+	weak_ptr<GameObject> _gameObject;
 
 private:
 	const vector<BoneInfo>* _bones;
@@ -50,6 +60,6 @@ private:
 	int32							_blendFrame = 0;
 
 	shared_ptr<Material>			_computeMaterial;
-	shared_ptr<UploadBuffer>	_boneFinalMatrix;  // 특정 프레임의 최종 행렬
+	shared_ptr<UploadBuffer>		_boneFinalMatrix;  // 특정 프레임의 최종 행렬
 	bool							_boneFinalUpdated = false;
 };

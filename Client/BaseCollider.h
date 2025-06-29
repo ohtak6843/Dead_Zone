@@ -1,5 +1,8 @@
 #pragma once
-#include "Component.h"
+#include "GameObject.h"
+
+class GameObject;
+class Transform;
 
 enum class ColliderType
 {
@@ -9,12 +12,15 @@ enum class ColliderType
 	OBB,
 };
 
-class BaseCollider : public Component
+class BaseCollider
 {
 public:
 	BaseCollider(ColliderType colliderType);
 	virtual ~BaseCollider();
 
+	virtual void FinalUpdate() {}
+
+public:
 	ColliderType GetColliderType() { return _colliderType; }
 
 	virtual bool Intersects(Vec4 rayOrigin, Vec4 rayDir, OUT float& distance) = 0;
@@ -28,6 +34,15 @@ public:
 	void SetRotation(Vec3 rotation) { _rotation = rotation; }
 
 	shared_ptr<GameObject> GetDebugCollider() { return _debugCollider; }
+
+public:
+	shared_ptr<GameObject> GetGameObject() { return _gameObject.lock(); }
+	shared_ptr<Transform> GetTransform() { return _gameObject.lock()->GetTransform(); }
+
+private:
+	friend class GameObject;
+	void SetGameObject(shared_ptr<GameObject> gameObject) { _gameObject = gameObject; }
+	weak_ptr<GameObject> _gameObject;
 
 protected:
 	Vec3						_center = {}; // 콜라이더의 로컬 중심 위치

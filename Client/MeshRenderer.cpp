@@ -7,7 +7,7 @@
 #include "Resources.h"
 #include "Animator.h"
 
-MeshRenderer::MeshRenderer() : Component(COMPONENT_TYPE::MESH_RENDERER)
+MeshRenderer::MeshRenderer()
 {
 
 }
