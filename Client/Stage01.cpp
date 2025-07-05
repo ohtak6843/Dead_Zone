@@ -322,8 +322,6 @@ void Stage01::Init()
 			gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 0.f, 0.f));
 			AddGameObject(gameObject);
 		}
-
-		GET_SINGLE(JsonMgr)->SaveMapCollider(L"..\\Resources\\Json\\Stage01_Collider.json", gameObjects);
 	}
 
 	// Debris
