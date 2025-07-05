@@ -31,15 +31,11 @@ void TitleCamera::LateUpdate()
 	//	}
 	//}
 
-	if (INPUT->GetButtonDown(KEY_TYPE::SPACE))
-	{
-		GET_SINGLE(SceneMgr)->SetChangeScene(true);
-		GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE01);
-	}
-
-	// 콜라이더 출력 여부
-	if (INPUT->GetButtonDown(KEY_TYPE::KEY_F5))
-		SET_DEBUG_MODE(!DEBUG_MODE);
+	//if (INPUT->GetButtonDown(KEY_TYPE::SPACE))
+	//{
+	//	GET_SINGLE(SceneMgr)->SetChangeScene(true);
+	//	GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE01);
+	//}
 
 	//constexpr float left = (WINDOW_WIDTH / 2) + 380.f - 400.f; // 620
 	//constexpr float right = (WINDOW_WIDTH / 2) + 380.f + 400.f; // 1420
