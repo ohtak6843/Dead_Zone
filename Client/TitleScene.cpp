@@ -6,8 +6,13 @@
 #include "Camera.h"
 #include "TitleCamera.h"
 
+#include "InputMgr.h"
 #include "SceneMgr.h"
 #include "Resources.h"
+
+#include "Framework.h"
+#include "BaseCollider.h"
+#include "OrientedBoxCollider.h"
 
 TitleScene::TitleScene()
 {
@@ -63,6 +68,7 @@ void TitleScene::Init()
 #pragma region 
 	{
 		shared_ptr<GameObject> gameStartButton = make_shared<GameObject>();
+		gameStartButton->SetName(L"GameStartButton");
 		gameStartButton->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
 		gameStartButton->SetTransform(make_shared<Transform>());
 		gameStartButton->GetTransform()->SetLocalScale(Vec3(400.f, 200.f, 1.f));
@@ -80,9 +86,17 @@ void TitleScene::Init()
 			material->SetTexture(0, texture);
 			meshRenderer->SetMaterial(material);
 		}
-
 		gameStartButton->SetMeshRenderer(meshRenderer);
+
+		//shared_ptr<OrientedBoxCollider> boundingBox = make_shared<OrientedBoxCollider>();
+		//boundingBox->SetCenter(Vec3(0.f, 0.f, 0.f));
+		//boundingBox->SetExtents(Vec3(0.5f, 0.5f, 0.f));
+		//gameStartButton->SetCollider(boundingBox);
+		gameStartButton->SetCheckFrustum(false);
 		AddGameObject(gameStartButton);
 	}
 #pragma endregion
+
+	INPUT->LockCursor(false);
+	gameFramework->ToggleFullScreen(false);
 }

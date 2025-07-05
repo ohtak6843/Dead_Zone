@@ -40,6 +40,12 @@ public:
 	bool IsFullScreen() { return _fullScreen; }
 	void SetFullScreen(bool flag) { _fullScreen = flag; }
 
+	bool GetChangeScene() { return _changeScene; }
+	void SetChangeScene(bool changeScene) { _changeScene = changeScene; }
+
+	SCENE_TYPE GetNextSceneType() { return _nextSceneType; }
+	void SetNextSceneType(SCENE_TYPE type) { _nextSceneType = type; }
+
 public:
 	shared_ptr<Scene> GetActiveScene() { return _activeScene; }
 
@@ -57,5 +63,8 @@ private:
 
 	bool _debugMode = false;
 	bool _fullScreen = false;
+
+	bool _changeScene = false;
+	SCENE_TYPE _nextSceneType;
 };
 

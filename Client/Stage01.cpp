@@ -15,7 +15,10 @@
 #include "MeshRenderer.h"
 #include "M4A1.h"
 #include "AK47.h"
+
 #include "SceneMgr.h"
+#include "InputMgr.h"
+#include "JsonMgr.h"
 
 Stage01::Stage01()
 {
@@ -23,6 +26,18 @@ Stage01::Stage01()
 
 Stage01::~Stage01()
 {
+}
+
+void Stage01::LoadResources()
+{
+	// 맵 로드
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Factory1Items.fbx");
+
+	// 플레이어 로드
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Soldado.fbx");
+
+	// 좀비 로드
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
 }
 
 void Stage01::Init()
@@ -240,7 +255,7 @@ void Stage01::Init()
 
 #pragma region AK47
 	{
-		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\AK74.fbx");
+		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\AK47.fbx");
 
 		vector<shared_ptr<AK47>> gameObjects = meshData->InstantiateAs<AK47>();
 		uint8 gunLayer = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"Gun");
@@ -269,7 +284,7 @@ void Stage01::Init()
 	{
 		shared_ptr<LightObject> light = make_shared<LightObject>();
 		light->SetTransform(make_shared<Transform>());
-		light->GetTransform()->SetLocalPosition(Vec3(1185.f, 4000.f, 473.f));
+		light->GetTransform()->SetLocalPosition(Vec3(1185.f, 2000.f, 473.f));
 		light->SetLight(make_shared<Light>());
 		light->GetLight()->SetLightDirection(Vec3(0.f, -1.f, 0.f));
 		light->GetLight()->SetLightType(LIGHT_TYPE::DIRECTIONAL_LIGHT);
@@ -282,30 +297,49 @@ void Stage01::Init()
 #pragma endregion
 
 #pragma region Map
+	// Roof
 	{
-		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Factory1Items.fbx");
+		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Factory1_Roof.fbx");
 		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate(ColliderType::OBB);
 
 		for (auto& gameObject : gameObjects)
 		{
-			gameObject->SetName(L"Map");
-			//gameObject->SetStatic(true);
+			gameObject->SetStatic(true);
+			gameObject->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
+			gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 0.f, 0.f));
+			AddGameObject(gameObject);
+		}
+	}
+
+	// Base
+	{
+		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Factory1_Base.fbx");
+		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate(ColliderType::OBB);
+
+		for (auto& gameObject : gameObjects)
+		{
+			gameObject->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
+			gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 0.f, 0.f));
+			AddGameObject(gameObject);
+		}
+
+		GET_SINGLE(JsonMgr)->SaveMapCollider(L"..\\Resources\\Json\\Stage01_Collider.json", gameObjects);
+	}
+
+	// Debris
+	{
+		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Factory1_Debris.fbx");
+		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate(ColliderType::OBB);
+
+		for (auto& gameObject : gameObjects)
+		{
 			gameObject->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
 			gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 0.f, 0.f));
 			AddGameObject(gameObject);
 		}
 	}
 #pragma endregion
-}
 
-void Stage01::LoadResources()
-{
-	// 맵 로드
-	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Factory1Items.fbx");
-
-	// 플레이어 로드
-	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Soldado.fbx");
-
-	// 좀비 로드
-	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
+	INPUT->LockCursor(true);
+	gameFramework->ToggleFullScreen(true);
 }

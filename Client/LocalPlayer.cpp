@@ -176,9 +176,8 @@ void LocalPlayer::LateUpdate()
 
 void LocalPlayer::ProcessKeyInput()
 {
-	// 콜라이더 출력 여부
 	if (INPUT->GetButtonDown(KEY_TYPE::KEY_F6))
-		gameFramework->ToggleFullScreen();
+		gameFramework->ToggleFullScreen(!FULL_SCREEN);	
 
 	// 콜라이더 출력 여부
 	if (INPUT->GetButtonDown(KEY_TYPE::KEY_F5))

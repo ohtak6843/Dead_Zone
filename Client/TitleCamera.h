@@ -8,5 +8,8 @@ public:
 	virtual ~TitleCamera();
 
 	virtual void LateUpdate() override;
+
+private:
+	POINT _mousePos;
 };
 
