@@ -5,10 +5,13 @@
 #include "GameManager.h"
 #include "Zombie.h"
 #include <vector>
+#include "MapColliderLoader.h"
+#include "Pathfinding.h"
 
 // 활성 방 목록 전방 선언
 class GameRoom;
 extern std::vector<GameRoom*> activeRooms;
+extern std::vector<Collider> mapColliders;
 
 class GameRoom {
 public:
@@ -27,10 +30,16 @@ public:
     std::chrono::milliseconds                spawnInterval{ 1000 };
 
     void RemoveZombieById(long long zombieId);
+    int      killCount = 0;
+    uint8_t  currentStage = 1;
 private:
+    
     std::vector<Zombie>              zombies;
     uint32_t                          snapshotFrameCount = 0;
     uint32_t                          snapshotFrameInterval;
+    std::vector<std::vector<bool>> grid;  // 차단 정보(이동 가능/불가)
+    float cellSize = 50.0f;            // 한 그리드 셀의 크기 (world units)
+    Vec2f worldOrigin = { 0, 0 };  // 그리드(0,0)에 대응하는 월드 좌표
     long long nextZombieId = 1;
     void HandlePlayerPhysics(float dt);
     void HandlePlayerCollisions();

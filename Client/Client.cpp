@@ -199,7 +199,13 @@ void ReceiverThread(SOCKET clientSocket) {
                     g_gameStarted = true;
                     break;
                 }
-
+                case S2C_P_STAGE_CHANGE: {
+                    auto* p = reinterpret_cast<sc_packet_stage_change*>(packet);
+                    uint8_t newStage = p->newStage;
+                    // TODO: 씬 새 스테이지 반영
+                    MessageBoxA(NULL, "스테이지 변경 수신", "Debug - stage", MB_OK);
+                    break;
+                }
                 default:
                     std::cout << "[클라이언트] 정의되지 않은 패킷 타입: "
                         << static_cast<int>(pktType) << std::endl;
@@ -266,7 +272,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     GET_SINGLE(SceneMgr)->LoadScene(L"TestScene");
 
     std::thread recvThread(ReceiverThread, g_clientSocket);
-    // 자동 로그인: cs_packet_login 패킷 전송
+    // 자동 로그인: cs_packet_login 패킷 전송 게임 스타트 버튼을 눌렀을때로 변경
     cs_packet_login loginPacket;
     loginPacket.size = sizeof(cs_packet_login);
     loginPacket.type = C2S_P_LOGIN;

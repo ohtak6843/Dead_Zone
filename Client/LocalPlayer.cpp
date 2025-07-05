@@ -64,8 +64,8 @@ void LocalPlayer::LateUpdate()
 	{
 		_moveDir.Normalize();
 
-		pos += _moveDir * _speed * DELTA_TIME;
-		GetTransform()->SetLocalPosition(pos);
+		/*pos += _moveDir * _speed * DELTA_TIME;
+		GetTransform()->SetLocalPosition(pos);*/ //서버권위 수정
 
 		cs_packet_move pkt;
 		pkt.size = sizeof(cs_packet_move);
@@ -171,7 +171,7 @@ void LocalPlayer::LateUpdate()
 		lastState = newState;
 	}
 
-	GetTransform()->SetLocalPosition(pos);
+	//GetTransform()->SetLocalPosition(pos); 서버권위
 }
 
 void LocalPlayer::ProcessKeyInput()

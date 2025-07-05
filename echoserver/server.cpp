@@ -18,6 +18,7 @@
 #include <atomic>
 #include <cstring>
 #include <algorithm>
+#include "MapColliderLoader.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -35,6 +36,8 @@ std::vector<PER_SOCKET_CONTEXT*> g_connectedPlayers;
 std::atomic<bool> g_running{ true };
 
 LPFN_ACCEPTEX lpfnAcceptEx = NULL;
+
+std::vector<Collider> mapColliders;
 
 GameRoom* FindGameRoomForPlayer(PER_SOCKET_CONTEXT* player) {
     for (auto* room : activeRooms) {
@@ -310,9 +313,18 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         ev.position = { pContext->posX, pContext->posY, pContext->posZ };
         ev.look = pContext->look;
         if (auto* room = FindGameRoomForPlayer(pContext)) {
-            for (auto* peer : room->players)
-                if (peer != pContext)
-                     PostSendPacket(peer, &ev, ev.size);
+            for (auto* peer : room->players) {
+                if (peer == pContext) {
+                    // 자기 자신에게 보낼 때만 Y를 +90
+                    sc_packet_move evSelf = ev;
+                    evSelf.position.y += 140.0f;
+                    PostSendPacket(peer, &evSelf, evSelf.size);
+                }
+                else {
+                    // 다른 플레이어들에겐 원본(ev) 그대로
+                    PostSendPacket(peer, &ev, ev.size);
+                }
+            }
         }
         break;
     }
@@ -337,6 +349,18 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
             }
 
             room->RemoveZombieById(zid);
+            
+            if (room->killCount >= 10) {
+                room->killCount = 0;          
+                room->currentStage += 1;      
+                sc_packet_stage_change stagePkt{};
+                stagePkt.size = sizeof(stagePkt);
+                stagePkt.type = S2C_P_STAGE_CHANGE;
+                stagePkt.newStage = room->currentStage;
+                for (auto* peer : room->players) {
+                    PostSendPacket(peer, &stagePkt, stagePkt.size);
+                }
+            }
         }
         break;
     }
@@ -392,13 +416,13 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
 
     void MatchmakingCheck() {
     std::lock_guard<std::mutex> lock(g_lobbyMutex);
-    while (g_lobbyQueue.size() >= 3) {
+    while (g_lobbyQueue.size() >= 2) {
         PER_SOCKET_CONTEXT* p1 = g_lobbyQueue.front(); g_lobbyQueue.pop();
         PER_SOCKET_CONTEXT* p2 = g_lobbyQueue.front(); g_lobbyQueue.pop();
-        PER_SOCKET_CONTEXT* p3 = g_lobbyQueue.front(); g_lobbyQueue.pop();
+        /*PER_SOCKET_CONTEXT* p3 = g_lobbyQueue.front(); g_lobbyQueue.pop();*/
 
-        p1->state = p2->state = p3->state = STATE_GAME;
-        std::vector<PER_SOCKET_CONTEXT*> players = { p1, p2, p3 };
+        p1->state = p2->state = /*p3->state =*/ STATE_GAME;
+        std::vector<PER_SOCKET_CONTEXT*> players = { p1, p2/*, p3*/ };
 
         sc_packet_game_start gameStart{};
         gameStart.size = sizeof(sc_packet_game_start);
@@ -427,8 +451,8 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
 
         new GameRoom(players);
 
-        printf("게임룸 생성: %s, %s, %s\n",
-            p1->username.c_str(), p2->username.c_str(), p3->username.c_str());
+        printf("게임룸 생성: %s, %s\n",
+            p1->username.c_str(), p2->username.c_str()/*, p3->username.c_str()*/);
     }
 }
 
@@ -462,6 +486,15 @@ int main() {
 
     g_hIOCP = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
     CreateIoCompletionPort((HANDLE)g_listenSocket, g_hIOCP, 0, 0);
+
+    try {
+        mapColliders = MapColliderLoader::Load("MapCollider.json");
+    }
+    catch (const std::exception& e) {
+        std::cerr << "맵 콜라이더 로드 실패: " << e.what() << std::endl;
+        return -1;
+    }
+    std::cout << "Loaded colliders: " << mapColliders.size() << "\n";
 
     GUID guidAcceptEx = WSAID_ACCEPTEX;
     DWORD bytes = 0;

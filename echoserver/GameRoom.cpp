@@ -7,6 +7,7 @@
 #include <chrono>
 #include <cmath>
 #include <limits>
+#include "PhysicsSystem.h"
 
 constexpr float MAP_MIN_X = 237.0f;
 constexpr float MAP_MAX_X = 2030.0f;
@@ -91,32 +92,35 @@ void GameRoom::SendLandPacket(PER_SOCKET_CONTEXT* p)
 
 void GameRoom::HandlePlayerCollisions()
 {
-    // 맵 경계 AABB
+   // (1) 지면 바닥 Y만 남겨두고, 맵 경계는 mapColliders로 처리
     const float groundY = MAP_MIN_Y;
     for (auto* p : players) {
-        if (p->posX - PLAYER_RADIUS < MAP_MIN_X)
-            p->posX = MAP_MIN_X + PLAYER_RADIUS;
-        else if (p->posX + PLAYER_RADIUS > MAP_MAX_X)
-            p->posX = MAP_MAX_X - PLAYER_RADIUS;
-
-        if (p->posZ - PLAYER_RADIUS < MAP_MIN_Z)
-            p->posZ = MAP_MIN_Z + PLAYER_RADIUS;
-        else if (p->posZ + PLAYER_RADIUS > MAP_MAX_Z)
-            p->posZ = MAP_MAX_Z - PLAYER_RADIUS;
-
+        // 지면 아래로 떨어지지 않도록 최소 높이 고정
         if (p->posY < groundY)
             p->posY = groundY;
+
+        // 맵 콜라이더(AABB)과 구 충돌 해제
+        // mapColliders는 server.cpp에서 MapColliderLoader로 로드된 전역 변수
+        for (const auto& col : mapColliders) {
+            PhysicsSystem::ResolveCollision(
+                p->posX, p->posY, p->posZ,
+                col,
+                PLAYER_RADIUS
+            );
+        }
     }
 
-    // 플레이어 간 구 충돌
+    // (2) 플레이어끼리의 구-구 충돌 처리 (기존 로직 유지)
     size_t n = players.size();
     for (size_t i = 0; i < n; ++i) {
         auto* a = players[i];
         for (size_t j = i + 1; j < n; ++j) {
             auto* b = players[j];
-            ResolveSphereCollision(a->posX, a->posY, a->posZ,
+            ResolveSphereCollision(
+                a->posX, a->posY, a->posZ,
                 b->posX, b->posY, b->posZ,
-                PLAYER_RADIUS);
+                PLAYER_RADIUS
+            );
         }
     }
 }
@@ -173,7 +177,7 @@ void GameRoom::SpawnZombies()
 void GameRoom::UpdateZombies(float dt)
 {
     for (auto& z : zombies) {
-        // 가장 가까운 플레이어 찾기
+        // 1) 가장 가까운 플레이어 찾기 (기존 로직)
         PER_SOCKET_CONTEXT* nearest = nullptr;
         float bestDist2 = std::numeric_limits<float>::infinity();
         for (auto* p : players) {
@@ -183,21 +187,43 @@ void GameRoom::UpdateZombies(float dt)
             if (d2 < bestDist2) { bestDist2 = d2; nearest = p; }
         }
 
-        // 상태 및 동작 로직
+        // 2) 상태 전환 (기존 로직)
         if (nearest && bestDist2 <= ATTACK_RADIUS2) {
             SetZombieState(z, Zombie::ATTACK);
         }
         else if (nearest && bestDist2 <= DETECT_RADIUS2) {
             SetZombieState(z, Zombie::WALK);
-            auto [dx, dz] = z.UpdatePosition(dt, nearest->posX, nearest->posZ);
-            BroadcastZombieMove(z, dx, dz);
+
+            // 3) 이동량 계산 (기존 z.UpdatePosition)
+            auto [rawDx, rawDz] = z.UpdatePosition(dt, nearest->posX, nearest->posZ);
+
+            // 4) 예측 위치에 물리 충돌 해제 적용
+            float newX = z.x + rawDx;
+            float newY = z.y;           // z.y는 땅+반지름으로 고정돼 있을 겁니다
+            float newZ = z.z + rawDz;
+            for (const auto& col : mapColliders) {
+                PhysicsSystem::ResolveCollision(
+                    newX, newY, newZ,
+                    col,
+                    ZOMBIE_RADIUS
+                );
+            }
+
+            // 5) 실제 적용된 이동량 재계산
+            float appliedDx = newX - z.x;
+            float appliedDz = newZ - z.z;
+
+            // 6) 위치 갱신
+            z.x = newX;
+            z.z = newZ;
+            // (z.y는 바닥 충돌 로직으로 이미 고정되어 있어야 합니다)
+
+            // 7) 브로드캐스트
+            BroadcastZombieMove(z, appliedDx, appliedDz);
         }
         else {
             SetZombieState(z, Zombie::IDLE);
         }
-
-        // 맵 경계 클램프
-        ClampZombiePosition(z);
     }
 }
 
@@ -278,5 +304,6 @@ void GameRoom::RemoveZombieById(long long zombieId)
         });
     if (it != zombies.end()) {
         zombies.erase(it);
+        killCount += 1;
     }
 }

@@ -257,6 +257,21 @@ void Scene::MovePlayer(sc_packet_move* packet)
 	Vec3 position = Vec3(packet->position.x, packet->position.y, packet->position.z);
 	Vec3 look = Vec3(packet->look.x, packet->look.y, packet->look.z);
 
+	if (packet->playerId == GWindowInfo.local) {
+		auto& root = _localPlayer[0];  
+		if (root) {
+			shared_ptr<Transform> rootTransform = root->GetTransform();
+			rootTransform->SetLocalPosition(position);
+			rootTransform->LookAt(look);
+
+			Vec3 rotation = rootTransform->GetLocalRotation();
+			rotation.x = -90.f;
+			rotation.y += 180.f;
+			rootTransform->SetLocalRotation(rotation);
+		}
+		return;
+	}
+
 	for (auto& [id, group] : _players) {
 		auto& root = group[0];
 		if (id == packet->playerId) {

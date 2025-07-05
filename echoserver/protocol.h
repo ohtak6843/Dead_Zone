@@ -22,6 +22,7 @@ constexpr char S2C_P_ZOMBIE_MOVE = 18;
 constexpr char S2C_P_ZOMBIE_STATE = 19;
 constexpr char MAX_ID_LEN = 20;
 constexpr char S2C_P_ZOMBIE_DIE = 21;
+constexpr char S2C_P_STAGE_CHANGE = 22;
 
 struct Vector3 {
     float x;
@@ -171,5 +172,11 @@ struct sc_packet_zombie_die {
     uint8_t    size;
     char       type;       
     long long  zombieId;   
+};
+
+struct sc_packet_stage_change {
+    uint8_t size;    
+    char    type;      
+    uint8_t newStage;  
 };
 #pragma pack(pop)

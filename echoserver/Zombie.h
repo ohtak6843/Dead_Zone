@@ -1,8 +1,8 @@
-// Zombie.h
 #pragma once
 #include <cmath>
 #include <string>
 #include <cstdio>
+#include "Pathfinding.h"
 
 // 좀비 종류 열거형
 enum ZombieType {
@@ -31,6 +31,7 @@ public:
     float attackSpeed; // 초당 공격 횟수
     float walkSpeed;
     float runSpeed;
+
     enum ZOMBIE_STATE : uint8_t {
         T_POSE = 0,
         IDLE = 1,
@@ -47,7 +48,9 @@ public:
 
     // 현재 위치
     float x, y, z;
-
+    std::vector<Vec2f> path;
+    size_t             pathIdx = 0;
+    float              speed = walkSpeed;
     // 생성자: 입력된 타입에 따라 스펙 초기화
     Zombie(ZombieType t) : type(t), x(0.0f), y(0.0f), z(0.0f) {
         if (t == BASIC) {
