@@ -1,5 +1,12 @@
 #pragma once
-class LoadingScene
-{
-};
+#include "Scene.h"
+#include "SceneMgr.h"
 
+class LoadingScene : public Scene
+{
+public:
+    LoadingScene();
+    virtual ~LoadingScene();
+
+    virtual void Init() override;
+};

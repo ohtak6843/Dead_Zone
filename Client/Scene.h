@@ -21,12 +21,16 @@ public:
 	Scene();
 	virtual ~Scene();
 
-	void Awake();
-	void Start();
-	void Update();
-	void LateUpdate();
-	void FinalUpdate();
+	virtual void LoadResources() {}
 
+	virtual void Init() {}
+	virtual void Awake();
+	virtual void Start();
+	virtual void Update();
+	virtual void LateUpdate();
+	virtual void FinalUpdate();
+
+public:
 	shared_ptr<Camera> GetMainCamera();
 	shared_ptr<Camera> GetPlayerCamera();
 	shared_ptr<Camera> GetGunCamera();

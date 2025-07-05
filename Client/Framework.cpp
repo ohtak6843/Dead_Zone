@@ -37,12 +37,14 @@ void Framework::Init(const WindowInfo& info)
 
 	ResizeWindow(info.width, info.height);
 
-	//ToggleFullScreen();
-
 	GET_SINGLE(InputMgr)->Init(info.hwnd);
 	GET_SINGLE(Timer)->Init();
 	GET_SINGLE(Resources)->Init();
 	GET_SINGLE(GameInfo)->Init();
+
+	GET_SINGLE(SceneMgr)->SetLayerName(0, L"Default");
+	GET_SINGLE(SceneMgr)->SetLayerName(1, L"Gun"); // 총 UI 별도 처리
+	GET_SINGLE(SceneMgr)->SetLayerName(2, L"UI");
 }
 
 void Framework::Update()
@@ -55,6 +57,14 @@ void Framework::Update()
 	Render();
 
 	ShowFps();
+
+	// 씬 전환 처리
+	if (GET_SINGLE(SceneMgr)->GetChangeScene())
+	{
+		SCENE_TYPE nextSceneType = GET_SINGLE(SceneMgr)->GetNextSceneType();
+		GET_SINGLE(SceneMgr)->SetChangeScene(false);
+		GET_SINGLE(SceneMgr)->SwitchScene(nextSceneType);
+	}
 }
 
 void Framework::Render()
@@ -94,9 +104,9 @@ void Framework::ResizeWindow(int32 width, int32 height)
 	::SetWindowPos(_window.hwnd, 0, 100, 100, width, height, 0);
 }
 
-void Framework::ToggleFullScreen()
+void Framework::ToggleFullScreen(bool flag)
 {
-	if (!FULL_SCREEN)
+	if (flag)
 	{
 		// 창모드 -> 전체화면
 		// 스타일 변경: 테두리 제거하고 팝업 스타일로
@@ -117,7 +127,7 @@ void Framework::ToggleFullScreen()
 				SWP_NOZORDER | SWP_FRAMECHANGED);
 		}
 
-		SET_FULL_SCREEN(true);
+		SET_FULL_SCREEN(flag);
 	}
 	else
 	{
@@ -132,7 +142,7 @@ void Framework::ToggleFullScreen()
 		::SetWindowPos(_window.hwnd, 0, 100, 100, _window.width, _window.height,
 			SWP_FRAMECHANGED | SWP_SHOWWINDOW);
 
-		SET_FULL_SCREEN(false);
+		SET_FULL_SCREEN(flag);
 	}
 }
 

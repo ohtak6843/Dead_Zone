@@ -4,6 +4,7 @@ class Scene;
 
 enum SCENE_TYPE
 {
+	TITLE,
 	LOADING,
 	STAGE01,
 	END,
@@ -22,7 +23,9 @@ public:
 	void Update();
 	void Render();
 	void RenderUI();
-	void LoadScene(wstring sceneName);
+	
+	void LoadScene(SCENE_TYPE type);
+	void SwitchScene(SCENE_TYPE type);
 
 	void SetLayerName(uint8 index, const wstring& name);
 	const wstring& IndexToLayerName(uint8 index) { return _layerNames[index]; }
@@ -36,6 +39,12 @@ public:
 
 	bool IsFullScreen() { return _fullScreen; }
 	void SetFullScreen(bool flag) { _fullScreen = flag; }
+
+	bool GetChangeScene() { return _changeScene; }
+	void SetChangeScene(bool changeScene) { _changeScene = changeScene; }
+
+	SCENE_TYPE GetNextSceneType() { return _nextSceneType; }
+	void SetNextSceneType(SCENE_TYPE type) { _nextSceneType = type; }
 
 public:
 	shared_ptr<Scene> GetActiveScene() { return _activeScene; }
@@ -54,5 +63,8 @@ private:
 
 	bool _debugMode = false;
 	bool _fullScreen = false;
+
+	bool _changeScene = false;
+	SCENE_TYPE _nextSceneType;
 };
 

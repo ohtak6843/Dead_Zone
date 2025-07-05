@@ -217,6 +217,8 @@
     <ClInclude Include="SimpleMath.h" />
     <ClInclude Include="SphereCollider.h" />
     <ClInclude Include="Stage01.h" />
+    <ClInclude Include="TitleCamera.h" />
+    <ClInclude Include="TitleScene.h" />
     <ClInclude Include="UICamera.h" />
     <ClInclude Include="UploadBuffer.h" />
     <ClInclude Include="DescriptorHeap.h" />
@@ -282,6 +284,8 @@
     <ClCompile Include="SimpleMath.cpp" />
     <ClCompile Include="SphereCollider.cpp" />
     <ClCompile Include="Stage01.cpp" />
+    <ClCompile Include="TitleCamera.cpp" />
+    <ClCompile Include="TitleScene.cpp" />
     <ClCompile Include="UICamera.cpp" />
     <ClCompile Include="UploadBuffer.cpp" />
     <ClCompile Include="DescriptorHeap.cpp" />

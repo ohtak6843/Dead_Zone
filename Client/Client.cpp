@@ -269,24 +269,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // 게임 프레임워크 초기화
     gameFramework->Init(GWindowInfo);
-    GET_SINGLE(SceneMgr)->LoadScene(L"TestScene");
+    GET_SINGLE(SceneMgr)->LoadScene(SCENE_TYPE::TITLE);
 
     std::thread recvThread(ReceiverThread, g_clientSocket);
-    // 자동 로그인: cs_packet_login 패킷 전송 게임 스타트 버튼을 눌렀을때로 변경
-    cs_packet_login loginPacket;
-    loginPacket.size = sizeof(cs_packet_login);
-    loginPacket.type = C2S_P_LOGIN;
-    int sendResult = send(g_clientSocket, reinterpret_cast<char*>(&loginPacket), sizeof(loginPacket), 0);
-    if (sendResult == SOCKET_ERROR) {
-        std::cerr << "로그인 패킷 전송 실패: " << WSAGetLastError() << std::endl;
-        closesocket(g_clientSocket);
-        WSACleanup();
-        if (recvThread.joinable())
-            recvThread.join();
-        return 1;
-    }
-    std::cout << "자동 로그인 패킷 전송 완료: size=" << (int)loginPacket.size << ", type=" << (int)loginPacket.type << std::endl;
-   
+
+
     MSG msg;
     HACCEL hAccelTable = LoadAccelerators(hInst, MAKEINTRESOURCE(IDC_CLIENT));
     while (true) {

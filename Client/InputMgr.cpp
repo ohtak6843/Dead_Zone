@@ -10,8 +10,6 @@ void InputMgr::Init(HWND hwnd)
 	_keyStates.resize(KEY_TYPE_COUNT, KEY_STATE::NONE);
 	_centerScreenPos = { gameFramework->GetWindow().width / 2, gameFramework->GetWindow().height / 2 };
 
-	LockCursor(true);
-
 	// DirectInput √ ±‚»≠
 	HRESULT hr = S_OK;
 	if (FAILED(hr = DirectInput8Create(_hInst,
