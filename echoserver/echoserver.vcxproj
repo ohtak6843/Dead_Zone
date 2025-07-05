@@ -185,6 +185,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Resources\Json\Stage01_Collider.json" />
     <None Include="MapCollider.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

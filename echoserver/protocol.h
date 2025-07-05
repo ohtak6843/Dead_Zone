@@ -23,6 +23,7 @@ constexpr char S2C_P_ZOMBIE_STATE = 19;
 constexpr char MAX_ID_LEN = 20;
 constexpr char S2C_P_ZOMBIE_DIE = 21;
 constexpr char S2C_P_STAGE_CHANGE = 22;
+constexpr char C2S_P_SCENE_LOADED = 23;
 
 struct Vector3 {
     float x;
@@ -31,6 +32,16 @@ struct Vector3 {
 };
 
 #pragma pack(push, 1)
+
+struct cs_packet_generic {
+    unsigned char size;
+    char          type;
+};
+
+struct sc_packet_generic {
+    unsigned char size;
+    char          type;
+};
 
 struct cs_packet_login {
     unsigned char size;

@@ -286,13 +286,6 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         loginOk.isFainted = pContext->isFainted;
 
         PostSendPacket(pContext, &loginOk, loginOk.size);
-
-        {
-            std::lock_guard<std::mutex> lock(g_lobbyMutex);
-            g_lobbyQueue.push(pContext);
-        }
-
-        MatchmakingCheck();
         break;
     }
 
@@ -406,7 +399,15 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         }
         break;
         }
-
+    case C2S_P_SCENE_LOADED: {
+        {
+            std::lock_guard<std::mutex> lock(g_lobbyMutex);
+            g_lobbyQueue.push(pContext);
+        }
+        MatchmakingCheck();
+        break;
+    }
+    
     default: {
         printf("정의되지 않은 패킷 타입: %d\n", packetType);
         break;
@@ -488,7 +489,7 @@ int main() {
     CreateIoCompletionPort((HANDLE)g_listenSocket, g_hIOCP, 0, 0);
 
     try {
-        mapColliders = MapColliderLoader::Load("MapCollider.json");
+        mapColliders = MapColliderLoader::Load("../Resources/json/Stage01_Collider.json");
     }
     catch (const std::exception& e) {
         std::cerr << "맵 콜라이더 로드 실패: " << e.what() << std::endl;

@@ -9,6 +9,7 @@
 #include "Resources.h"
 #include "InstancingMgr.h"
 #include "GameInfo.h"
+#include "../echoserver/protocol.h"
 
 void Framework::Init(const WindowInfo& info)
 {
@@ -64,6 +65,10 @@ void Framework::Update()
 		SCENE_TYPE nextSceneType = GET_SINGLE(SceneMgr)->GetNextSceneType();
 		GET_SINGLE(SceneMgr)->SetChangeScene(false);
 		GET_SINGLE(SceneMgr)->SwitchScene(nextSceneType);
+		cs_packet_generic ready{static_cast<unsigned char>(sizeof(cs_packet_generic)),C2S_P_SCENE_LOADED};
+		send(gameFramework->GetWindow().sock,
+			reinterpret_cast<char*>(&ready),
+			sizeof(ready), 0);
 	}
 }
 

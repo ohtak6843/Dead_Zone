@@ -34,6 +34,7 @@ struct PER_SOCKET_CONTEXT {
     float          moveX, moveY, moveZ;
     bool          isJumping;
     float         verticalVelocity;
+    bool hasSceneReady = false;
 };
 
 // AcceptEx 함수 포인터
