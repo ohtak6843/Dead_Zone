@@ -68,6 +68,7 @@ void SceneMgr::RenderUI()
 
 	// 잔여탄 UI
 	{
+		// 현재 총알 수를 가져오는 로직 이상 생김. 수정 필요
 		int32 currentAmmo = 0;
 		int32 gunType = static_pointer_cast<LocalPlayer>(_activeScene->FindGameObject(L"LocalPlayer"))->getGunType();
 		if (gunType == 0)
@@ -75,30 +76,120 @@ void SceneMgr::RenderUI()
 		else if (gunType == 1)
 			currentAmmo = static_pointer_cast<AK47>(_activeScene->FindGameObject(L"AK47"))->GetCurrentAmmo();
 
+		currentAmmo = 30;
 		std::wstringstream wss;
 		wss << currentAmmo;
 
 		GET_SINGLE(UIMgr)->DrawTextUI(
 			wss.str(),
-			Vec2(995.f, 680.f),			// 위치
+			Vec2(995.f, 740.f),			// 위치
 			Vec2(100.f, 100.f),			// 텍스트 상자 크기
 			16,							// 폰트 크기 ( 8 ~ 128까지 짝수 사이즈만 설정 가능)
 			D2D1::ColorF::White,		// 텍스트 색상
 			D2D1::ColorF(0, 0, 0, 0.0f) // 배경 색
 		);
 	}
+	
 
-	// HP UI
+	// LocalPlayer HP UI
 	{
+		std::wstringstream wss;
+		wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
+		uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
+		wss << name << "1 - " << hp;
 		GET_SINGLE(UIMgr)->DrawTextUI(
-			L"HP : 100",
-			Vec2(50.f, 680.f),
+			wss.str(),
+			Vec2(10.f, 740.f),
 			Vec2(300.f, 100.f),
-			30,
+			16,
 			D2D1::ColorF::White,
 			D2D1::ColorF(0, 0, 0, 0.0f)
 		);
+		auto hpber = _activeScene->FindGameObject(L"PlayerPanel_1_HP");
+		if (hpber)
+		{
+			uint32 maxHp = 100;
+			float hpRatio = static_cast<float>(hp) / maxHp;
+
+			const float fullWidth = 270.f; // 전체 HP바 너비
+			Vec3 scale = hpber->GetTransform()->GetLocalScale();
+			scale.x = fullWidth * hpRatio;
+			hpber->GetTransform()->SetLocalScale(scale);
+
+
+			Vec3 position = hpber->GetTransform()->GetLocalPosition();
+			position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
+			hpber->GetTransform()->SetLocalPosition(position);
+		}
 	}
+
+	// TODO: 나중에 플레이어2, 3의 HP를 실제로 가져와야 함
+	// Player2 HP UI
+	{
+		std::wstringstream wss;
+		wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
+		uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
+		hp = 85;
+		wss << name << "2 - " << hp;
+		GET_SINGLE(UIMgr)->DrawTextUI(
+			wss.str(),
+			Vec2(10.f, 740.f - 60.f),
+			Vec2(300.f, 100.f),
+			16,
+			D2D1::ColorF::White,
+			D2D1::ColorF(0, 0, 0, 0.0f)
+		);
+		auto hpber = _activeScene->FindGameObject(L"PlayerPanel_2_HP");
+		if (hpber)
+		{
+			uint32 maxHp = 100;
+			float hpRatio = static_cast<float>(hp) / maxHp;
+
+			const float fullWidth = 270.f; // 전체 HP바 너비
+			Vec3 scale = hpber->GetTransform()->GetLocalScale();
+			scale.x = fullWidth * hpRatio;
+			hpber->GetTransform()->SetLocalScale(scale);
+
+
+			Vec3 position = hpber->GetTransform()->GetLocalPosition();
+			position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
+			hpber->GetTransform()->SetLocalPosition(position);
+		}
+	}
+
+	// Player3 HP UI
+	{
+		std::wstringstream wss;
+		wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
+		uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
+		hp = 55;
+		wss << name << "3 - " << hp;
+		GET_SINGLE(UIMgr)->DrawTextUI(
+			wss.str(),
+			Vec2(10.f, 740.f - 120.f),
+			Vec2(300.f, 100.f),
+			16,
+			D2D1::ColorF::White,
+			D2D1::ColorF(0, 0, 0, 0.0f)
+		);
+		auto hpber = _activeScene->FindGameObject(L"PlayerPanel_3_HP");
+		if (hpber)
+		{
+			uint32 maxHp = 100;
+			float hpRatio = static_cast<float>(hp) / maxHp;
+
+			const float fullWidth = 270.f; // 전체 HP바 너비
+			Vec3 scale = hpber->GetTransform()->GetLocalScale();
+			scale.x = fullWidth * hpRatio;
+			hpber->GetTransform()->SetLocalScale(scale);
+
+
+			Vec3 position = hpber->GetTransform()->GetLocalPosition();
+			position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
+			hpber->GetTransform()->SetLocalPosition(position);
+		}
+	}
+
 
 	gameFramework->EndD2DRender();
 }
@@ -476,29 +567,115 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 	// 총 패널 UI 생성
 	GET_SINGLE(UIMgr)->CreateRectangleUI(
 		L"GunPanel_1",
-		Vec2(490.f, -300.f), // 화면 중앙
-		Vec2(300.f, 50.f), // 크기
+		Vec2(490.f, -360.f),
+		Vec2(300.f, 50.f),
 		Vec4(0.5f, 0.5f, 0.5f, 0.5f), // 반투명 검정색
 		scene
 	);
+
 	GET_SINGLE(UIMgr)->CreateImageUI(
 		L"AK47",
 		L"..\\Resources\\Texture\\Icon\\Gun\\AK47 실루엣(흰색).png",
-		Vec2(520.f, -300.f), // 화면 중앙
-		Vec2(165.f, 50.f), // 크기
+		Vec2(520.f, -360.f), 
+		Vec2(165.f, 50.f),
 		scene
 	);
 	GET_SINGLE(UIMgr)->CreateImageUI(
 		L"소총탄",
 		L"..\\Resources\\Texture\\Icon\\Bullet\\소총탄.png",
-		Vec2(410.f, -300.f), // 화면 중앙
-		Vec2(40.f, 40.f), // 크기
+		Vec2(410.f, -360.f), 
+		Vec2(40.f, 40.f),
+		scene
+	);
+
+	// 플레이어1 정보 출력
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_1",					// 이름
+		Vec2(-500.f, -360.f),				// 위치
+		Vec2(300.f, 50.f),					// 크기
+		Vec4(0.5f, 0.5f, 0.5f, 0.5f),		// 색상
+		scene
+	);
+
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_1_Max_Hp",			// 이름
+		Vec2(-495.f, -370.f),				// 위치
+		Vec2(270.f, 20.f),					// 크기
+		Vec4(0.0f, 0.0f, 0.0f, 1.f),		// 색상
+		scene
+	);
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_1_HP",				// 이름
+		Vec2(-495.f, -370.f),				// 위치
+		Vec2(270.f, 20.f),					// 크기
+		Vec4(1.f, 0.0f, 0.0f, 1.f),			// 색상
 		scene
 	);
 
 
+	// 플레이어2 정보 출력
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_2",					// 이름
+		Vec2(-500.f, -300.f),				// 위치
+		Vec2(300.f, 50.f),					// 크기
+		Vec4(0.5f, 0.5f, 0.5f, 0.5f),		// 색상
+		scene
+	);
+
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_2_Max_Hp",			// 이름
+		Vec2(-495.f, -310.f),				// 위치
+		Vec2(270.f, 20.f),					// 크기
+		Vec4(0.0f, 0.0f, 0.0f, 1.f),		// 색상
+		scene
+	);
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_2_HP",				// 이름
+		Vec2(-495.f, -310.f),				// 위치
+		Vec2(270.f, 20.f),					// 크기
+		Vec4(1.f, 0.0f, 0.0f, 1.f),			// 색상
+		scene
+	);
+
+
+	// 플레이어3 정보 출력
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_3",					// 이름
+		Vec2(-500.f, -240.f),				// 위치
+		Vec2(300.f, 50.f),					// 크기
+		Vec4(0.5f, 0.5f, 0.5f, 0.5f),		// 색상
+		scene
+	);
+
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_3_Max_Hp",			// 이름
+		Vec2(-495.f, -250.f),				// 위치
+		Vec2(270.f, 20.f),					// 크기
+		Vec4(0.0f, 0.0f, 0.0f, 1.f),		// 색상
+		scene
+	);
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_3_HP",				// 이름
+		Vec2(-495.f, -250.f),				// 위치
+		Vec2(270.f, 20.f),					// 크기
+		Vec4(1.f, 0.0f, 0.0f, 1.f),			// 색상
+		scene
+	);
 
 	
+
+
+	//for (size_t i = 0; i < 20; i++)
+	//{
+	//	// 플레이어 정보 출력
+	//	GET_SINGLE(UIMgr)->CreateImageUI(
+	//		L"소총탄",
+	//		L"..\\Resources\\Texture\\Icon\\Bullet\\소총탄.png",
+	//		Vec2(410.f, -360.f),
+	//		Vec2(40.f, 40.f),
+	//		scene
+	//	);
+	//}
 
 	
 }
