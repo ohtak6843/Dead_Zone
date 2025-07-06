@@ -33,6 +33,7 @@
 #include "LoadingScene.h"
 #include "TitleScene.h"
 #include "Stage01.h"
+#include "Stage02.h"
 
 // TODO: 나중에 삭제
 #include "Timer.h"
@@ -172,6 +173,9 @@ void SceneMgr::LoadScene(SCENE_TYPE type)
 	case SCENE_TYPE::STAGE01:
 		GET_SINGLE(SceneMgr)->SetSceneType(SCENE_TYPE::STAGE01);
 		_activeScene = make_shared<Stage01>();
+	case SCENE_TYPE::STAGE02:
+		GET_SINGLE(SceneMgr)->SetSceneType(SCENE_TYPE::STAGE02);
+		_activeScene = make_shared<Stage02>();
 		break;
 	}
 
@@ -543,8 +547,6 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 			gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 0.f, 0.f));
 			scene->AddGameObject(gameObject);
 		}
-
-		//GET_SINGLE(JsonMgr)->SaveMapCollider(L"..\\Resources\\Json\\MapCollider.json", gameObjects);
 	}
 #pragma endregion
 
