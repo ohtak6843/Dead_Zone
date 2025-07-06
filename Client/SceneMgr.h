@@ -7,6 +7,7 @@ enum SCENE_TYPE
 	TITLE,
 	LOADING,
 	STAGE01,
+	STAGE02,
 	END,
 };
 
