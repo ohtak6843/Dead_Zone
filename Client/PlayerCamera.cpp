@@ -16,6 +16,8 @@
 #include "M4A1.h"
 #include "AK47.h"
 
+#include "InputMgr.h"
+
 #include "../echoserver/protocol.h"
 
 PlayerCamera::PlayerCamera()

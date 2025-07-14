@@ -5,6 +5,8 @@
 #include "BaseCollider.h"
 #include "Animator.h"
 
+#include "InputMgr.h"
+
 LightObject::LightObject()
 {
 	_type = GAMEOBJECT_TYPE::LIGHT;
@@ -28,6 +30,34 @@ void LightObject::Update()
 
 void LightObject::LateUpdate()
 {
+	// TODO: 그림자 테스트용, 나중에 삭제
+	if (INPUT->GetButton(KEY_TYPE::KEY_5))
+	{
+		Vec3 position = GetTransform()->GetLocalPosition();
+		position.y += 50.0f;
+		GetTransform()->SetLocalPosition(position);
+	}
+
+	if (INPUT->GetButton(KEY_TYPE::KEY_6))
+	{
+		Vec3 position = GetTransform()->GetLocalPosition();
+		position.y -= 50.0f;
+		GetTransform()->SetLocalPosition(position);
+	}
+
+	if (INPUT->GetButton(KEY_TYPE::KEY_7))
+	{
+		Vec3 rotation = GetTransform()->GetLocalRotation();
+		rotation.x += 15.0f;
+		GetTransform()->SetLocalRotation(rotation);
+	}
+
+	if (INPUT->GetButton(KEY_TYPE::KEY_8))
+	{
+		Vec3 rotation = GetTransform()->GetLocalRotation();
+		rotation.x -= 15.0f;
+		GetTransform()->SetLocalRotation(rotation);
+	}
 }
 
 void LightObject::FinalUpdate()

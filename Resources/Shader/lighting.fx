@@ -70,11 +70,21 @@ PS_OUT PS_DirLight(VS_OUT input)
         if (0 < uv.x && uv.x < 1 && 0 < uv.y && uv.y < 1)
         {
             float shadowDepth = g_tex_2.Sample(g_sam_0, uv).x;
-            if (shadowDepth > 0 && depth > shadowDepth + 0.00001f)
+            if (shadowDepth > 0 && depth > shadowDepth + 0.000001f)
             {
                 color.diffuse *= 0.5f;
                 color.specular = (float4) 0.f;
             }
+            
+            // 편향값 조정 코드 (TEST용)
+            //float shadowDepth = g_tex_2.Sample(g_sam_0, uv).x;
+            //float3 lightDir = normalize(g_light[g_int_0].direction.xyz);
+            //float bias = max(0.005f, 0.002f * (1.0 - dot(viewNormal, lightDir)));
+            //if (shadowDepth > 0 && depth > shadowDepth + bias)
+            //{
+            //    color.diffuse *= 0.5f;
+            //    color.specular = (float4) 0.f;
+            //}
         }
     }
     

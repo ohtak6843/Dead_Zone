@@ -157,6 +157,98 @@ void SceneMgr::RenderUI()
 		//	device->GetSolidColorBrush().Get());
 	}
 
+	if (_activeScene && GET_SINGLE(SceneMgr)->GetSceneType() == SCENE_TYPE::STAGE02)
+	{
+		Vec2 pivot = {
+			static_cast<float>(gameFramework->GetWindow().width - 100),
+			static_cast<float>(gameFramework->GetWindow().height - 50) };
+		D2D1_RECT_F textRect = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
+
+		pivot = { static_cast<float>(gameFramework->GetWindow().width - 100), static_cast<float>(gameFramework->GetWindow().height / 2) };
+		D2D1_RECT_F textRect3 = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
+
+		// LightPos
+		std::wstringstream wss;
+		wstring text3 = L"LP_X : ";
+		Vec3 lightPos = _activeScene->FindGameObject(L"DirectionalLight")->GetTransform()->GetWorldPosition();
+		wss.str(L"");
+		wss.clear();
+		wss << std::fixed << std::setprecision(2) << lightPos.x;
+		text3 += wss.str();
+		text3 += L"\nLP_Y : ";
+		wss.str(L"");
+		wss.clear();
+		wss << std::fixed << std::setprecision(2) << lightPos.y;
+		text3 += wss.str();
+		text3 += L"\nLP_Z : ";
+		wss.str(L"");
+		wss.clear();
+		wss << std::fixed << std::setprecision(2) << lightPos.z;
+		text3 += wss.str();
+		
+		device->GetD2DDeviceContext()->DrawTextW(
+			text3.c_str(),
+			static_cast<uint32>(text3.size()),
+			device->GetTextFormat().Get(),
+			&textRect3,
+			device->GetSolidColorBrush().Get());
+
+		pivot = { static_cast<float>(gameFramework->GetWindow().width / 2), static_cast<float>(gameFramework->GetWindow().height - 200) };
+		D2D1_RECT_F textRect5 = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
+
+		// Light Dir
+		wstring text5 = L"LL_X : ";
+		Vec3 lightDir = _activeScene->FindGameObject(L"DirectionalLight")->GetTransform()->GetLook();
+		wss.str(L"");
+		wss.clear();
+		wss << std::fixed << std::setprecision(2) << lightDir.x;
+		text5 += wss.str();
+		text5 += L"\nLL_Y : ";
+		wss.str(L"");
+		wss.clear();
+		wss << std::fixed << std::setprecision(2) << lightDir.y;
+		text5 += wss.str();
+		text5 += L"\nLL_Z : ";
+		wss.str(L"");
+		wss.clear();
+		wss << std::fixed << std::setprecision(2) << lightDir.z;
+		text5 += wss.str();
+
+		device->GetD2DDeviceContext()->DrawTextW(
+			text5.c_str(),
+			static_cast<uint32>(text5.size()),
+			device->GetTextFormat().Get(),
+			&textRect5,
+			device->GetSolidColorBrush().Get());
+
+		// Camera Position
+		pivot = { 100.f, static_cast<float>(gameFramework->GetWindow().height / 2) };
+		D2D1_RECT_F textRect4 = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
+
+		wstring text4 = L"X : ";
+		Vec3 mainCameraPos = _activeScene->GetPlayerCamera()->GetTransform()->GetWorldPosition();
+		wss.str(L"");
+		wss.clear();
+		wss << std::fixed << std::setprecision(2) << mainCameraPos.x;
+		text4 += wss.str();
+		text4 += L"\nY : ";
+		wss.str(L"");
+		wss.clear();
+		wss << std::fixed << std::setprecision(2) << mainCameraPos.y;
+		text4 += wss.str();
+		text4 += L"\nZ : ";
+		wss.str(L"");
+		wss.clear();
+		wss << std::fixed << std::setprecision(2) << mainCameraPos.z;
+		text4 += wss.str();
+		device->GetD2DDeviceContext()->DrawTextW(
+			text4.c_str(),
+			static_cast<uint32>(text4.size()),
+			device->GetTextFormat().Get(),
+			&textRect4,
+			device->GetSolidColorBrush().Get());
+	}
+
 	device->GetD2DDeviceContext()->EndDraw();
 	device->GetD3D11on12Device()->ReleaseWrappedResources(device->GetWrappedBackBuffer(backbufferindex).GetAddressOf(), 1);
 	device->GetD3D11DeviceContext()->Flush();

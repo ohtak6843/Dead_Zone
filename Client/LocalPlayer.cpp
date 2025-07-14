@@ -208,6 +208,11 @@ void LocalPlayer::ProcessKeyInput()
 		_moveDir.y = 0.f;
 	}
 
+	if (INPUT->GetButton(KEY_TYPE::KEY_9))
+	{
+		GetTransform()->LookAt(Vec3(0.f, 0.f, -1.f));
+	}
+
 	if (INPUT->GetButtonDown(KEY_TYPE::F))
 	{
 		// 테스트용 임시로 대충 만듦
