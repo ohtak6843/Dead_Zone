@@ -304,6 +304,5 @@ void GameRoom::RemoveZombieById(long long zombieId)
         });
     if (it != zombies.end()) {
         zombies.erase(it);
-        killCount += 1;
     }
 }

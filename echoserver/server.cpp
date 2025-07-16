@@ -342,17 +342,21 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
             }
 
             room->RemoveZombieById(zid);
-            
-            if (room->killCount >= 10) {
-                room->killCount = 0;          
-                room->currentStage += 1;      
+            room->killCount++;
+            const int killThreshold = 3; 
+            const int maxStage = 2;    
+            if (room->killCount >= killThreshold
+                && room->currentStage < maxStage)
+            {
+                room->killCount = 0;
+                room->currentStage++;
+
                 sc_packet_stage_change stagePkt{};
                 stagePkt.size = sizeof(stagePkt);
                 stagePkt.type = S2C_P_STAGE_CHANGE;
                 stagePkt.newStage = room->currentStage;
-                for (auto* peer : room->players) {
+                for (auto* peer : room->players)
                     PostSendPacket(peer, &stagePkt, stagePkt.size);
-                }
             }
         }
         break;
@@ -407,7 +411,39 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         MatchmakingCheck();
         break;
     }
-    
+    case C2S_P_STAGE_LOADED:  
+        if (auto* room = FindGameRoomForPlayer(pContext)) {
+            room->zombies.clear();
+            room->killCount = 0;
+            room->stageReadyCount++;
+            // 방에 있는 모든 플레이어가 스테2 로드를 완료했을 때
+            if (room->stageReadyCount == (int)room->players.size()) {
+                // 1) 스테이지 시작 신호 보내기 (optional: 재활용)
+                sc_packet_game_start gs{};
+                gs.size = sizeof(gs);
+                gs.type = S2C_P_GAME_START;  // 또는 S2C_P_STAGE_START 별도 타입
+                for (auto* pl : room->players)
+                    PostSendPacket(pl, &gs, gs.size);
+
+                // 2) 플레이어 정보 초기화용 패킷 전송
+                for (auto* pl : room->players) {
+                    sc_packet_player_info info{};
+                    info.size = sizeof(info);
+                    info.type = S2C_P_PLAYER_INFO;
+                    info.playerId = pl->socket;
+                    info.position = { pl->posX, pl->posY, pl->posZ };
+                    info.health = pl->health;
+                    info.walkSpeed = pl->walkSpeed;
+                    info.runSpeed = pl->runSpeed;
+                    info.faintCount = pl->faintCount;
+                    info.isFainted = pl->isFainted;
+
+                    for (auto* peer : room->players)
+                        PostSendPacket(peer, &info, info.size);
+                }
+            }
+            break;
+        }
     default: {
         printf("정의되지 않은 패킷 타입: %d\n", packetType);
         break;

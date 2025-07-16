@@ -13,7 +13,7 @@ public:
 	float GetDeltaTime() { return _deltaTime; }
 
 	void SetTimeout(const std::function<void()>& callback, float delay);
-
+	void CancelAll();
 private:
 	struct TimeoutTask {
 		std::function<void()> callback;

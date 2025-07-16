@@ -63,6 +63,7 @@ public:
 	void RemovePlayer(struct sc_packet_player_leave* packet);
 
 	void ClearPlayers();
+	void ClearZombies();
 
 	void AddZombie(struct sc_packet_spawn_zombie* packet);
 	void MoveZombie(struct sc_packet_zombie_move* packet);

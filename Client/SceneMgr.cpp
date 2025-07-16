@@ -173,6 +173,7 @@ void SceneMgr::LoadScene(SCENE_TYPE type)
 	case SCENE_TYPE::STAGE01:
 		GET_SINGLE(SceneMgr)->SetSceneType(SCENE_TYPE::STAGE01);
 		_activeScene = make_shared<Stage01>();
+		break;
 	case SCENE_TYPE::STAGE02:
 		GET_SINGLE(SceneMgr)->SetSceneType(SCENE_TYPE::STAGE02);
 		_activeScene = make_shared<Stage02>();

@@ -24,6 +24,7 @@ constexpr char MAX_ID_LEN = 20;
 constexpr char S2C_P_ZOMBIE_DIE = 21;
 constexpr char S2C_P_STAGE_CHANGE = 22;
 constexpr char C2S_P_SCENE_LOADED = 23;
+constexpr char C2S_P_STAGE_LOADED = 24;
 
 struct Vector3 {
     float x;
@@ -41,6 +42,11 @@ struct cs_packet_generic {
 struct sc_packet_generic {
     unsigned char size;
     char          type;
+};
+
+struct cs_packet_stage_loaded {
+    uint8_t size;
+    char    type;   
 };
 
 struct cs_packet_login {

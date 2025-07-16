@@ -36,6 +36,8 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
 uint32_t g_localPlayerId = 0;
+std::atomic<bool>    g_stageChangeRequested{ false };
+std::atomic<uint8_t> g_requestedStage{ 0 };
 
 // 네트워크 초기화 함수
 bool InitNetwork(const std::string& serverIp) {
@@ -196,14 +198,17 @@ void ReceiverThread(SOCKET clientSocket) {
                     GET_SINGLE(SceneMgr)
                         ->GetActiveScene()
                         ->ClearPlayers();
+                    GET_SINGLE(SceneMgr)
+                        ->GetActiveScene()
+                        ->ClearZombies();
                     g_gameStarted = true;
                     break;
                 }
                 case S2C_P_STAGE_CHANGE: {
                     auto* p = reinterpret_cast<sc_packet_stage_change*>(packet);
-                    uint8_t newStage = p->newStage;
-                    // TODO: 씬 새 스테이지 반영
-                    MessageBoxA(NULL, "스테이지 변경 수신", "Debug - stage", MB_OK);
+                    GET_SINGLE(SceneMgr)->SetChangeScene(true);
+                    GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE02);
+
                     break;
                 }
                 default:
@@ -269,7 +274,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // 게임 프레임워크 초기화
     gameFramework->Init(GWindowInfo);
-    GET_SINGLE(SceneMgr)->LoadScene(SCENE_TYPE::STAGE02);
+    GET_SINGLE(SceneMgr)->LoadScene(SCENE_TYPE::TITLE);
 
     std::thread recvThread(ReceiverThread, g_clientSocket);
 

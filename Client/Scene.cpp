@@ -25,6 +25,8 @@
 
 #include "TP_AK47.h"
 
+#include "SceneMgr.h"
+
 #include "..//echoserver//protocol.h"
 
 extern WindowInfo GWindowInfo;
@@ -344,6 +346,17 @@ void Scene::ClearPlayers()
 	_players.clear();
 }
 
+void Scene::ClearZombies()
+{
+	// _zombies는 vector< vector< shared_ptr<GameObject> > >
+	for (auto& group : _zombies) {
+		for (auto& part : group) {
+			RemoveGameObject(part);
+		}
+	}
+	_zombies.clear();
+}
+
 void Scene::AddZombie(sc_packet_spawn_zombie* packet)
 {
 	Vec3 position = Vec3(packet->position.x, packet->position.y, packet->position.z);
@@ -430,8 +443,7 @@ void Scene::DieZombie(sc_packet_zombie_die* pkt)
 		float deathAnimDuration = anim->GetAnimDuration(idx);
 		GET_SINGLE(Timer)->SetTimeout([this, id]() {
 			RemoveZombieById(id);
-			}, deathAnimDuration);
-
+		}, deathAnimDuration);
 		// 한 번 처리했으면 루프 탈출
 		break;
 	}

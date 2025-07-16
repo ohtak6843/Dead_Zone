@@ -46,3 +46,8 @@ void Timer::SetTimeout(const std::function<void()>& callback, float delay)
 {
 	_timeoutTasks.push_back(TimeoutTask{ callback, delay });
 }
+
+void Timer::CancelAll()
+{
+	_timeoutTasks.clear();
+}

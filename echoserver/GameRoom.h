@@ -28,13 +28,14 @@ public:
     GameManager              gameManager;
     std::chrono::steady_clock::time_point lastSpawn;
     std::chrono::milliseconds                spawnInterval{ 1000 };
-
+    int stageReadyCount = 0;
     void RemoveZombieById(long long zombieId);
     int      killCount = 0;
     uint8_t  currentStage = 1;
+    std::vector<Zombie>              zombies;
 private:
     
-    std::vector<Zombie>              zombies;
+    
     uint32_t                          snapshotFrameCount = 0;
     uint32_t                          snapshotFrameInterval;
     std::vector<std::vector<bool>> grid;  // 차단 정보(이동 가능/불가)
