@@ -7,7 +7,10 @@ This example shows how to integrate RNBO C++ source code into an FMOD effect.
 2. Add the generated RNBO source .cpp file and rnbo/RNBO.cpp files to your list
    of source files.
 3. Build and copy the generated library into your FMOD Studio script directory:
-   https://fmod.com/docs/2.02/studio/plugin-reference.html#loading-plug-ins
+   https://fmod.com/docs/2.03/studio/plugin-reference.html#loading-plug-ins
+Note:
+FMOD parameters have a max length of 15 characters. RNBO parameters greater
+than 15 chracters will be truncated.
 ==============================================================================*/
 #if __has_include("RNBO.h")
 #include "RNBO.h"
@@ -167,6 +170,8 @@ extern "C" F_EXPORT FMOD_DSP_DESCRIPTION *F_CALL FMODGetDSPDescription()
             params[i] = (FMOD_DSP_PARAMETER_DESC *)malloc(sizeof(FMOD_DSP_PARAMETER_DESC));
             memset(params[i], 0, sizeof(FMOD_DSP_PARAMETER_DESC));
 
+            // FMOD_DSP_PARAMETER_DESC::name can only hold 15 characters (excluding \0 null terminator).
+            // RNBO parameters greater than 15 chracters will be truncated.
             snprintf(params[i]->name, sizeof(params[i]->name), "%s", tmpRnboObject.getParameterId(i));
             snprintf(params[i]->label, sizeof(params[i]->label), "%s", info.unit);
 

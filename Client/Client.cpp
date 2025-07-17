@@ -13,6 +13,7 @@
 
 #include "Scene.h"
 #include "SceneMgr.h"
+#include "FmodMgr.h"
 
 #pragma comment(lib, "ws2_32.lib")
 

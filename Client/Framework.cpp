@@ -6,9 +6,12 @@
 #include "Timer.h"
 #include "SceneMgr.h"
 #include "Light.h"
+
 #include "Resources.h"
 #include "InstancingMgr.h"
 #include "GameInfo.h"
+#include "FmodMgr.h"
+
 #include "../echoserver/protocol.h"
 
 void Framework::Init(const WindowInfo& info)
@@ -42,6 +45,7 @@ void Framework::Init(const WindowInfo& info)
 	GET_SINGLE(Timer)->Init();
 	GET_SINGLE(Resources)->Init();
 	GET_SINGLE(GameInfo)->Init();
+	GET_SINGLE(FmodMgr)->Init();
 
 	GET_SINGLE(SceneMgr)->SetLayerName(0, L"Default");
 	GET_SINGLE(SceneMgr)->SetLayerName(1, L"Gun"); // ÃÑ UI º°µµ Ã³¸®
@@ -53,6 +57,7 @@ void Framework::Update()
 	GET_SINGLE(InputMgr)->Update();
 	GET_SINGLE(Timer)->Update();
 	GET_SINGLE(SceneMgr)->Update();
+	GET_SINGLE(FmodMgr)->Update();
 	GET_SINGLE(InstancingMgr)->ClearBuffer();
 
 	Render();

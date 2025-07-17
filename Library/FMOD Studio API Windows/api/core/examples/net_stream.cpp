@@ -7,6 +7,7 @@ This example shows how to play streaming audio from an Internet source
 For information on using FMOD example code in your own programs, visit
 https://www.fmod.com/legal
 ==============================================================================*/
+#define COMMON_REQUIRE_NETWORK
 #include "fmod.hpp"
 #include "common.h"
 

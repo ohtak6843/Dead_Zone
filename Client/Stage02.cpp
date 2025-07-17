@@ -19,6 +19,7 @@
 #include "SceneMgr.h"
 #include "InputMgr.h"
 #include "JsonMgr.h"
+#include "FmodMgr.h"
 
 Stage02::Stage02()
 {
@@ -373,4 +374,6 @@ void Stage02::Init()
 
 	INPUT->LockCursor(true);
 	gameFramework->ToggleFullScreen(true);
+
+	GET_SINGLE(FmodMgr)->PlaySound();
 }

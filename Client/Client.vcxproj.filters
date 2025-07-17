@@ -259,6 +259,9 @@
     <ClInclude Include="Stage02.h">
       <Filter>Game\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="FmodMgr.h">
+      <Filter>Game\Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc">
@@ -453,6 +456,9 @@
     </ClCompile>
     <ClCompile Include="Stage02.cpp">
       <Filter>Game\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="FmodMgr.cpp">
+      <Filter>Game\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
