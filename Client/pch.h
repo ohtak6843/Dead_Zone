@@ -60,6 +60,10 @@ using namespace Microsoft::WRL;
 #pragma comment(lib, "dwrite.lib")
 #pragma comment(lib, "d3d11.lib")
 
+// FMOD lib
+#include <fmod.hpp>
+#pragma comment(lib, "fmod_vc.lib")
+
 #ifdef _DEBUG
 #pragma comment(lib, "DirectXTex\\DirectXTex_debug.lib")
 #else

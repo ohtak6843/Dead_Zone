@@ -13,6 +13,8 @@ enum class INFO_TYPE : uint8
 enum class ZOMBIE_TYPE : uint8
 {
 	NORMAL,
+	POLICE,
+	ELITE,
 
 	END
 };

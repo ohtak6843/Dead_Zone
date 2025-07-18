@@ -25,7 +25,7 @@ MuzzleFlashParticle::MuzzleFlashParticle()
 	// 텍스처 설정
 	shared_ptr<Texture> tex = GET_SINGLE(Resources)->Load<Texture>(
 		L"Fire", L"..\\Resources\\Texture\\Particle\\Fire.png");
-	SetTexture(tex);
+	SetTexture(_type, tex);
 }
 
 void MuzzleFlashParticle::FinalUpdate()

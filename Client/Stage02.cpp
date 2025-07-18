@@ -19,6 +19,7 @@
 #include "SceneMgr.h"
 #include "InputMgr.h"
 #include "JsonMgr.h"
+#include "FmodMgr.h"
 
 Stage02::Stage02()
 {
@@ -34,10 +35,10 @@ void Stage02::LoadResources()
 	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Abandoned_Factory.fbx");
 
 	// 플레이어 로드
-	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Soldado.fbx");
+	//GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Soldado.fbx");
 
 	// 좀비 로드
-	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
+	//GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
 }
 
 void Stage02::Init()
@@ -283,14 +284,20 @@ void Stage02::Init()
 #pragma region Directional Light
 	{
 		shared_ptr<LightObject> light = make_shared<LightObject>();
+		light->SetName(L"DirectionalLight");
 		light->SetTransform(make_shared<Transform>());
-		light->GetTransform()->SetLocalPosition(Vec3(0.f, 2000.f, 0.f));
+		light->GetTransform()->SetLocalPosition(Vec3(0.f, 5000.f, 0.f));
 		light->SetLight(make_shared<Light>());
 		light->GetLight()->SetLightDirection(Vec3(0.f, -1.f, 0.f));
 		light->GetLight()->SetLightType(LIGHT_TYPE::DIRECTIONAL_LIGHT);
 		light->GetLight()->SetDiffuse(Vec3(1.f, 1.f, 1.f));
 		light->GetLight()->SetAmbient(Vec3(0.1f, 0.1f, 0.1f));
 		light->GetLight()->SetSpecular(Vec3(0.1f, 0.1f, 0.1f));
+
+		light->GetTransform()->SetLocalRotation(Vec3(90.f, 0.f, 0.f));
+		light->GetLight()->GetShadowCamera()->GetCamera()->SetFar(5000.f);
+		light->GetLight()->GetShadowCamera()->GetCamera()->SetWidth(16384);
+		light->GetLight()->GetShadowCamera()->GetCamera()->SetHeight(16384);
 
 		AddGameObject(light);
 	}
@@ -303,7 +310,7 @@ void Stage02::Init()
 
 		for (auto& gameObject : gameObjects)
 		{
-			gameObject->SetStatic(true);
+			gameObject->SetStatic(false);
 			gameObject->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
 			gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 0.f, 0.f));
 			AddGameObject(gameObject);
@@ -311,6 +318,62 @@ void Stage02::Init()
 	}
 #pragma endregion
 
+#pragma region Object
+	{
+		shared_ptr<GameObject> obj = make_shared<GameObject>();
+		obj->SetName(L"OBJ");
+		obj->SetTransform(make_shared<Transform>());
+		obj->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
+		obj->GetTransform()->SetLocalPosition(Vec3(0, 200.f, -500.f));
+		obj->SetStatic(false);
+		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
+		{
+			shared_ptr<Mesh> sphereMesh = GET_SINGLE(Resources)->LoadSphereMesh();
+			meshRenderer->SetMesh(sphereMesh);
+		}
+		{
+			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"Deferred");
+			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"Leather", L"..\\Resources\\Texture\\Leather.jpg");
+			shared_ptr<Texture> texture2 = GET_SINGLE(Resources)->Load<Texture>(L"Leather_Normal", L"..\\Resources\\Texture\\Leather_Normal.jpg");
+			shared_ptr<Material> material = make_shared<Material>();
+			material->SetShader(shader);
+			material->SetTexture(0, texture);
+			material->SetTexture(1, texture2);
+			meshRenderer->SetMaterial(material->Clone());
+		}
+		obj->SetMeshRenderer(meshRenderer);
+		AddGameObject(obj);
+	}
+
+	{
+		shared_ptr<GameObject> obj = make_shared<GameObject>();
+		obj->SetName(L"OBJ");
+		obj->SetTransform(make_shared<Transform>());
+		obj->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
+		obj->GetTransform()->SetLocalPosition(Vec3(0, 200.f, -2500.f));
+		obj->SetStatic(false);
+		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
+		{
+			shared_ptr<Mesh> sphereMesh = GET_SINGLE(Resources)->LoadSphereMesh();
+			meshRenderer->SetMesh(sphereMesh);
+		}
+		{
+			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"Deferred");
+			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"Leather", L"..\\Resources\\Texture\\Leather.jpg");
+			shared_ptr<Texture> texture2 = GET_SINGLE(Resources)->Load<Texture>(L"Leather_Normal", L"..\\Resources\\Texture\\Leather_Normal.jpg");
+			shared_ptr<Material> material = make_shared<Material>();
+			material->SetShader(shader);
+			material->SetTexture(0, texture);
+			material->SetTexture(1, texture2);
+			meshRenderer->SetMaterial(material->Clone());
+		}
+		obj->SetMeshRenderer(meshRenderer);
+		AddGameObject(obj);
+	}
+#pragma endregion
+
 	INPUT->LockCursor(true);
 	gameFramework->ToggleFullScreen(true);
+
+	GET_SINGLE(FmodMgr)->PlaySound();
 }

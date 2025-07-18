@@ -34,6 +34,10 @@ enum class KEY_TYPE
 	KEY_4 = DIK_4,
 	KEY_5 = DIK_5,
 	KEY_6 = DIK_6,
+	KEY_7 = DIK_7,
+	KEY_8 = DIK_8,
+	KEY_9 = DIK_9,
+	KEY_0 = DIK_0,
 
 	KEY_F4 = DIK_F4,
 	KEY_F5 = DIK_F5,

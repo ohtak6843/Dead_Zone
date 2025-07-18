@@ -13,6 +13,7 @@
 
 #include "Scene.h"
 #include "SceneMgr.h"
+#include "FmodMgr.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -379,7 +380,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
-    return 0; 
+    return 0;
 }
 
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)

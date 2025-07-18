@@ -16,6 +16,8 @@
 #include "Gun.h"
 #include "M4A1.h"
 #include "AK47.h"
+#include "Zombie.h"
+#include "ParticleObject.h"
 
 LocalPlayer::LocalPlayer()
 {
@@ -208,6 +210,11 @@ void LocalPlayer::ProcessKeyInput()
 		_moveDir.y = 0.f;
 	}
 
+	if (INPUT->GetButton(KEY_TYPE::KEY_9))
+	{
+		GetTransform()->LookAt(Vec3(0.f, 0.f, -1.f));
+	}
+
 	if (INPUT->GetButtonDown(KEY_TYPE::F))
 	{
 		// 테스트용 임시로 대충 만듦
@@ -238,17 +245,26 @@ void LocalPlayer::ProcessMouseInput()
 {
 	if (INPUT->GetButton(MOUSE_TYPE::LBUTTON))
 	{
-		shared_ptr<GameObject> obj = GET_SINGLE(RaycastMgr)->PickZombie(gameFramework->GetWindow().width / 2, gameFramework->GetWindow().height / 2);
+		Vec3 hitPos;
+		shared_ptr<Zombie> zombie;
 
-		if (obj) {
+		if (GET_SINGLE(RaycastMgr)->PickZombie(gameFramework->GetWindow().width / 2, gameFramework->GetWindow().height / 2, OUT hitPos, OUT zombie)) {
 			cs_packet_attack atkPkt{};
 			atkPkt.size = sizeof(atkPkt);
 			atkPkt.type = C2S_P_ATTACK;
-			atkPkt.zombieId = obj ? static_cast<long long>(obj->GetID()) : -1;
+			atkPkt.zombieId = zombie ? static_cast<long long>(zombie->GetID()) : -1;
 			send(gameFramework->GetWindow().sock,
 				reinterpret_cast<char*>(&atkPkt),
 				sizeof(atkPkt),
 				0);
+
+			if (zombie) {
+				shared_ptr<ParticleObject> particleObj = zombie->GetParticle();
+				if (particleObj) {
+					particleObj->GetTransform()->SetLocalPosition(hitPos);
+					particleObj->GetParticle()->SetActive(true);
+				}
+			}
 		}
 	}
 

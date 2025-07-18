@@ -6,9 +6,13 @@
 #include "Timer.h"
 #include "SceneMgr.h"
 #include "Light.h"
+
 #include "Resources.h"
 #include "InstancingMgr.h"
 #include "GameInfo.h"
+#include "UIMgr.h"
+#include "FmodMgr.h"
+
 #include "../echoserver/protocol.h"
 
 void Framework::Init(const WindowInfo& info)
@@ -42,6 +46,8 @@ void Framework::Init(const WindowInfo& info)
 	GET_SINGLE(Timer)->Init();
 	GET_SINGLE(Resources)->Init();
 	GET_SINGLE(GameInfo)->Init();
+	GET_SINGLE(UIMgr)->Init();
+	GET_SINGLE(FmodMgr)->Init();
 
 	GET_SINGLE(SceneMgr)->SetLayerName(0, L"Default");
 	GET_SINGLE(SceneMgr)->SetLayerName(1, L"Gun"); // ÃÑ UI º°µµ Ã³¸®
@@ -53,6 +59,7 @@ void Framework::Update()
 	GET_SINGLE(InputMgr)->Update();
 	GET_SINGLE(Timer)->Update();
 	GET_SINGLE(SceneMgr)->Update();
+	GET_SINGLE(FmodMgr)->Update();
 	GET_SINGLE(InstancingMgr)->ClearBuffer();
 
 	Render();
@@ -316,12 +323,12 @@ void Framework::CreateRenderTargetGroups()
 		vector<RenderTarget> rtVec(RENDER_TARGET_SHADOW_GROUP_MEMBER_COUNT);
 
 		rtVec[0].target = GET_SINGLE(Resources)->CreateTexture(L"ShadowTarget",
-			DXGI_FORMAT_R32_FLOAT, 4096, 4096,
+			DXGI_FORMAT_R32_FLOAT, 8192, 8192,
 			CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 			D3D12_HEAP_FLAG_NONE, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
 
 		shared_ptr<Texture> shadowDepthTexture = GET_SINGLE(Resources)->CreateTexture(L"ShadowDepthStencil",
-			DXGI_FORMAT_D32_FLOAT, 4096, 4096,
+			DXGI_FORMAT_D32_FLOAT, 8192, 8192,
 			CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 			D3D12_HEAP_FLAG_NONE, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
 
@@ -378,4 +385,24 @@ void Framework::CreateD3D11On12Device()
 	_rtGroups[static_cast<uint8>(RENDER_TARGET_GROUP_TYPE::SWAP_CHAIN)]->GetRTTexture(1)->GetTex2D()
 	};
 	_d3d11on12Device->Init(_device, _factory, rtVec, _graphicsCmdQueue->GetCmdQueue());
+}
+
+void Framework::BeginD2DRender()
+{
+	uint8 idx = GetCurrBackBufferIndex();
+	auto device = GetD3D11on12Device();
+
+	device->GetD3D11on12Device()->AcquireWrappedResources(device->GetWrappedBackBuffer(idx).GetAddressOf(), 1);
+	device->GetD2DDeviceContext()->SetTarget(device->GetD3D11On12RT(idx).Get());
+	device->GetD2DDeviceContext()->BeginDraw();
+}
+
+void Framework::EndD2DRender()
+{
+	uint8 idx = GetCurrBackBufferIndex();
+	auto device = GetD3D11on12Device();
+
+	device->GetD2DDeviceContext()->EndDraw();
+	device->GetD3D11on12Device()->ReleaseWrappedResources(device->GetWrappedBackBuffer(idx).GetAddressOf(), 1);
+	device->GetD3D11DeviceContext()->Flush();
 }

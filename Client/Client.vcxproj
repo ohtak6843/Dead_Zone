@@ -77,13 +77,13 @@
     <OutDir>$(SolutionDir)Output\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)Library/Include/FBX;$(SolutionDir)Library/Include/;$(SolutionDir)Engine\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Library/Lib/;$(SolutionDir)Output\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Library\FMOD Studio API Windows\api\core\inc;$(SolutionDir)Library/Include/FBX;$(SolutionDir)Library/Include/;$(SolutionDir)Engine\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Library\FMOD Studio API Windows\api\core\lib\x64;$(SolutionDir)Library/Lib/;$(SolutionDir)Output\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Output\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)Library/Include/FBX;$(SolutionDir)Library/Include/;$(SolutionDir)Engine\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Library/Lib/;$(SolutionDir)Output\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Library\FMOD Studio API Windows\api\core\inc;$(SolutionDir)Library/Include/FBX;$(SolutionDir)Library/Include/;$(SolutionDir)Engine\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Library\FMOD Studio API Windows\api\core\lib\x64;$(SolutionDir)Library/Lib/;$(SolutionDir)Output\;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)Output\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -129,10 +129,13 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderType>Effect</ShaderType>
@@ -152,12 +155,15 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderType>Effect</ShaderType>
@@ -178,6 +184,8 @@
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="D3D11On12Device.h" />
     <ClInclude Include="d3dx12.h" />
+    <ClInclude Include="FmodMgr.h" />
+    <ClInclude Include="EliteZombie.h" />
     <ClInclude Include="Framework.h" />
     <ClInclude Include="FBXLoader.h" />
     <ClInclude Include="GameInfo.h" />
@@ -205,6 +213,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerCamera.h" />
+    <ClInclude Include="PoliceZombie.h" />
     <ClInclude Include="RaycastMgr.h" />
     <ClInclude Include="RenderPass.h" />
     <ClInclude Include="RenderTargetGroup.h" />
@@ -221,6 +230,7 @@
     <ClInclude Include="TitleCamera.h" />
     <ClInclude Include="TitleScene.h" />
     <ClInclude Include="UICamera.h" />
+    <ClInclude Include="UIMgr.h" />
     <ClInclude Include="UploadBuffer.h" />
     <ClInclude Include="DescriptorHeap.h" />
     <ClInclude Include="targetver.h" />
@@ -243,6 +253,8 @@
     <ClCompile Include="CommandQueue.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="D3D11On12Device.cpp" />
+    <ClCompile Include="FmodMgr.cpp" />
+    <ClCompile Include="EliteZombie.cpp" />
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="FBXLoader.cpp" />
     <ClCompile Include="GameInfo.cpp" />
@@ -274,6 +286,7 @@
     </ClCompile>
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerCamera.cpp" />
+    <ClCompile Include="PoliceZombie.cpp" />
     <ClCompile Include="RaycastMgr.cpp" />
     <ClCompile Include="RenderPass.cpp" />
     <ClCompile Include="RenderTargetGroup.cpp" />
@@ -289,6 +302,7 @@
     <ClCompile Include="TitleCamera.cpp" />
     <ClCompile Include="TitleScene.cpp" />
     <ClCompile Include="UICamera.cpp" />
+    <ClCompile Include="UIMgr.cpp" />
     <ClCompile Include="UploadBuffer.cpp" />
     <ClCompile Include="DescriptorHeap.cpp" />
     <ClCompile Include="LocalPlayer.cpp" />
