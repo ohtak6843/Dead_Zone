@@ -375,3 +375,23 @@ void Framework::CreateD3D11On12Device()
 	};
 	_d3d11on12Device->Init(_device, _factory, rtVec, _graphicsCmdQueue->GetCmdQueue());
 }
+
+void Framework::BeginD2DRender()
+{
+	uint8 idx = GetCurrBackBufferIndex();
+	auto device = GetD3D11on12Device();
+
+	device->GetD3D11on12Device()->AcquireWrappedResources(device->GetWrappedBackBuffer(idx).GetAddressOf(), 1);
+	device->GetD2DDeviceContext()->SetTarget(device->GetD3D11On12RT(idx).Get());
+	device->GetD2DDeviceContext()->BeginDraw();
+}
+
+void Framework::EndD2DRender()
+{
+	uint8 idx = GetCurrBackBufferIndex();
+	auto device = GetD3D11on12Device();
+
+	device->GetD2DDeviceContext()->EndDraw();
+	device->GetD3D11on12Device()->ReleaseWrappedResources(device->GetWrappedBackBuffer(idx).GetAddressOf(), 1);
+	device->GetD3D11DeviceContext()->Flush();
+}

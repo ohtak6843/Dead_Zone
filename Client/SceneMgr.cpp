@@ -35,6 +35,8 @@
 #include "Stage01.h"
 #include "Stage02.h"
 
+#include "UIMgr.h"
+
 // TODO: 나중에 삭제
 #include "Timer.h"
 #include <sstream>
@@ -59,199 +61,148 @@ void SceneMgr::Render()
 
 void SceneMgr::RenderUI()
 {
-	uint8 backbufferindex = gameFramework->GetCurrBackBufferIndex();
-	shared_ptr<D3D11On12Device> device = gameFramework->GetD3D11on12Device();
-	D2D1_SIZE_F rtSize = device->GetD3D11On12RT(backbufferindex)->GetSize();
-	//D2D1_RECT_F textRect = D2D1::RectF(0, 0, rtSize.width, rtSize.height);
+	if (_activeScene == nullptr || GetSceneType() == SCENE_TYPE::LOADING)
+		return;
 
-	device->GetD3D11on12Device()->AcquireWrappedResources(device->GetWrappedBackBuffer(backbufferindex).GetAddressOf(), 1);
-	device->GetD2DDeviceContext()->SetTarget(device->GetD3D11On12RT(backbufferindex).Get());
-	device->GetSolidColorBrush()->SetColor(D2D1::ColorF(D2D1::ColorF::White));
-	device->GetD2DDeviceContext()->BeginDraw();
+	gameFramework->BeginD2DRender();
 
-	// TODO: UI 렌더링
-	//if (_activeScene)
-	//	_activeScene->RenderUI();
+	auto device = gameFramework->GetD3D11on12Device();
+	auto ctx = device->GetD2DDeviceContext();
+	auto brush = device->GetSolidColorBrush();
 
-	static float elapsedTime = 0.f;
-	if(DELTA_TIME < 1.f)
-		elapsedTime += DELTA_TIME;
-	if (_activeScene && GET_SINGLE(SceneMgr)->GetSceneType() == SCENE_TYPE::STAGE01)
+	brush->SetColor(D2D1::ColorF(D2D1::ColorF::White)); // 텍스트 색 설정
+
+	// 잔여탄 UI
 	{
-		// 총알 UI
-		Vec2 pivot = {
-			static_cast<float>(gameFramework->GetWindow().width - 100),
-			static_cast<float>(gameFramework->GetWindow().height - 50) };
-		D2D1_RECT_F textRect = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
+		// 현재 총알 수를 가져오는 로직 이상 생김. 수정 필요
 		int32 currentAmmo = 0;
-		
 		int32 gunType = static_pointer_cast<LocalPlayer>(_activeScene->FindGameObject(L"LocalPlayer"))->getGunType();
 		if (gunType == 0)
 			currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"M4A1"))->GetCurrentAmmo();
 		else if (gunType == 1)
 			currentAmmo = static_pointer_cast<AK47>(_activeScene->FindGameObject(L"AK47"))->GetCurrentAmmo();
-		
-		std::wstringstream wss1;
-		wss1 << std::fixed << std::setprecision(2) << currentAmmo;
-		wstring text = L"탄창: ";
-		text += wss1.str();
-		device->GetD2DDeviceContext()->DrawTextW(
-			text.c_str(),
-			static_cast<uint32>(text.size()),
-			device->GetTextFormat().Get(),
-			&textRect,
-			device->GetSolidColorBrush().Get());
 
-		// 타이머 UI
-		//pivot = { static_cast<float>(gameFramework->GetWindow().width / 2), 50.f };
-		//D2D1_RECT_F textRect2 = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
+		currentAmmo = 30;
+		std::wstringstream wss;
+		wss << currentAmmo;
 
-		//wstring text2 = L"시간 : ";
-		//std::wstringstream wss;
-		//wss << std::fixed << std::setprecision(2) << elapsedTime;
-		//text2 += wss.str();
-		//device->GetD2DDeviceContext()->DrawTextW(
-		//	text2.c_str(),
-		//	static_cast<uint32>(text2.size()),
-		//	device->GetTextFormat().Get(),
-		//	&textRect2,
-		//	device->GetSolidColorBrush().Get());
+		GET_SINGLE(UIMgr)->DrawTextUI(
+			wss.str(),
+			Vec2(995.f, 740.f),			// 위치
+			Vec2(100.f, 100.f),			// 텍스트 상자 크기
+			16,							// 폰트 크기 ( 8 ~ 128까지 짝수 사이즈만 설정 가능)
+			D2D1::ColorF::White,		// 텍스트 색상
+			D2D1::ColorF(0, 0, 0, 0.0f) // 배경 색
+		);
+	}
+	
 
-		// 체력 UI
-		pivot = { 100.f, static_cast<float>(gameFramework->GetWindow().height - 50) };
-		D2D1_RECT_F textRect3 = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
+	// LocalPlayer HP UI
+	{
+		std::wstringstream wss;
+		wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
+		uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
+		wss << name << "1 - " << hp;
+		GET_SINGLE(UIMgr)->DrawTextUI(
+			wss.str(),
+			Vec2(10.f, 740.f),
+			Vec2(300.f, 100.f),
+			16,
+			D2D1::ColorF::White,
+			D2D1::ColorF(0, 0, 0, 0.0f)
+		);
+		auto hpber = _activeScene->FindGameObject(L"PlayerPanel_1_HP");
+		if (hpber)
+		{
+			uint32 maxHp = 100;
+			float hpRatio = static_cast<float>(hp) / maxHp;
 
-		wstring text3 = L"HP : 100";
-		device->GetD2DDeviceContext()->DrawTextW(
-			text3.c_str(),
-			static_cast<uint32>(text3.size()),
-			device->GetTextFormat().Get(),
-			&textRect3,
-			device->GetSolidColorBrush().Get());
+			const float fullWidth = 270.f; // 전체 HP바 너비
+			Vec3 scale = hpber->GetTransform()->GetLocalScale();
+			scale.x = fullWidth * hpRatio;
+			hpber->GetTransform()->SetLocalScale(scale);
 
-		pivot = { 100.f, static_cast<float>(gameFramework->GetWindow().height / 2) };
-		D2D1_RECT_F textRect4 = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
 
-		//std::wstringstream wss;
-		//wstring text4 = L"X : ";
-		//Vec3 mainCameraPos = _activeScene->GetPlayerCamera()->GetTransform()->GetWorldPosition();
-		//wss.str(L"");
-		//wss.clear();
-		//wss << std::fixed << std::setprecision(2) << mainCameraPos.x;
-		//text4 += wss.str();
-		//text4 += L"\nY : ";
-		//wss.str(L"");
-		//wss.clear();
-		//wss << std::fixed << std::setprecision(2) << mainCameraPos.y;
-		//text4 += wss.str();
-		//text4 += L"\nZ : ";
-		//wss.str(L"");
-		//wss.clear();
-		//wss << std::fixed << std::setprecision(2) << mainCameraPos.z;
-		//text4 += wss.str();
-		//device->GetD2DDeviceContext()->DrawTextW(
-		//	text4.c_str(),
-		//	static_cast<uint32>(text4.size()),
-		//	device->GetTextFormat().Get(),
-		//	&textRect4,
-		//	device->GetSolidColorBrush().Get());
+			Vec3 position = hpber->GetTransform()->GetLocalPosition();
+			position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
+			hpber->GetTransform()->SetLocalPosition(position);
+		}
 	}
 
-	if (_activeScene && GET_SINGLE(SceneMgr)->GetSceneType() == SCENE_TYPE::STAGE02)
+	// TODO: 나중에 플레이어2, 3의 HP를 실제로 가져와야 함
+	// Player2 HP UI
 	{
-		Vec2 pivot = {
-			static_cast<float>(gameFramework->GetWindow().width - 100),
-			static_cast<float>(gameFramework->GetWindow().height - 50) };
-		D2D1_RECT_F textRect = D2D1::RectF(pivot.x - 100, pivot.y - 100, pivot.x + 100, pivot.y + 100);
-
-		pivot = { static_cast<float>(gameFramework->GetWindow().width - 100), static_cast<float>(gameFramework->GetWindow().height / 2) };
-		D2D1_RECT_F textRect3 = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
-
-		// LightPos
 		std::wstringstream wss;
-		wstring text3 = L"LP_X : ";
-		Vec3 lightPos = _activeScene->FindGameObject(L"DirectionalLight")->GetTransform()->GetWorldPosition();
-		wss.str(L"");
-		wss.clear();
-		wss << std::fixed << std::setprecision(2) << lightPos.x;
-		text3 += wss.str();
-		text3 += L"\nLP_Y : ";
-		wss.str(L"");
-		wss.clear();
-		wss << std::fixed << std::setprecision(2) << lightPos.y;
-		text3 += wss.str();
-		text3 += L"\nLP_Z : ";
-		wss.str(L"");
-		wss.clear();
-		wss << std::fixed << std::setprecision(2) << lightPos.z;
-		text3 += wss.str();
-		
-		device->GetD2DDeviceContext()->DrawTextW(
-			text3.c_str(),
-			static_cast<uint32>(text3.size()),
-			device->GetTextFormat().Get(),
-			&textRect3,
-			device->GetSolidColorBrush().Get());
+		wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
+		uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
+		hp = 85;
+		wss << name << "2 - " << hp;
+		GET_SINGLE(UIMgr)->DrawTextUI(
+			wss.str(),
+			Vec2(10.f, 740.f - 60.f),
+			Vec2(300.f, 100.f),
+			16,
+			D2D1::ColorF::White,
+			D2D1::ColorF(0, 0, 0, 0.0f)
+		);
+		auto hpber = _activeScene->FindGameObject(L"PlayerPanel_2_HP");
+		if (hpber)
+		{
+			uint32 maxHp = 100;
+			float hpRatio = static_cast<float>(hp) / maxHp;
 
-		pivot = { static_cast<float>(gameFramework->GetWindow().width / 2), static_cast<float>(gameFramework->GetWindow().height - 200) };
-		D2D1_RECT_F textRect5 = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
+			const float fullWidth = 270.f; // 전체 HP바 너비
+			Vec3 scale = hpber->GetTransform()->GetLocalScale();
+			scale.x = fullWidth * hpRatio;
+			hpber->GetTransform()->SetLocalScale(scale);
 
-		// Light Dir
-		wstring text5 = L"LL_X : ";
-		Vec3 lightDir = _activeScene->FindGameObject(L"DirectionalLight")->GetTransform()->GetLook();
-		wss.str(L"");
-		wss.clear();
-		wss << std::fixed << std::setprecision(2) << lightDir.x;
-		text5 += wss.str();
-		text5 += L"\nLL_Y : ";
-		wss.str(L"");
-		wss.clear();
-		wss << std::fixed << std::setprecision(2) << lightDir.y;
-		text5 += wss.str();
-		text5 += L"\nLL_Z : ";
-		wss.str(L"");
-		wss.clear();
-		wss << std::fixed << std::setprecision(2) << lightDir.z;
-		text5 += wss.str();
 
-		device->GetD2DDeviceContext()->DrawTextW(
-			text5.c_str(),
-			static_cast<uint32>(text5.size()),
-			device->GetTextFormat().Get(),
-			&textRect5,
-			device->GetSolidColorBrush().Get());
+			Vec3 position = hpber->GetTransform()->GetLocalPosition();
+			position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
+			hpber->GetTransform()->SetLocalPosition(position);
+		}
+	}
 
-		// Camera Position
-		pivot = { 100.f, static_cast<float>(gameFramework->GetWindow().height / 2) };
-		D2D1_RECT_F textRect4 = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
+	// Player3 HP UI
+	{
+		std::wstringstream wss;
+		wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
+		uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
+		hp = 55;
+		wss << name << "3 - " << hp;
+		GET_SINGLE(UIMgr)->DrawTextUI(
+			wss.str(),
+			Vec2(10.f, 740.f - 120.f),
+			Vec2(300.f, 100.f),
+			16,
+			D2D1::ColorF::White,
+			D2D1::ColorF(0, 0, 0, 0.0f)
+		);
+		auto hpber = _activeScene->FindGameObject(L"PlayerPanel_3_HP");
+		if (hpber)
+		{
+			uint32 maxHp = 100;
+			float hpRatio = static_cast<float>(hp) / maxHp;
 
-		wstring text4 = L"X : ";
-		Vec3 mainCameraPos = _activeScene->GetPlayerCamera()->GetTransform()->GetWorldPosition();
-		wss.str(L"");
-		wss.clear();
-		wss << std::fixed << std::setprecision(2) << mainCameraPos.x;
-		text4 += wss.str();
-		text4 += L"\nY : ";
-		wss.str(L"");
-		wss.clear();
-		wss << std::fixed << std::setprecision(2) << mainCameraPos.y;
-		text4 += wss.str();
-		text4 += L"\nZ : ";
-		wss.str(L"");
-		wss.clear();
-		wss << std::fixed << std::setprecision(2) << mainCameraPos.z;
-		text4 += wss.str();
-		device->GetD2DDeviceContext()->DrawTextW(
-			text4.c_str(),
-			static_cast<uint32>(text4.size()),
-			device->GetTextFormat().Get(),
-			&textRect4,
-			device->GetSolidColorBrush().Get());
+			const float fullWidth = 270.f; // 전체 HP바 너비
+			Vec3 scale = hpber->GetTransform()->GetLocalScale();
+			scale.x = fullWidth * hpRatio;
+			hpber->GetTransform()->SetLocalScale(scale);
+
+
+			Vec3 position = hpber->GetTransform()->GetLocalPosition();
+			position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
+			hpber->GetTransform()->SetLocalPosition(position);
+		}
 	}
 
 	device->GetD2DDeviceContext()->EndDraw();
+	// Release our wrapped render target resource. Releasing 
+	// transitions the back buffer resource to the state specified
+	// as the OutState when the wrapped resource was created.
 	device->GetD3D11on12Device()->ReleaseWrappedResources(device->GetWrappedBackBuffer(backbufferindex).GetAddressOf(), 1);
-	device->GetD3D11DeviceContext()->Flush();
+
+	gameFramework->EndD2DRender();
 }
 
 void SceneMgr::LoadScene(SCENE_TYPE type)
@@ -411,21 +362,6 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 	}
 #pragma endregion
 
-#pragma region UI_Camera
-	{
-		shared_ptr<UICamera> camera = make_shared<UICamera>();
-		camera->SetName(L"UI_Camera");
-		camera->SetTransform(make_shared<Transform>());
-		camera->SetCamera(make_shared<Camera>());
-		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 0.f));
-		camera->GetCamera()->SetProjectionType(PROJECTION_TYPE::ORTHOGRAPHIC);
-		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
-		camera->GetCamera()->SetCullingMaskAll(); // 다 끄고
-		camera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, false); // UI만 찍음
-		scene->AddGameObject(camera);
-	}
-#pragma endregion
-
 #pragma region GunCamera
 	{
 		shared_ptr<GunCamera> gunCamera = make_shared<GunCamera>();
@@ -444,6 +380,22 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 		scene->AddGameObject(gunCamera);
 	}
 #pragma endregion
+
+#pragma region UI_Camera
+	{
+		shared_ptr<UICamera> camera = make_shared<UICamera>();
+		camera->SetName(L"UI_Camera");
+		camera->SetTransform(make_shared<Transform>());
+		camera->SetCamera(make_shared<Camera>());
+		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 0.f));
+		camera->GetCamera()->SetProjectionType(PROJECTION_TYPE::ORTHOGRAPHIC);
+		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
+		camera->GetCamera()->SetCullingMaskAll(); // 다 끄고
+		camera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, false); // UI만 찍음
+		scene->AddGameObject(camera);
+	}
+#pragma endregion
+
 
 #pragma region SkyBox
 	{
@@ -502,30 +454,9 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 	}
 #pragma endregion
 
-#pragma region Crosshair
+#pragma region Load_UI_Image
 	{
-		shared_ptr<GameObject> crosshair = make_shared<GameObject>();
-		crosshair->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
-		crosshair->SetTransform(make_shared<Transform>());
-		crosshair->GetTransform()->SetLocalScale(Vec3(50.f, 50.f, 50.f));
-		crosshair->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 300.f));
-
-		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
-		{
-			shared_ptr<Mesh> mesh = GET_SINGLE(Resources)->LoadRectangleMesh();
-			meshRenderer->SetMesh(mesh);
-		}
-		{
-			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"AlphaTexture");
-			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"Crosshair", L"..\\Resources\\Texture\\Crosshair\\crosshair01.png");
-			shared_ptr<Material> material = make_shared<Material>();
-			material->SetShader(shader);
-			material->SetTexture(0, texture);
-			meshRenderer->SetMaterial(material);
-		}
-		crosshair->SetName(L"Crosshair");
-		crosshair->SetMeshRenderer(meshRenderer);
-		scene->AddGameObject(crosshair);
+		LoadUIImage(scene);
 	}
 #pragma endregion
 
@@ -575,7 +506,7 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 			}
 			gameObject->SetLayerIndex(gunLayer);
 			gameObject->SetActive(false);
-			
+
 			scene->AddGameObject(gameObject);
 		}
 
@@ -626,24 +557,159 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 	}
 #pragma endregion
 
-#pragma region Map
-	{
-		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Factory1Items.fbx");
-		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate(ColliderType::OBB);
-		
-		for (auto& gameObject : gameObjects)
-		{
-			gameObject->SetName(L"Map");
-			//gameObject->SetStatic(true);
-			gameObject->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
-			gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 0.f, 0.f));
-			scene->AddGameObject(gameObject);
-		}
-	}
-#pragma endregion
+//#pragma region Map
+//	{
+//		shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Factory1Items.fbx");
+//		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate(ColliderType::OBB);
+//
+//		for (auto& gameObject : gameObjects)
+//		{
+//			gameObject->SetName(L"Map");
+//			//gameObject->SetStatic(true);
+//			gameObject->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
+//			gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 0.f, 0.f));
+//			//gameObject->GetTransform()->SetParent(t->GetTransform());
+//			scene->AddGameObject(gameObject);
+//		}
+//
+//		//GET_SINGLE(JsonMgr)->SaveMapCollider(L"..\\Resources\\Json\\MapCollider.json", gameObjects);
+//	}
+//#pragma endregion
 
-GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Soldado.fbx");
-GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Soldado.fbx");
+	//GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
+	//GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\PoliceZombie.fbx");
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\EliteZombie.fbx");
 
 	return scene;
+}
+
+void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
+{
+	GET_SINGLE(UIMgr)->Init(); // 임시 텍스트 폰트 설정 ( 어디다 넣어야 할지 고민중..)
+
+	// 조준선 UI 생성
+	GET_SINGLE(UIMgr)->CreateImageUI(
+		L"Crosshair",
+		L"..\\Resources\\Texture\\Crosshair\\crosshair01.png",
+		Vec2(0.f, 0.f), // 화면 중앙
+		Vec2(50.f, 50.f), // 크기
+		scene
+	);
+
+
+	// 총 패널 UI 생성
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"GunPanel_1",
+		Vec2(490.f, -360.f),
+		Vec2(300.f, 50.f),
+		Vec4(0.5f, 0.5f, 0.5f, 0.5f), // 반투명 검정색
+		scene
+	);
+
+	GET_SINGLE(UIMgr)->CreateImageUI(
+		L"AK47",
+		L"..\\Resources\\Texture\\Icon\\Gun\\AK47 실루엣(흰색).png",
+		Vec2(520.f, -360.f), 
+		Vec2(165.f, 50.f),
+		scene
+	);
+	GET_SINGLE(UIMgr)->CreateImageUI(
+		L"소총탄",
+		L"..\\Resources\\Texture\\Icon\\Bullet\\소총탄.png",
+		Vec2(410.f, -360.f), 
+		Vec2(40.f, 40.f),
+		scene
+	);
+
+	// 플레이어1 정보 출력
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_1",					// 이름
+		Vec2(-500.f, -360.f),				// 위치
+		Vec2(300.f, 50.f),					// 크기
+		Vec4(0.5f, 0.5f, 0.5f, 0.5f),		// 색상
+		scene
+	);
+
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_1_Max_Hp",			// 이름
+		Vec2(-495.f, -370.f),				// 위치
+		Vec2(270.f, 20.f),					// 크기
+		Vec4(0.0f, 0.0f, 0.0f, 1.f),		// 색상
+		scene
+	);
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_1_HP",				// 이름
+		Vec2(-495.f, -370.f),				// 위치
+		Vec2(270.f, 20.f),					// 크기
+		Vec4(1.f, 0.0f, 0.0f, 1.f),			// 색상
+		scene
+	);
+
+
+	// 플레이어2 정보 출력
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_2",					// 이름
+		Vec2(-500.f, -300.f),				// 위치
+		Vec2(300.f, 50.f),					// 크기
+		Vec4(0.5f, 0.5f, 0.5f, 0.5f),		// 색상
+		scene
+	);
+
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_2_Max_Hp",			// 이름
+		Vec2(-495.f, -310.f),				// 위치
+		Vec2(270.f, 20.f),					// 크기
+		Vec4(0.0f, 0.0f, 0.0f, 1.f),		// 색상
+		scene
+	);
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_2_HP",				// 이름
+		Vec2(-495.f, -310.f),				// 위치
+		Vec2(270.f, 20.f),					// 크기
+		Vec4(1.f, 0.0f, 0.0f, 1.f),			// 색상
+		scene
+	);
+
+
+	// 플레이어3 정보 출력
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_3",					// 이름
+		Vec2(-500.f, -240.f),				// 위치
+		Vec2(300.f, 50.f),					// 크기
+		Vec4(0.5f, 0.5f, 0.5f, 0.5f),		// 색상
+		scene
+	);
+
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_3_Max_Hp",			// 이름
+		Vec2(-495.f, -250.f),				// 위치
+		Vec2(270.f, 20.f),					// 크기
+		Vec4(0.0f, 0.0f, 0.0f, 1.f),		// 색상
+		scene
+	);
+	GET_SINGLE(UIMgr)->CreateRectangleUI(
+		L"PlayerPanel_3_HP",				// 이름
+		Vec2(-495.f, -250.f),				// 위치
+		Vec2(270.f, 20.f),					// 크기
+		Vec4(1.f, 0.0f, 0.0f, 1.f),			// 색상
+		scene
+	);
+
+	
+
+
+	//for (size_t i = 0; i < 20; i++)
+	//{
+	//	// 플레이어 정보 출력
+	//	GET_SINGLE(UIMgr)->CreateImageUI(
+	//		L"소총탄",
+	//		L"..\\Resources\\Texture\\Icon\\Bullet\\소총탄.png",
+	//		Vec2(410.f, -360.f),
+	//		Vec2(40.f, 40.f),
+	//		scene
+	//	);
+	//}
+
+	
 }

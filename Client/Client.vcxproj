@@ -185,6 +185,7 @@
     <ClInclude Include="D3D11On12Device.h" />
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="FmodMgr.h" />
+    <ClInclude Include="EliteZombie.h" />
     <ClInclude Include="Framework.h" />
     <ClInclude Include="FBXLoader.h" />
     <ClInclude Include="GameInfo.h" />
@@ -212,6 +213,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerCamera.h" />
+    <ClInclude Include="PoliceZombie.h" />
     <ClInclude Include="RaycastMgr.h" />
     <ClInclude Include="RenderPass.h" />
     <ClInclude Include="RenderTargetGroup.h" />
@@ -228,6 +230,7 @@
     <ClInclude Include="TitleCamera.h" />
     <ClInclude Include="TitleScene.h" />
     <ClInclude Include="UICamera.h" />
+    <ClInclude Include="UIMgr.h" />
     <ClInclude Include="UploadBuffer.h" />
     <ClInclude Include="DescriptorHeap.h" />
     <ClInclude Include="targetver.h" />
@@ -251,6 +254,7 @@
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="D3D11On12Device.cpp" />
     <ClCompile Include="FmodMgr.cpp" />
+    <ClCompile Include="EliteZombie.cpp" />
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="FBXLoader.cpp" />
     <ClCompile Include="GameInfo.cpp" />
@@ -282,6 +286,7 @@
     </ClCompile>
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerCamera.cpp" />
+    <ClCompile Include="PoliceZombie.cpp" />
     <ClCompile Include="RaycastMgr.cpp" />
     <ClCompile Include="RenderPass.cpp" />
     <ClCompile Include="RenderTargetGroup.cpp" />
@@ -297,6 +302,7 @@
     <ClCompile Include="TitleCamera.cpp" />
     <ClCompile Include="TitleScene.cpp" />
     <ClCompile Include="UICamera.cpp" />
+    <ClCompile Include="UIMgr.cpp" />
     <ClCompile Include="UploadBuffer.cpp" />
     <ClCompile Include="DescriptorHeap.cpp" />
     <ClCompile Include="LocalPlayer.cpp" />

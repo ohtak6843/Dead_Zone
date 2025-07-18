@@ -22,6 +22,8 @@
 #include "MultiPlayer.h"
 
 #include "Zombie.h"
+#include "PoliceZombie.h"
+#include "EliteZombie.h"
 
 #include "TP_AK47.h"
 
@@ -95,6 +97,7 @@ void Scene::FinalUpdate()
 {
 	for (const shared_ptr<GameObject>& gameObject : _gameObjects)
 	{
+		if (!gameObject) continue; // 방어 코드, 크러시 원인 찾기 전까지 임시
 		if (!gameObject->IsActive()) continue;
 		gameObject->FinalUpdate();
 	}
@@ -348,9 +351,14 @@ void Scene::AddZombie(sc_packet_spawn_zombie* packet)
 {
 	Vec3 position = Vec3(packet->position.x, packet->position.y, packet->position.z);
 
-	shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
+	/*shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
+	vector<shared_ptr<Zombie>> zombieObjects = meshData->InstantiateAs<Zombie>(ColliderType::OBB);*/
 
-	vector<shared_ptr<Zombie>> zombieObjects = meshData->InstantiateAs<Zombie>(ColliderType::OBB);
+	/*shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\PoliceZombie.fbx");
+	vector<shared_ptr<PoliceZombie>> zombieObjects = meshData->InstantiateAs<PoliceZombie>(ColliderType::OBB);*/
+
+	shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\EliteZombie.fbx");
+	vector<shared_ptr<EliteZombie>> zombieObjects = meshData->InstantiateAs<EliteZombie>(ColliderType::OBB);
 
 	for (const auto& zombieObject : zombieObjects)
 	{
@@ -371,8 +379,13 @@ void Scene::AddZombie(sc_packet_spawn_zombie* packet)
 	for (auto& zombie : zombieObjects) {
 		AddGameObject(zombie);
 	}
+	// 업 캐스팅
+	vector<shared_ptr<Zombie>> castedZombies;
+	for (const auto& pz : zombieObjects) {
+		castedZombies.push_back(static_pointer_cast<Zombie>(pz));
+	}
 
-	_zombies.push_back(zombieObjects);
+	_zombies.push_back(castedZombies);
 }
 
 void Scene::MoveZombie(sc_packet_zombie_move* packet)

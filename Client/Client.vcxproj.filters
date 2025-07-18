@@ -262,6 +262,15 @@
     <ClInclude Include="FmodMgr.h">
       <Filter>Game\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="UIMgr.h">
+      <Filter>Game\GameObject\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="PoliceZombie.h">
+      <Filter>Game\GameObject\Zombie</Filter>
+    </ClInclude>
+    <ClInclude Include="EliteZombie.h">
+      <Filter>Game\GameObject\Zombie</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc">
@@ -459,6 +468,15 @@
     </ClCompile>
     <ClCompile Include="FmodMgr.cpp">
       <Filter>Game\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="UIMgr.cpp">
+      <Filter>Game\GameObject\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="PoliceZombie.cpp">
+      <Filter>Game\GameObject\Zombie</Filter>
+    </ClCompile>
+    <ClCompile Include="EliteZombie.cpp">
+      <Filter>Game\GameObject\Zombie</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

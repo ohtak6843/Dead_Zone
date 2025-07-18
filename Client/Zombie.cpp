@@ -6,12 +6,20 @@
 #include "BaseCollider.h"
 #include "Animator.h"
 
-Zombie::Zombie()
+#include "Scene.h"
+#include "SceneMgr.h"
+#include "Pch.h"
+
+#include "BloodParticle.h"
+#include "GameObject.h"
+#include "ParticleObject.h"
+
+Zombie::Zombie(const wstring& infoKey)
 {
 	_type = GAMEOBJECT_TYPE::ZOMBIE;
 	_name = L"Zombie";
 
-	shared_ptr<ZombieInfo> info = GET_SINGLE(GameInfo)->Get<ZombieInfo>(L"NormalZombie");
+	shared_ptr<ZombieInfo> info = GET_SINGLE(GameInfo)->Get<ZombieInfo>(infoKey);
 	_info = *info;
 
 	//SetRandomDirection();
@@ -19,6 +27,21 @@ Zombie::Zombie()
 
 	_moving = false;
 	_elapsedTime = 0.0f;
+
+
+	// 파티클 생성
+	_particle = make_shared<ParticleObject>();
+	_particle->SetTransform(make_shared<Transform>());
+	_blood = make_shared<BloodParticle>();
+	_particle->SetParticle(_blood);
+
+
+	//_particle->GetTransform()->SetParent(GetTransform());
+	//_particle->GetTransform()->SetLocalPosition(Vec3(0.f, 13.f, 100.f));
+	_particle->SetCheckFrustum(false);
+
+	GET_SINGLE(SceneMgr)->GetActiveScene()->AddGameObject(_particle);
+	_blood->SetActive(false);
 }
 
 Zombie::~Zombie()
@@ -27,7 +50,6 @@ Zombie::~Zombie()
 
 void Zombie::Awake()
 {
-
 }
 
 void Zombie::Start()
@@ -62,7 +84,7 @@ void Zombie::SetState(ZOMBIE_STATE playerState)
 	}
 	case ZOMBIE_STATE::IDLE:
 	{
-		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::IDLE1);
+		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::IDLE);
 		GetAnimator()->Play(index);
 		break;
 	}
@@ -80,13 +102,13 @@ void Zombie::SetState(ZOMBIE_STATE playerState)
 	}
 	case ZOMBIE_STATE::ATTACK:
 	{
-		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::ATTACK1);
+		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::ATTACK);
 		GetAnimator()->Play(index);
 		break;
 	}
 	case ZOMBIE_STATE::DIE:
 	{
-		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::DIE1);
+		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::DIE);
 		GetAnimator()->Play(index);
 		break;
 	}

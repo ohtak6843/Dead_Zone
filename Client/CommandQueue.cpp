@@ -4,7 +4,6 @@
 
 BaseCommandQueue::~BaseCommandQueue()
 {
-	::CloseHandle(_fenceEvent);
 }
 
 void BaseCommandQueue::Init(ComPtr<ID3D12Device> device, D3D12_COMMAND_LIST_TYPE type)

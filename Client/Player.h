@@ -34,7 +34,11 @@ public:
 
 public:
 	virtual void SetState(PLAYER_STATE state) { _state = state; }
-	
+	uint32 GetHp() const { return _info.hp; }
+	wstring GetName() const { return _info.name; }
+
+	void SetHp(uint32 hp) { _info.hp = hp; }
+
 protected:
 	PLAYER_STATE _state;
 	PlayerInfo _info;
