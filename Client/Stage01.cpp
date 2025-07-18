@@ -292,6 +292,7 @@ void Stage01::Init()
 		light->GetLight()->SetAmbient(Vec3(0.1f, 0.1f, 0.1f));
 		light->GetLight()->SetSpecular(Vec3(0.1f, 0.1f, 0.1f));
 
+		light->GetTransform()->SetLocalRotation(Vec3(90.f, 0.f, 0.f));
 		AddGameObject(light);
 	}
 #pragma endregion
@@ -336,6 +337,10 @@ void Stage01::Init()
 			AddGameObject(gameObject);
 		}
 	}
+#pragma endregion
+
+#pragma region Load UI
+	GET_SINGLE(SceneMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
 #pragma endregion
 
 	INPUT->LockCursor(true);

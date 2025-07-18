@@ -372,6 +372,10 @@ void Stage02::Init()
 	}
 #pragma endregion
 
+#pragma region Load UI
+	GET_SINGLE(SceneMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
+#pragma endregion
+
 	INPUT->LockCursor(true);
 	gameFramework->ToggleFullScreen(true);
 

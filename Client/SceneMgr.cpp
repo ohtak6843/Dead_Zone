@@ -72,127 +72,130 @@ void SceneMgr::RenderUI()
 
 	brush->SetColor(D2D1::ColorF(D2D1::ColorF::White)); // 텍스트 색 설정
 
-	// 잔여탄 UI
+	if (_activeScene && (_sceneType == SCENE_TYPE::STAGE01 || _sceneType == SCENE_TYPE::STAGE02))
 	{
-		// 현재 총알 수를 가져오는 로직 이상 생김. 수정 필요
-		int32 currentAmmo = 0;
-		int32 gunType = static_pointer_cast<LocalPlayer>(_activeScene->FindGameObject(L"LocalPlayer"))->getGunType();
-		if (gunType == 0)
-			currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"M4A1"))->GetCurrentAmmo();
-		else if (gunType == 1)
-			currentAmmo = static_pointer_cast<AK47>(_activeScene->FindGameObject(L"AK47"))->GetCurrentAmmo();
-
-		currentAmmo = 30;
-		std::wstringstream wss;
-		wss << currentAmmo;
-
-		GET_SINGLE(UIMgr)->DrawTextUI(
-			wss.str(),
-			Vec2(995.f, 740.f),			// 위치
-			Vec2(100.f, 100.f),			// 텍스트 상자 크기
-			16,							// 폰트 크기 ( 8 ~ 128까지 짝수 사이즈만 설정 가능)
-			D2D1::ColorF::White,		// 텍스트 색상
-			D2D1::ColorF(0, 0, 0, 0.0f) // 배경 색
-		);
-	}
-	
-
-	// LocalPlayer HP UI
-	{
-		std::wstringstream wss;
-		wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
-		uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
-		wss << name << "1 - " << hp;
-		GET_SINGLE(UIMgr)->DrawTextUI(
-			wss.str(),
-			Vec2(10.f, 740.f),
-			Vec2(300.f, 100.f),
-			16,
-			D2D1::ColorF::White,
-			D2D1::ColorF(0, 0, 0, 0.0f)
-		);
-		auto hpber = _activeScene->FindGameObject(L"PlayerPanel_1_HP");
-		if (hpber)
+		// 잔여탄 UI
 		{
-			uint32 maxHp = 100;
-			float hpRatio = static_cast<float>(hp) / maxHp;
+			// 현재 총알 수를 가져오는 로직 이상 생김. 수정 필요
+			int32 currentAmmo = 0;
+			int32 gunType = static_pointer_cast<LocalPlayer>(_activeScene->FindGameObject(L"LocalPlayer"))->getGunType();
+			if (gunType == 0)
+				currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"M4A1"))->GetCurrentAmmo();
+			else if (gunType == 1)
+				currentAmmo = static_pointer_cast<AK47>(_activeScene->FindGameObject(L"AK47"))->GetCurrentAmmo();
 
-			const float fullWidth = 270.f; // 전체 HP바 너비
-			Vec3 scale = hpber->GetTransform()->GetLocalScale();
-			scale.x = fullWidth * hpRatio;
-			hpber->GetTransform()->SetLocalScale(scale);
+			currentAmmo = 30;
+			std::wstringstream wss;
+			wss << currentAmmo;
 
-
-			Vec3 position = hpber->GetTransform()->GetLocalPosition();
-			position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
-			hpber->GetTransform()->SetLocalPosition(position);
+			GET_SINGLE(UIMgr)->DrawTextUI(
+				wss.str(),
+				Vec2(995.f, 740.f),			// 위치
+				Vec2(100.f, 100.f),			// 텍스트 상자 크기
+				16,							// 폰트 크기 ( 8 ~ 128까지 짝수 사이즈만 설정 가능)
+				D2D1::ColorF::White,		// 텍스트 색상
+				D2D1::ColorF(0, 0, 0, 0.0f) // 배경 색
+			);
 		}
-	}
 
-	// TODO: 나중에 플레이어2, 3의 HP를 실제로 가져와야 함
-	// Player2 HP UI
-	{
-		std::wstringstream wss;
-		wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
-		uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
-		hp = 85;
-		wss << name << "2 - " << hp;
-		GET_SINGLE(UIMgr)->DrawTextUI(
-			wss.str(),
-			Vec2(10.f, 740.f - 60.f),
-			Vec2(300.f, 100.f),
-			16,
-			D2D1::ColorF::White,
-			D2D1::ColorF(0, 0, 0, 0.0f)
-		);
-		auto hpber = _activeScene->FindGameObject(L"PlayerPanel_2_HP");
-		if (hpber)
+
+		// LocalPlayer HP UI
 		{
-			uint32 maxHp = 100;
-			float hpRatio = static_cast<float>(hp) / maxHp;
+			std::wstringstream wss;
+			wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
+			uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
+			wss << name << "1 - " << hp;
+			GET_SINGLE(UIMgr)->DrawTextUI(
+				wss.str(),
+				Vec2(10.f, 740.f),
+				Vec2(300.f, 100.f),
+				16,
+				D2D1::ColorF::White,
+				D2D1::ColorF(0, 0, 0, 0.0f)
+			);
+			auto hpber = _activeScene->FindGameObject(L"PlayerPanel_1_HP");
+			if (hpber)
+			{
+				uint32 maxHp = 100;
+				float hpRatio = static_cast<float>(hp) / maxHp;
 
-			const float fullWidth = 270.f; // 전체 HP바 너비
-			Vec3 scale = hpber->GetTransform()->GetLocalScale();
-			scale.x = fullWidth * hpRatio;
-			hpber->GetTransform()->SetLocalScale(scale);
+				const float fullWidth = 270.f; // 전체 HP바 너비
+				Vec3 scale = hpber->GetTransform()->GetLocalScale();
+				scale.x = fullWidth * hpRatio;
+				hpber->GetTransform()->SetLocalScale(scale);
 
 
-			Vec3 position = hpber->GetTransform()->GetLocalPosition();
-			position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
-			hpber->GetTransform()->SetLocalPosition(position);
+				Vec3 position = hpber->GetTransform()->GetLocalPosition();
+				position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
+				hpber->GetTransform()->SetLocalPosition(position);
+			}
 		}
-	}
 
-	// Player3 HP UI
-	{
-		std::wstringstream wss;
-		wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
-		uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
-		hp = 55;
-		wss << name << "3 - " << hp;
-		GET_SINGLE(UIMgr)->DrawTextUI(
-			wss.str(),
-			Vec2(10.f, 740.f - 120.f),
-			Vec2(300.f, 100.f),
-			16,
-			D2D1::ColorF::White,
-			D2D1::ColorF(0, 0, 0, 0.0f)
-		);
-		auto hpber = _activeScene->FindGameObject(L"PlayerPanel_3_HP");
-		if (hpber)
+		// TODO: 나중에 플레이어2, 3의 HP를 실제로 가져와야 함
+		// Player2 HP UI
 		{
-			uint32 maxHp = 100;
-			float hpRatio = static_cast<float>(hp) / maxHp;
+			std::wstringstream wss;
+			wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
+			uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
+			hp = 85;
+			wss << name << "2 - " << hp;
+			GET_SINGLE(UIMgr)->DrawTextUI(
+				wss.str(),
+				Vec2(10.f, 740.f - 60.f),
+				Vec2(300.f, 100.f),
+				16,
+				D2D1::ColorF::White,
+				D2D1::ColorF(0, 0, 0, 0.0f)
+			);
+			auto hpber = _activeScene->FindGameObject(L"PlayerPanel_2_HP");
+			if (hpber)
+			{
+				uint32 maxHp = 100;
+				float hpRatio = static_cast<float>(hp) / maxHp;
 
-			const float fullWidth = 270.f; // 전체 HP바 너비
-			Vec3 scale = hpber->GetTransform()->GetLocalScale();
-			scale.x = fullWidth * hpRatio;
-			hpber->GetTransform()->SetLocalScale(scale);
+				const float fullWidth = 270.f; // 전체 HP바 너비
+				Vec3 scale = hpber->GetTransform()->GetLocalScale();
+				scale.x = fullWidth * hpRatio;
+				hpber->GetTransform()->SetLocalScale(scale);
 
 
-			Vec3 position = hpber->GetTransform()->GetLocalPosition();
-			position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
-			hpber->GetTransform()->SetLocalPosition(position);
+				Vec3 position = hpber->GetTransform()->GetLocalPosition();
+				position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
+				hpber->GetTransform()->SetLocalPosition(position);
+			}
+		}
+
+		// Player3 HP UI
+		{
+			std::wstringstream wss;
+			wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
+			uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
+			hp = 55;
+			wss << name << "3 - " << hp;
+			GET_SINGLE(UIMgr)->DrawTextUI(
+				wss.str(),
+				Vec2(10.f, 740.f - 120.f),
+				Vec2(300.f, 100.f),
+				16,
+				D2D1::ColorF::White,
+				D2D1::ColorF(0, 0, 0, 0.0f)
+			);
+			auto hpber = _activeScene->FindGameObject(L"PlayerPanel_3_HP");
+			if (hpber)
+			{
+				uint32 maxHp = 100;
+				float hpRatio = static_cast<float>(hp) / maxHp;
+
+				const float fullWidth = 270.f; // 전체 HP바 너비
+				Vec3 scale = hpber->GetTransform()->GetLocalScale();
+				scale.x = fullWidth * hpRatio;
+				hpber->GetTransform()->SetLocalScale(scale);
+
+
+				Vec3 position = hpber->GetTransform()->GetLocalPosition();
+				position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
+				hpber->GetTransform()->SetLocalPosition(position);
+			}
 		}
 	}
 

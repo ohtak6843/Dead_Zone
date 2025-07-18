@@ -50,7 +50,7 @@ public:
 public:
 	shared_ptr<Scene> GetActiveScene() { return _activeScene; }
 
-private:
+public:
 	void LoadUIImage(shared_ptr<Scene> scene); // 임시 ( 나중에 구조 바뀌면 같이 수정해주기 - 당장은 어떤식으로 처리해야 할지 감이 안잡힘.)
 
 private:

@@ -245,7 +245,7 @@ void Scene::AddPlayer(sc_packet_player_info* packet)
 	_players[packet->playerId] = std::move(players);
 
 	// ÃÑ ¸ðµ¨
-	shared_ptr<MeshData> guns = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\AK74.fbx");
+	shared_ptr<MeshData> guns = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\AK47.fbx");
 	vector<shared_ptr<TP_AK47>> gunObjects = guns->InstantiateAs<TP_AK47>();
 
 	for (auto& gunObject : gunObjects)
