@@ -40,10 +40,28 @@ void GameInfo::CreateDefaultZombieInfo()
 				100,
 				10,
 				1.f,
-				100.f,
+				150.f,
 				3.3f,
 			});
 		Add<ZombieInfo>(L"NormalZombie", info);
+	}
+
+	// Police Zombie Info
+	{
+		shared_ptr<ZombieInfo> info = make_shared<ZombieInfo>(
+			ZombieInfo
+			{
+				INFO_TYPE::ZOMBIE,
+				L"PoliceZombie",
+
+				ZOMBIE_TYPE::POLICE,
+				200,
+				15,
+				1.0f,
+				120.f,
+				3.3f,
+			});
+		Add<ZombieInfo>(L"PoliceZombie", info);
 	}
 }
 

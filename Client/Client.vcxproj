@@ -205,6 +205,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerCamera.h" />
+    <ClInclude Include="PoliceZombie.h" />
     <ClInclude Include="RaycastMgr.h" />
     <ClInclude Include="RenderPass.h" />
     <ClInclude Include="RenderTargetGroup.h" />
@@ -272,6 +273,7 @@
     </ClCompile>
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerCamera.cpp" />
+    <ClCompile Include="PoliceZombie.cpp" />
     <ClCompile Include="RaycastMgr.cpp" />
     <ClCompile Include="RenderPass.cpp" />
     <ClCompile Include="RenderTargetGroup.cpp" />

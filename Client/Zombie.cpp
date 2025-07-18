@@ -14,12 +14,12 @@
 #include "GameObject.h"
 #include "ParticleObject.h"
 
-Zombie::Zombie()
+Zombie::Zombie(const wstring& infoKey)
 {
 	_type = GAMEOBJECT_TYPE::ZOMBIE;
 	_name = L"Zombie";
 
-	shared_ptr<ZombieInfo> info = GET_SINGLE(GameInfo)->Get<ZombieInfo>(L"NormalZombie");
+	shared_ptr<ZombieInfo> info = GET_SINGLE(GameInfo)->Get<ZombieInfo>(infoKey);
 	_info = *info;
 
 	//SetRandomDirection();
@@ -84,7 +84,7 @@ void Zombie::SetState(ZOMBIE_STATE playerState)
 	}
 	case ZOMBIE_STATE::IDLE:
 	{
-		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::IDLE1);
+		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::IDLE);
 		GetAnimator()->Play(index);
 		break;
 	}
@@ -102,13 +102,13 @@ void Zombie::SetState(ZOMBIE_STATE playerState)
 	}
 	case ZOMBIE_STATE::ATTACK:
 	{
-		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::ATTACK1);
+		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::ATTACK);
 		GetAnimator()->Play(index);
 		break;
 	}
 	case ZOMBIE_STATE::DIE:
 	{
-		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::DIE1);
+		uint32 index = static_cast<uint32>(NORMAL_ZOMBIE_ANIMATION::DIE);
 		GetAnimator()->Play(index);
 		break;
 	}

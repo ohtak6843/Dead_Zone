@@ -253,6 +253,9 @@
     <ClInclude Include="UIMgr.h">
       <Filter>Game\GameObject\UI</Filter>
     </ClInclude>
+    <ClInclude Include="PoliceZombie.h">
+      <Filter>Game\GameObject\Zombie</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc">
@@ -441,6 +444,9 @@
     </ClCompile>
     <ClCompile Include="UIMgr.cpp">
       <Filter>Game\GameObject\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="PoliceZombie.cpp">
+      <Filter>Game\GameObject\Zombie</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

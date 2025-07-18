@@ -16,15 +16,10 @@ enum class ZOMBIE_STATE
 
 enum class NORMAL_ZOMBIE_ANIMATION
 {
-	ATTACK1,
-	DIE1,
-	DIE2,
-	IDLE1,
-	IDLE2,
-	ATTACK2,
+	ATTACK,
+	DIE,
+	IDLE,
 	RUN,
-	SCREAM,
-	WALK,
 	T_POSE,
 
 	END
@@ -33,7 +28,7 @@ enum class NORMAL_ZOMBIE_ANIMATION
 class Zombie : public GameObject
 {
 public:
-	Zombie();
+	Zombie(const wstring& infoKey = L"NormalZombie");
 	virtual ~Zombie();
 
 	virtual void Awake() override;
@@ -50,7 +45,7 @@ public:
 	void Move();
 	shared_ptr<class ParticleObject> GetParticle() { return _particle; }
 
-private:
+protected:
 	ZOMBIE_STATE _state;
 	ZombieInfo _info;
 	shared_ptr<class ParticleObject> _particle;
