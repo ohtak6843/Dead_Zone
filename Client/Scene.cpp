@@ -23,6 +23,7 @@
 
 #include "Zombie.h"
 #include "PoliceZombie.h"
+#include "EliteZombie.h"
 
 #include "TP_AK47.h"
 
@@ -338,8 +339,11 @@ void Scene::AddZombie(sc_packet_spawn_zombie* packet)
 	/*shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
 	vector<shared_ptr<Zombie>> zombieObjects = meshData->InstantiateAs<Zombie>(ColliderType::OBB);*/
 
-	shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\PoliceZombie.fbx");
-	vector<shared_ptr<PoliceZombie>> zombieObjects = meshData->InstantiateAs<PoliceZombie>(ColliderType::OBB);
+	/*shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\PoliceZombie.fbx");
+	vector<shared_ptr<PoliceZombie>> zombieObjects = meshData->InstantiateAs<PoliceZombie>(ColliderType::OBB);*/
+
+	shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\EliteZombie.fbx");
+	vector<shared_ptr<EliteZombie>> zombieObjects = meshData->InstantiateAs<EliteZombie>(ColliderType::OBB);
 
 	for (const auto& zombieObject : zombieObjects)
 	{

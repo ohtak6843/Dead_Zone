@@ -77,10 +77,10 @@ public:
             specialSkill = "None";
         }
         else if (t == ELITE) {
-            health = 250;
-            attack = 15;
+            health = 300;
+            attack = 20;
             attackSpeed = 1.1f;
-            walkSpeed = 1.1f;
+            walkSpeed = 170.0f;
             runSpeed = 3.7f;
             specialSkill = "None";
         }

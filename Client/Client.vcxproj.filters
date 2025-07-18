@@ -256,6 +256,9 @@
     <ClInclude Include="PoliceZombie.h">
       <Filter>Game\GameObject\Zombie</Filter>
     </ClInclude>
+    <ClInclude Include="EliteZombie.h">
+      <Filter>Game\GameObject\Zombie</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc">
@@ -446,6 +449,9 @@
       <Filter>Game\GameObject\UI</Filter>
     </ClCompile>
     <ClCompile Include="PoliceZombie.cpp">
+      <Filter>Game\GameObject\Zombie</Filter>
+    </ClCompile>
+    <ClCompile Include="EliteZombie.cpp">
       <Filter>Game\GameObject\Zombie</Filter>
     </ClCompile>
   </ItemGroup>

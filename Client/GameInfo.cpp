@@ -63,6 +63,24 @@ void GameInfo::CreateDefaultZombieInfo()
 			});
 		Add<ZombieInfo>(L"PoliceZombie", info);
 	}
+
+	// Elite Zombie Info
+	{
+		shared_ptr<ZombieInfo> info = make_shared<ZombieInfo>(
+			ZombieInfo
+			{
+				INFO_TYPE::ZOMBIE,
+				L"EliteZombie",
+
+				ZOMBIE_TYPE::ELITE,
+				300,
+				20,
+				1.1f,
+				170.f,
+				3.3f,
+			});
+		Add<ZombieInfo>(L"EliteZombie", info);
+	}
 }
 
 void GameInfo::CreateDefaultGunInfo()
