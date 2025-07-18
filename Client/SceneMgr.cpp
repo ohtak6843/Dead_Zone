@@ -196,12 +196,6 @@ void SceneMgr::RenderUI()
 		}
 	}
 
-	device->GetD2DDeviceContext()->EndDraw();
-	// Release our wrapped render target resource. Releasing 
-	// transitions the back buffer resource to the state specified
-	// as the OutState when the wrapped resource was created.
-	device->GetD3D11on12Device()->ReleaseWrappedResources(device->GetWrappedBackBuffer(backbufferindex).GetAddressOf(), 1);
-
 	gameFramework->EndD2DRender();
 }
 
@@ -586,8 +580,6 @@ shared_ptr<Scene> SceneMgr::LoadStage01()
 
 void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 {
-	GET_SINGLE(UIMgr)->Init(); // 임시 텍스트 폰트 설정 ( 어디다 넣어야 할지 고민중..)
-
 	// 조준선 UI 생성
 	GET_SINGLE(UIMgr)->CreateImageUI(
 		L"Crosshair",

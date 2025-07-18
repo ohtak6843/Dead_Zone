@@ -10,6 +10,7 @@
 #include "Resources.h"
 #include "InstancingMgr.h"
 #include "GameInfo.h"
+#include "UIMgr.h"
 #include "FmodMgr.h"
 
 #include "../echoserver/protocol.h"
@@ -45,6 +46,7 @@ void Framework::Init(const WindowInfo& info)
 	GET_SINGLE(Timer)->Init();
 	GET_SINGLE(Resources)->Init();
 	GET_SINGLE(GameInfo)->Init();
+	GET_SINGLE(UIMgr)->Init();
 	GET_SINGLE(FmodMgr)->Init();
 
 	GET_SINGLE(SceneMgr)->SetLayerName(0, L"Default");

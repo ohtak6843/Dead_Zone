@@ -10,8 +10,6 @@ void FmodMgr::Init()
     result = _system->init(512, FMOD_INIT_NORMAL, nullptr);
 
 	result = _system->createSound("..\\Resources\\Sound\\background.mp3", FMOD_DEFAULT, nullptr, &_sound[0]);
-
-	PlaySound();
 }
 
 void FmodMgr::Update()
