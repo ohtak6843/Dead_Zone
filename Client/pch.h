@@ -20,6 +20,9 @@
 #include <thread>
 #include <mutex>
 
+#include <Windows.h>
+#include <iostream>
+
 #include <random>
 using namespace std;
 
@@ -229,6 +232,7 @@ extern unique_ptr<class Framework> gameFramework;
 // Utils
 wstring s2ws(const string& s);
 string ws2s(const wstring& s);
+void EnableConsole();
 
 template<typename T>
 T Lerp(const T& a, const T& b, float t)
