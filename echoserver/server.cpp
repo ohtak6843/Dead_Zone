@@ -412,11 +412,21 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         break;
     }
     case C2S_P_STAGE_LOADED:  
+       /* mapColliders = MapColliderLoader::Load("../Resources/json/Stage01_Collider.json");
+        std::cout << "Loaded colliders: " << mapColliders.size() << "\n";*/
         if (auto* room = FindGameRoomForPlayer(pContext)) {
+            if (room->currentStage == 2) {
+                for (auto* pl : room->players) {
+                    pl->posY += 15;
+                    printf("1\n");
+                }
+            }
             room->zombies.clear();
             room->killCount = 0;
             room->stageReadyCount++;
             // 방에 있는 모든 플레이어가 스테2 로드를 완료했을 때
+            
+            
             if (room->stageReadyCount == (int)room->players.size()) {
                 // 1) 스테이지 시작 신호 보내기 (optional: 재활용)
                 sc_packet_game_start gs{};
@@ -525,7 +535,8 @@ int main() {
     CreateIoCompletionPort((HANDLE)g_listenSocket, g_hIOCP, 0, 0);
 
     try {
-        mapColliders = MapColliderLoader::Load("../Resources/json/Stage01_Collider.json");
+        mapColliders = MapColliderLoader::Load("../Resources/json/Stage02_Collider.json");
+
     }
     catch (const std::exception& e) {
         std::cerr << "맵 콜라이더 로드 실패: " << e.what() << std::endl;

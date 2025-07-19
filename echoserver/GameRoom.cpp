@@ -110,7 +110,7 @@ void GameRoom::HandlePlayerCollisions()
         }
     }
 
-    // (2) 플레이어끼리의 구-구 충돌 처리 (기존 로직 유지)
+    // (2) 플레이어끼리의 구-구 충돌 처리 
     size_t n = players.size();
     for (size_t i = 0; i < n; ++i) {
         auto* a = players[i];
@@ -177,7 +177,7 @@ void GameRoom::SpawnZombies()
 void GameRoom::UpdateZombies(float dt)
 {
     for (auto& z : zombies) {
-        // 1) 가장 가까운 플레이어 찾기 (기존 로직)
+        // 1) 가장 가까운 플레이어 찾기 
         PER_SOCKET_CONTEXT* nearest = nullptr;
         float bestDist2 = std::numeric_limits<float>::infinity();
         for (auto* p : players) {
@@ -187,7 +187,7 @@ void GameRoom::UpdateZombies(float dt)
             if (d2 < bestDist2) { bestDist2 = d2; nearest = p; }
         }
 
-        // 2) 상태 전환 (기존 로직)
+        // 2) 상태 전환 
         if (nearest && bestDist2 <= ATTACK_RADIUS2) {
             SetZombieState(z, Zombie::ATTACK);
         }
@@ -199,7 +199,7 @@ void GameRoom::UpdateZombies(float dt)
 
             // 4) 예측 위치에 물리 충돌 해제 적용
             float newX = z.x + rawDx;
-            float newY = z.y;           // z.y는 땅+반지름으로 고정돼 있을 겁니다
+            float newY = z.y;       
             float newZ = z.z + rawDz;
             for (const auto& col : mapColliders) {
                 PhysicsSystem::ResolveCollision(

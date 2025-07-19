@@ -37,12 +37,12 @@ void LocalPlayer::LateUpdate()
 		bInitialized = true;
 	}*/
 
-	constexpr float MAP_MIN_X = 237.0f;
+	/*constexpr float MAP_MIN_X = 237.0f;
 	constexpr float MAP_MAX_X = 2030.0f;
 	constexpr float MAP_MIN_Z = -3552.0f;
 	constexpr float MAP_MAX_Z = 3535.0f;
 	constexpr float MAP_MIN_Y = 140.0f;
-	constexpr float MAP_MAX_Y =  960.0f;
+	constexpr float MAP_MAX_Y =  960.0f;*/
 
 	constexpr float PLAYER_RADIUS = 10.0f;
 
@@ -115,7 +115,7 @@ void LocalPlayer::LateUpdate()
 			0);
 	}
 
-	if (localJumping) {
+	/*if (localJumping) {
 		pos.y += localVerticalVelocity * DELTA_TIME;
 		localVerticalVelocity -= gravity * DELTA_TIME;
 		if (pos.y <= MAP_MIN_Y) {
@@ -135,7 +135,7 @@ void LocalPlayer::LateUpdate()
 		pos.z = MAP_MAX_Z - PLAYER_RADIUS;
 
 	if (pos.y < MAP_MIN_Y)
-		pos.y = MAP_MIN_Y;
+		pos.y = MAP_MIN_Y;*/
 	// if (pos.y > MAP_MAX_Y) 
 	//     pos.y = MAP_MAX_Y;
 
