@@ -590,6 +590,7 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		L"..\\Resources\\Texture\\Crosshair\\crosshair01.png",
 		Vec2(0.f, 0.f), // »≠∏È ¡ﬂæ”
 		Vec2(50.f, 50.f), // ≈©±‚
+		1.f, // ≈ı∏Ìµµ 0 ~ 1
 		scene
 	);
 
@@ -608,6 +609,7 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		L"..\\Resources\\Texture\\Icon\\Gun\\AK47 Ω«∑Áøß(»Úªˆ).png",
 		Vec2(520.f, -360.f), 
 		Vec2(165.f, 50.f),
+		0.5f, // ≈ı∏Ìµµ 0 ~ 1
 		scene
 	);
 	GET_SINGLE(UIMgr)->CreateImageUI(
@@ -615,6 +617,7 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		L"..\\Resources\\Texture\\Icon\\Bullet\\º“√—≈∫.png",
 		Vec2(410.f, -360.f), 
 		Vec2(40.f, 40.f),
+		0.5f, // ≈ı∏Ìµµ 0 ~ 1
 		scene
 	);
 

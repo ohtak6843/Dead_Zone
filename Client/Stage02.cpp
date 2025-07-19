@@ -173,33 +173,6 @@ void Stage02::Init()
 	}
 #pragma endregion
 
-#pragma region Crosshair
-	{
-		shared_ptr<GameObject> crosshair = make_shared<GameObject>();
-		crosshair->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
-		crosshair->SetTransform(make_shared<Transform>());
-		crosshair->GetTransform()->SetLocalScale(Vec3(50.f, 50.f, 50.f));
-		crosshair->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 300.f));
-
-		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
-		{
-			shared_ptr<Mesh> mesh = GET_SINGLE(Resources)->LoadRectangleMesh();
-			meshRenderer->SetMesh(mesh);
-		}
-		{
-			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"AlphaTexture");
-			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"Crosshair", L"..\\Resources\\Texture\\Crosshair\\crosshair01.png");
-			shared_ptr<Material> material = make_shared<Material>();
-			material->SetShader(shader);
-			material->SetTexture(0, texture);
-			meshRenderer->SetMaterial(material);
-		}
-		crosshair->SetName(L"Crosshair");
-		crosshair->SetMeshRenderer(meshRenderer);
-		AddGameObject(crosshair);
-	}
-#pragma endregion
-
 #pragma region Local Player
 	{
 		vector<shared_ptr<LocalPlayer>> localPlayers;
