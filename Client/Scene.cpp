@@ -269,10 +269,10 @@ void Scene::MovePlayer(sc_packet_move* packet)
 			rootTransform->SetLocalPosition(position);
 			rootTransform->LookAt(look);
 
-			Vec3 rotation = rootTransform->GetLocalRotation();
-			rotation.x = -90.f;
-			rotation.y += 180.f;
-			rootTransform->SetLocalRotation(rotation);
+			//Vec3 rotation = rootTransform->GetLocalRotation();
+			//rotation.x = -90.f;
+			//rotation.y += 180.f;
+			//rootTransform->SetLocalRotation(rotation);
 		}
 		return;
 	}
@@ -364,14 +364,14 @@ void Scene::AddZombie(sc_packet_spawn_zombie* packet)
 {
 	Vec3 position = Vec3(packet->position.x, packet->position.y, packet->position.z);
 
-	/*shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
-	vector<shared_ptr<Zombie>> zombieObjects = meshData->InstantiateAs<Zombie>(ColliderType::OBB);*/
+	shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
+	vector<shared_ptr<Zombie>> zombieObjects = meshData->InstantiateAs<Zombie>(ColliderType::OBB);
 
-	/*shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\PoliceZombie.fbx");
-	vector<shared_ptr<PoliceZombie>> zombieObjects = meshData->InstantiateAs<PoliceZombie>(ColliderType::OBB);*/
+	//shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\PoliceZombie.fbx");
+	//vector<shared_ptr<PoliceZombie>> zombieObjects = meshData->InstantiateAs<PoliceZombie>(ColliderType::OBB);
 
-	shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\EliteZombie.fbx");
-	vector<shared_ptr<EliteZombie>> zombieObjects = meshData->InstantiateAs<EliteZombie>(ColliderType::OBB);
+	//shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\EliteZombie.fbx");
+	//vector<shared_ptr<EliteZombie>> zombieObjects = meshData->InstantiateAs<EliteZombie>(ColliderType::OBB);
 
 	for (const auto& zombieObject : zombieObjects)
 	{

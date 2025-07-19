@@ -196,12 +196,12 @@ void ReceiverThread(SOCKET clientSocket) {
                     break;
                 }
                 case S2C_P_GAME_START: {
-                    GET_SINGLE(SceneMgr)
-                        ->GetActiveScene()
-                        ->ClearPlayers();
-                    GET_SINGLE(SceneMgr)
-                        ->GetActiveScene()
-                        ->ClearZombies();
+                    //GET_SINGLE(SceneMgr)
+                    //    ->GetActiveScene()
+                    //    ->ClearPlayers();
+                    //GET_SINGLE(SceneMgr)
+                    //    ->GetActiveScene()
+                    //    ->ClearZombies();
                     g_gameStarted = true;
                     break;
                 }
