@@ -74,6 +74,70 @@ void SceneMgr::RenderUI()
 
 	if (_activeScene && (_sceneType == SCENE_TYPE::STAGE01 || _sceneType == SCENE_TYPE::STAGE02))
 	{
+		// 플레이어 보는 방향
+		{
+			Vec2 pivot = { static_cast<float>(gameFramework->GetWindow().width - 100), static_cast<float>(gameFramework->GetWindow().height / 2) };
+			D2D1_RECT_F textRect = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
+
+			// LightPos
+			std::wstringstream wss;
+			wstring text = L"P_X : ";
+			Vec3 pLook = _activeScene->FindGameObject(L"LocalPlayer")->GetTransform()->GetLook();
+			wss.str(L"");
+			wss.clear();
+			wss << std::fixed << std::setprecision(2) << pLook.x;
+			text += wss.str();
+			text += L"\nP_Y : ";
+			wss.str(L"");
+			wss.clear();
+			wss << std::fixed << std::setprecision(2) << pLook.y;
+			text += wss.str();
+			text += L"\nP_Z : ";
+			wss.str(L"");
+			wss.clear();
+			wss << std::fixed << std::setprecision(2) << pLook.z;
+			text += wss.str();
+
+			device->GetD2DDeviceContext()->DrawTextW(
+				text.c_str(),
+				static_cast<uint32>(text.size()),
+				device->GetTextFormat().Get(),
+				&textRect,
+				device->GetSolidColorBrush().Get());
+		}
+
+		// 플레이어 위치
+		{
+			Vec2 pivot = { static_cast<float>(100), static_cast<float>(gameFramework->GetWindow().height / 2) };
+			D2D1_RECT_F textRect = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
+
+			// LightPos
+			std::wstringstream wss;
+			wstring text = L"P_X : ";
+			Vec3 pLook = _activeScene->FindGameObject(L"LocalPlayer")->GetTransform()->GetWorldPosition();
+			wss.str(L"");
+			wss.clear();
+			wss << std::fixed << std::setprecision(2) << pLook.x;
+			text += wss.str();
+			text += L"\nP_Y : ";
+			wss.str(L"");
+			wss.clear();
+			wss << std::fixed << std::setprecision(2) << pLook.y;
+			text += wss.str();
+			text += L"\nP_Z : ";
+			wss.str(L"");
+			wss.clear();
+			wss << std::fixed << std::setprecision(2) << pLook.z;
+			text += wss.str();
+
+			device->GetD2DDeviceContext()->DrawTextW(
+				text.c_str(),
+				static_cast<uint32>(text.size()),
+				device->GetTextFormat().Get(),
+				&textRect,
+				device->GetSolidColorBrush().Get());
+		}
+		
 		// 잔여탄 UI
 		{
 			// 현재 총알 수를 가져오는 로직 이상 생김. 수정 필요
