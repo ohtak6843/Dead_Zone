@@ -81,21 +81,6 @@ void Stage01::Init()
 	}
 #pragma endregion
 
-#pragma region UI_Camera
-	{
-		shared_ptr<UICamera> camera = make_shared<UICamera>();
-		camera->SetName(L"UI_Camera");
-		camera->SetTransform(make_shared<Transform>());
-		camera->SetCamera(make_shared<Camera>());
-		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 0.f));
-		camera->GetCamera()->SetProjectionType(PROJECTION_TYPE::ORTHOGRAPHIC);
-		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
-		camera->GetCamera()->SetCullingMaskAll(); // ´Ù ²ô°í
-		camera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, false); // UI¸¸ ÂïÀ½
-		AddGameObject(camera);
-	}
-#pragma endregion
-
 #pragma region GunCamera
 	{
 		shared_ptr<GunCamera> gunCamera = make_shared<GunCamera>();
@@ -112,6 +97,21 @@ void Stage01::Init()
 		gunCamera->GetTransform()->SetParent(mainCamera->GetTransform());
 
 		AddGameObject(gunCamera);
+	}
+#pragma endregion
+
+#pragma region UI_Camera
+	{
+		shared_ptr<UICamera> camera = make_shared<UICamera>();
+		camera->SetName(L"UI_Camera");
+		camera->SetTransform(make_shared<Transform>());
+		camera->SetCamera(make_shared<Camera>());
+		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 0.f));
+		camera->GetCamera()->SetProjectionType(PROJECTION_TYPE::ORTHOGRAPHIC);
+		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
+		camera->GetCamera()->SetCullingMaskAll(); // ´Ù ²ô°í
+		camera->GetCamera()->SetCullingMaskLayerOnOff(layerIndex, false); // UI¸¸ ÂïÀ½
+		AddGameObject(camera);
 	}
 #pragma endregion
 
