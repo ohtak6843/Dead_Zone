@@ -32,9 +32,10 @@ public:
     void RemoveZombieById(long long zombieId);
     int      killCount = 0;
     uint8_t  currentStage = 1;
+    float stageChangeTimer = -1.0f;
+    int nextStage = 1;
     std::vector<Zombie>              zombies;
 private:
-    
     
     uint32_t                          snapshotFrameCount = 0;
     uint32_t                          snapshotFrameInterval;

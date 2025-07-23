@@ -47,6 +47,31 @@ void GameRoom::Update(float dt)
     SpawnZombies();
     UpdateZombies(dt);
     BroadcastSnapshots();
+    // ─── 스테이지 전환 타이머 처리 ───
+    if (stageChangeTimer >= 0.0f) {
+        stageChangeTimer -= dt;
+        if (stageChangeTimer <= 0.0f) {
+            // 1) currentStage 갱신
+            currentStage = nextStage;
+
+            // 2) 맵 콜라이더 로드
+           /* std::ostringstream path;
+            path << "../Resources/json/Stage"
+                << std::setw(2) << std::setfill('0') << currentStage
+                << "_Collider.json";
+            mapColliders = MapColliderLoader::Load(path.str());*/
+
+            // 3) 클라이언트에 씬 전환 알림
+            sc_packet_stage_change stagePkt{};
+            stagePkt.size = sizeof(stagePkt);
+            stagePkt.type = S2C_P_STAGE_CHANGE;
+            stagePkt.newStage = (uint8_t)currentStage;
+            for (auto* peer : players)
+                PostSendPacket(peer, &stagePkt, stagePkt.size);
+            // 5) 타이머 리셋
+            stageChangeTimer = -1.0f;
+        }
+    }
 }
 
 void GameRoom::HandlePlayerPhysics(float dt)
@@ -177,6 +202,9 @@ void GameRoom::SpawnZombies()
 void GameRoom::UpdateZombies(float dt)
 {
     for (auto& z : zombies) {
+        z.attackCooldown -= dt;
+        if (z.attackCooldown < 0.0f) z.attackCooldown = 0.0f;
+
         // 1) 가장 가까운 플레이어 찾기 
         PER_SOCKET_CONTEXT* nearest = nullptr;
         float bestDist2 = std::numeric_limits<float>::infinity();
@@ -190,6 +218,30 @@ void GameRoom::UpdateZombies(float dt)
         // 2) 상태 전환 
         if (nearest && bestDist2 <= ATTACK_RADIUS2) {
             SetZombieState(z, Zombie::ATTACK);
+          if (z.attackCooldown <= 0.0f) {
+              z.attackCooldown = z.attackSpeed;
+               const int dmg = z.attack;
+               int newHp = nearest->health - dmg;
+               nearest->health = (newHp > 0) ? newHp : 0;
+                sc_packet_player_health hpPkt{};
+                hpPkt.size = sizeof(hpPkt);
+                hpPkt.type = S2C_P_PLAYER_HEALTH;
+                hpPkt.playerId = nearest->socket;
+                hpPkt.health = nearest->health;
+                for (auto* peer : players)
+                     PostSendPacket(peer, &hpPkt, hpPkt.size);
+                if (nearest->health == 0) {
+                    sc_packet_player_leave diePkt{};
+                    diePkt.size = sizeof(diePkt);
+                    diePkt.type = S2C_P_PLAYER_LEAVE;
+                    diePkt.playerId = nearest->socket;
+                    for (auto* peer : players)
+                         PostSendPacket(peer, &diePkt, diePkt.size);
+                    players.erase(
+                            std::remove(players.begin(), players.end(), nearest),
+                            players.end());    
+                }
+          }
         }
         else if (nearest && bestDist2 <= DETECT_RADIUS2) {
             SetZombieState(z, Zombie::WALK);

@@ -212,6 +212,18 @@ void ReceiverThread(SOCKET clientSocket) {
 
                     break;
                 }
+                case S2C_P_PLAYER_HEALTH: {
+                    auto* p = reinterpret_cast<sc_packet_player_health*>(packet);
+                    uint32_t id = static_cast<uint32_t>(p->playerId);
+                    int      hp = p->health;
+
+                    if (id == GWindowInfo.local) {
+                        // GET_SINGLE(UI)->SetHealth(hp);
+                    }
+                    // 멀티플레이어 상태에도 반영
+                    
+                    break;
+                }
                 default:
                     std::cout << "[클라이언트] 정의되지 않은 패킷 타입: "
                         << static_cast<int>(pktType) << std::endl;

@@ -25,6 +25,7 @@ constexpr char S2C_P_ZOMBIE_DIE = 21;
 constexpr char S2C_P_STAGE_CHANGE = 22;
 constexpr char C2S_P_SCENE_LOADED = 23;
 constexpr char C2S_P_STAGE_LOADED = 24;
+constexpr char S2C_P_PLAYER_HEALTH = 25;
 
 struct Vector3 {
     float x;
@@ -196,4 +197,12 @@ struct sc_packet_stage_change {
     char    type;      
     uint8_t newStage;  
 };
+
+struct sc_packet_player_health {
+    uint8_t    size;  
+    char       type;      
+    long long  playerId;  
+    int        health;    
+};
+
 #pragma pack(pop)
