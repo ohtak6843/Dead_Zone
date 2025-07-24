@@ -183,7 +183,14 @@ void GameRoom::SpawnZombies()
     float spawnZ = MAP_MIN_Z + PLAYER_RADIUS + (static_cast<float>(rand()) / RAND_MAX) * zRange;
     float spawnY = MAP_MIN_Y;
 
-    Zombie z(ZombieType::BASIC);
+    // 70% BASIC, 20% ELITE, 10% POLICE
+    int pct = rand() % 100;
+    ZombieType type;
+    if (pct < 70)           type = ZombieType::BASIC;
+    else if (pct < 90)      type = ZombieType::ELITE;
+    else                    type = ZombieType::POLICE;
+
+    Zombie z(type);
     z.x = spawnX; z.y = spawnY; z.z = spawnZ;
     z.id = nextZombieId++;
     zombies.push_back(z);
@@ -194,7 +201,8 @@ void GameRoom::SpawnZombies()
     pkt.type = S2C_P_SPAWN_ZOMBIE;
     pkt.zombieId = z.id;
     pkt.position = { z.x, z.y, z.z };
-    pkt.zombieType = static_cast<unsigned char>(ZombieType::BASIC);
+    pkt.zombieType = static_cast<unsigned char>(type);
+    //pkt.zombieType = static_cast<unsigned char>(ZombieType::BASIC);
     for (auto* peer : players)
         PostSendPacket(peer, &pkt, pkt.size);
 }
