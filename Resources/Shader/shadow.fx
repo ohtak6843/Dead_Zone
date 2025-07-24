@@ -30,7 +30,7 @@ VS_OUT VS_Main(VS_IN input)
         Skinning(finalPos, tempNormal, tempTangent, input.weight, input.indices);
     }
 
-    output.pos = mul(float4(input.pos, 1.f), g_matWVP);
+    output.pos = mul(float4(finalPos, 1.f), g_matWVP);
     output.clipPos = output.pos;
 
     return output;

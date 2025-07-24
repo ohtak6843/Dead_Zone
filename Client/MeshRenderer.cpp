@@ -72,7 +72,16 @@ void MeshRenderer::Render(shared_ptr<InstancingBuffer>& buffer)
 void MeshRenderer::RenderShadow()
 {
 	GetTransform()->PushData();
-	GET_SINGLE(Resources)->Get<Material>(L"Shadow")->PushGraphicsData();
+
+	shared_ptr<Material> material = GET_SINGLE(Resources)->Get<Material>(L"Shadow")->Clone();
+
+	if (GetAnimator())
+	{
+		GetAnimator()->PushData();
+		material->SetInt(1, 1);
+	}
+
+	material->PushGraphicsData();
 	_mesh->Render();
 }
 

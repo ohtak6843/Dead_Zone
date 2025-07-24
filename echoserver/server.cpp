@@ -1,6 +1,7 @@
 #include "server.h"
 #include "GameRoom.h"
 #include "GameManager.h"
+#include "Zombie.h"
 //#include "db_authentication.h"
 #include "protocol.h"
 
@@ -323,40 +324,50 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
     }
 
     case C2S_P_ATTACK: {
-        if (bytesTransferred < sizeof(cs_packet_attack))
-            break;
-
+        if (bytesTransferred < sizeof(cs_packet_attack)) break;
         auto* pkt = reinterpret_cast<cs_packet_attack*>(pIoData->buffer);
-        std::cout << "[서버] 공격 패킷 수신: playerId=" << pContext->socket
-            << ", zombieId=" << pkt->zombieId << std::endl;
         long long zid = pkt->zombieId;
 
-        sc_packet_zombie_die diePkt{};
-        diePkt.size = static_cast<unsigned char>(sizeof(diePkt));
-        diePkt.type = S2C_P_ZOMBIE_DIE;
-        diePkt.zombieId = zid;
-
         if (auto* room = FindGameRoomForPlayer(pContext)) {
-            for (auto* peer : room->players) {
-                PostSendPacket(peer, &diePkt, diePkt.size);
-            }
+            //  벡터에서 해당 좀비 객체 찾기
+            auto it = std::find_if(
+                room->zombies.begin(), room->zombies.end(),
+                [zid](const Zombie& z) { return z.id == zid; }
+            );
+            if (it == room->zombies.end()) break;  // 없으면 무시
 
-            room->RemoveZombieById(zid);
-            room->killCount++;
-            const int killThreshold = 3; 
-            const int maxStage = 2;    
-            if (room->killCount >= killThreshold
-                && room->currentStage < maxStage)
-            {
-                room->killCount = 0;
-                room->currentStage++;
+            //  데미지 적용
+            constexpr int DAMAGE = 10;
+            it->health -= DAMAGE;
 
-                sc_packet_stage_change stagePkt{};
-                stagePkt.size = sizeof(stagePkt);
-                stagePkt.type = S2C_P_STAGE_CHANGE;
-                stagePkt.newStage = room->currentStage;
+            //  HP가 0 이하일 때만 죽음 처리
+            if (it->health <= 0) {
+                sc_packet_zombie_die diePkt{};
+                diePkt.size = static_cast<unsigned char>(sizeof(diePkt));
+                diePkt.type = S2C_P_ZOMBIE_DIE;
+                diePkt.zombieId = zid;
                 for (auto* peer : room->players)
-                    PostSendPacket(peer, &stagePkt, stagePkt.size);
+                    PostSendPacket(peer, &diePkt, diePkt.size);
+
+                room->zombies.erase(it);
+                room->killCount++;
+
+                const int killThreshold = 1;
+                const int maxStage = 2;
+                if (room->killCount >= killThreshold
+                    && room->currentStage < maxStage)
+                {
+                    room->killCount = 0;
+                    room->nextStage = room->currentStage + 1;
+                    room->stageChangeTimer = 10.0f;
+                   /* room->currentStage++;
+                    sc_packet_stage_change stagePkt{};
+                    stagePkt.size = sizeof(stagePkt);
+                    stagePkt.type = S2C_P_STAGE_CHANGE;
+                    stagePkt.newStage = room->currentStage;
+                    for (auto* peer : room->players)
+                        PostSendPacket(peer, &stagePkt, stagePkt.size);*/
+                }
             }
         }
         break;
@@ -412,11 +423,21 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         break;
     }
     case C2S_P_STAGE_LOADED:  
+       /* mapColliders = MapColliderLoader::Load("../Resources/json/Stage01_Collider.json");
+        std::cout << "Loaded colliders: " << mapColliders.size() << "\n";*/
         if (auto* room = FindGameRoomForPlayer(pContext)) {
+            if (room->currentStage == 2) {
+                for (auto* pl : room->players) {
+                    pl->posY += 15;
+                    printf("1\n");
+                }
+            }
             room->zombies.clear();
             room->killCount = 0;
             room->stageReadyCount++;
             // 방에 있는 모든 플레이어가 스테2 로드를 완료했을 때
+            
+            
             if (room->stageReadyCount == (int)room->players.size()) {
                 // 1) 스테이지 시작 신호 보내기 (optional: 재활용)
                 sc_packet_game_start gs{};
@@ -525,7 +546,8 @@ int main() {
     CreateIoCompletionPort((HANDLE)g_listenSocket, g_hIOCP, 0, 0);
 
     try {
-        mapColliders = MapColliderLoader::Load("../Resources/json/Stage01_Collider.json");
+        mapColliders = MapColliderLoader::Load("../Resources/json/Stage02_Collider.json");
+
     }
     catch (const std::exception& e) {
         std::cerr << "맵 콜라이더 로드 실패: " << e.what() << std::endl;

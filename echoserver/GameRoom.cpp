@@ -47,6 +47,31 @@ void GameRoom::Update(float dt)
     SpawnZombies();
     UpdateZombies(dt);
     BroadcastSnapshots();
+    // ─── 스테이지 전환 타이머 처리 ───
+    if (stageChangeTimer >= 0.0f) {
+        stageChangeTimer -= dt;
+        if (stageChangeTimer <= 0.0f) {
+            // 1) currentStage 갱신
+            currentStage = nextStage;
+
+            // 2) 맵 콜라이더 로드
+           /* std::ostringstream path;
+            path << "../Resources/json/Stage"
+                << std::setw(2) << std::setfill('0') << currentStage
+                << "_Collider.json";
+            mapColliders = MapColliderLoader::Load(path.str());*/
+
+            // 3) 클라이언트에 씬 전환 알림
+            sc_packet_stage_change stagePkt{};
+            stagePkt.size = sizeof(stagePkt);
+            stagePkt.type = S2C_P_STAGE_CHANGE;
+            stagePkt.newStage = (uint8_t)currentStage;
+            for (auto* peer : players)
+                PostSendPacket(peer, &stagePkt, stagePkt.size);
+            // 5) 타이머 리셋
+            stageChangeTimer = -1.0f;
+        }
+    }
 }
 
 void GameRoom::HandlePlayerPhysics(float dt)
@@ -110,7 +135,7 @@ void GameRoom::HandlePlayerCollisions()
         }
     }
 
-    // (2) 플레이어끼리의 구-구 충돌 처리 (기존 로직 유지)
+    // (2) 플레이어끼리의 구-구 충돌 처리 
     size_t n = players.size();
     for (size_t i = 0; i < n; ++i) {
         auto* a = players[i];
@@ -158,7 +183,14 @@ void GameRoom::SpawnZombies()
     float spawnZ = MAP_MIN_Z + PLAYER_RADIUS + (static_cast<float>(rand()) / RAND_MAX) * zRange;
     float spawnY = MAP_MIN_Y;
 
-    Zombie z(ZombieType::BASIC);
+    // 70% BASIC, 20% ELITE, 10% POLICE
+    int pct = rand() % 100;
+    ZombieType type;
+    if (pct < 70)           type = ZombieType::BASIC;
+    else if (pct < 90)      type = ZombieType::ELITE;
+    else                    type = ZombieType::POLICE;
+
+    Zombie z(type);
     z.x = spawnX; z.y = spawnY; z.z = spawnZ;
     z.id = nextZombieId++;
     zombies.push_back(z);
@@ -169,7 +201,8 @@ void GameRoom::SpawnZombies()
     pkt.type = S2C_P_SPAWN_ZOMBIE;
     pkt.zombieId = z.id;
     pkt.position = { z.x, z.y, z.z };
-    pkt.zombieType = static_cast<unsigned char>(ZombieType::BASIC);
+    pkt.zombieType = static_cast<unsigned char>(type);
+    //pkt.zombieType = static_cast<unsigned char>(ZombieType::BASIC);
     for (auto* peer : players)
         PostSendPacket(peer, &pkt, pkt.size);
 }
@@ -177,7 +210,10 @@ void GameRoom::SpawnZombies()
 void GameRoom::UpdateZombies(float dt)
 {
     for (auto& z : zombies) {
-        // 1) 가장 가까운 플레이어 찾기 (기존 로직)
+        z.attackCooldown -= dt;
+        if (z.attackCooldown < 0.0f) z.attackCooldown = 0.0f;
+
+        // 1) 가장 가까운 플레이어 찾기 
         PER_SOCKET_CONTEXT* nearest = nullptr;
         float bestDist2 = std::numeric_limits<float>::infinity();
         for (auto* p : players) {
@@ -187,9 +223,33 @@ void GameRoom::UpdateZombies(float dt)
             if (d2 < bestDist2) { bestDist2 = d2; nearest = p; }
         }
 
-        // 2) 상태 전환 (기존 로직)
+        // 2) 상태 전환 
         if (nearest && bestDist2 <= ATTACK_RADIUS2) {
             SetZombieState(z, Zombie::ATTACK);
+          if (z.attackCooldown <= 0.0f) {
+              z.attackCooldown = z.attackSpeed;
+               const int dmg = z.attack;
+               int newHp = nearest->health - dmg;
+               nearest->health = (newHp > 0) ? newHp : 0;
+                sc_packet_player_health hpPkt{};
+                hpPkt.size = sizeof(hpPkt);
+                hpPkt.type = S2C_P_PLAYER_HEALTH;
+                hpPkt.playerId = nearest->socket;
+                hpPkt.health = nearest->health;
+                for (auto* peer : players)
+                     PostSendPacket(peer, &hpPkt, hpPkt.size);
+                if (nearest->health == 0) {
+                    sc_packet_player_leave diePkt{};
+                    diePkt.size = sizeof(diePkt);
+                    diePkt.type = S2C_P_PLAYER_LEAVE;
+                    diePkt.playerId = nearest->socket;
+                    for (auto* peer : players)
+                         PostSendPacket(peer, &diePkt, diePkt.size);
+                    players.erase(
+                            std::remove(players.begin(), players.end(), nearest),
+                            players.end());    
+                }
+          }
         }
         else if (nearest && bestDist2 <= DETECT_RADIUS2) {
             SetZombieState(z, Zombie::WALK);
@@ -199,7 +259,7 @@ void GameRoom::UpdateZombies(float dt)
 
             // 4) 예측 위치에 물리 충돌 해제 적용
             float newX = z.x + rawDx;
-            float newY = z.y;           // z.y는 땅+반지름으로 고정돼 있을 겁니다
+            float newY = z.y;       
             float newZ = z.z + rawDz;
             for (const auto& col : mapColliders) {
                 PhysicsSystem::ResolveCollision(

@@ -33,6 +33,7 @@ public:
     float attackSpeed; // 초당 공격 횟수
     float walkSpeed;
     float runSpeed;
+    float attackCooldown;
 
     enum ZOMBIE_STATE : uint8_t {
         T_POSE = 0,
@@ -61,6 +62,7 @@ public:
             attackSpeed = 1.0f;
             walkSpeed = 150.0f;
             runSpeed = 3.3f;
+            attackCooldown = 0.0f;
             specialSkill = "None";
 		}
 		else if (t == POLICE) {
@@ -69,6 +71,7 @@ public:
 			attackSpeed = 1.0f;
 			walkSpeed = 120.0f;
 			runSpeed = 3.3f;
+            attackCooldown = 0.0f;
 			specialSkill = "None";
 		}
         else if (t == RUNNING) {
@@ -77,6 +80,7 @@ public:
             attackSpeed = 1.0f;
             walkSpeed = 1.0f;
             runSpeed = 5.0f;
+            attackCooldown = 0.0f;
             specialSkill = "None";
         }
         else if (t == ELITE) {
@@ -85,6 +89,7 @@ public:
             attackSpeed = 1.1f;
             walkSpeed = 170.0f;
             runSpeed = 3.7f;
+            attackCooldown = 0.0f;
             specialSkill = "None";
         }
         else if (t == CHARGER) {
@@ -94,6 +99,7 @@ public:
             // 차저 좀비는 별도로 '돌진' 스킬을 가지며, 이동속도는 3m/s로 고정
             walkSpeed = 3.0f;
             runSpeed = 3.0f;
+            attackCooldown = 0.0f;
             specialSkill = "Charge";
         }
         else if (t == BOOMER) {
@@ -102,6 +108,7 @@ public:
             attackSpeed = 0.8f;
             walkSpeed = 2.0f;
             runSpeed = 2.0f;
+            attackCooldown = 0.0f;
             specialSkill = "Breath";
         }
         else if (t == HUNTER) {
@@ -110,6 +117,7 @@ public:
             attackSpeed = 1.5f;
             walkSpeed = 4.5f;
             runSpeed = 4.5f;
+            attackCooldown = 0.0f;
             specialSkill = "Leap";
         }
         else if (t == BOSS) {
@@ -120,6 +128,7 @@ public:
             attackSpeed = 0.8f;
             walkSpeed = 3.0f;
             runSpeed = 3.0f;
+            attackCooldown = 0.0f;
             specialSkill = "Boss Basic Skill";
         }
     }
@@ -156,10 +165,5 @@ public:
             return { moveX, moveZ };
         }
         return { 0.f, 0.f };
-    }
-
-    // 스킬 사용 함수 예시
-    std::string UseSkill() {
-        return "Using skill: " + specialSkill;
     }
 };

@@ -19,7 +19,7 @@ void FmodMgr::Update()
 
 void FmodMgr::PlaySound()
 {
-	_system->playSound(_sound[0], nullptr, false, &_channel[0]);
+	//_system->playSound(_sound[0], nullptr, false, &_channel[0]);
 
-	_channel[0]->setVolume(0.05f); // º¼·ý ¼³Á¤
+	//_channel[0]->setVolume(0.05f); // º¼·ý ¼³Á¤
 }

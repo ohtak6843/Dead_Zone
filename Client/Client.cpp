@@ -196,12 +196,12 @@ void ReceiverThread(SOCKET clientSocket) {
                     break;
                 }
                 case S2C_P_GAME_START: {
-                    GET_SINGLE(SceneMgr)
-                        ->GetActiveScene()
-                        ->ClearPlayers();
-                    GET_SINGLE(SceneMgr)
-                        ->GetActiveScene()
-                        ->ClearZombies();
+                    //GET_SINGLE(SceneMgr)
+                    //    ->GetActiveScene()
+                    //    ->ClearPlayers();
+                    //GET_SINGLE(SceneMgr)
+                    //    ->GetActiveScene()
+                    //    ->ClearZombies();
                     g_gameStarted = true;
                     break;
                 }
@@ -210,6 +210,18 @@ void ReceiverThread(SOCKET clientSocket) {
                     GET_SINGLE(SceneMgr)->SetChangeScene(true);
                     GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE02);
 
+                    break;
+                }
+                case S2C_P_PLAYER_HEALTH: {
+                    auto* p = reinterpret_cast<sc_packet_player_health*>(packet);
+                    uint32_t id = static_cast<uint32_t>(p->playerId);
+                    int      hp = p->health;
+
+                    if (id == GWindowInfo.local) {
+                        // GET_SINGLE(UI)->SetHealth(hp);
+                    }
+                    // 멀티플레이어 상태에도 반영
+                    
                     break;
                 }
                 default:
