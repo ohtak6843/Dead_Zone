@@ -339,6 +339,24 @@ void Scene::RemovePlayer(sc_packet_player_leave* packet)
 	}
 }
 
+void Scene::UpdatePlayerHealth(sc_packet_player_health* packet)
+{
+	if (packet->playerId == GWindowInfo.local) {
+		auto& root = _localPlayer[0];
+		if (root) {
+			root->SetHp(packet->health);
+		}
+		return;
+	}
+	for (auto& [id, group] : _players)
+	{
+		if (id == packet->playerId)
+		{
+			group[0]->SetHp(packet->health);
+		}
+	}
+}
+
 void Scene::ClearPlayers()
 {
 	for (auto& [id, group] : _players) {
