@@ -377,8 +377,8 @@ void Stage02::Init()
 	//}
 #pragma endregion
 
-	//INPUT->LockCursor(true);
-	//gameFramework->ToggleFullScreen(true);
+	INPUT->LockCursor(true);
+	gameFramework->ToggleFullScreen(true);
 
 	GET_SINGLE(FmodMgr)->PlaySound();
 }
