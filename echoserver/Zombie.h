@@ -60,7 +60,7 @@ public:
             health = 100;
             attack = 10;
             attackSpeed = 1.0f;
-            walkSpeed = 150.0f;
+            walkSpeed = 75.0f;
             runSpeed = 3.3f;
             attackCooldown = 0.0f;
             specialSkill = "None";
@@ -69,7 +69,7 @@ public:
 			health = 200;
 			attack = 15;
 			attackSpeed = 1.0f;
-			walkSpeed = 120.0f;
+			walkSpeed = 75.0f;
 			runSpeed = 3.3f;
             attackCooldown = 0.0f;
 			specialSkill = "None";
@@ -87,7 +87,7 @@ public:
             health = 300;
             attack = 20;
             attackSpeed = 1.1f;
-            walkSpeed = 170.0f;
+            walkSpeed = 75.0f;
             runSpeed = 3.7f;
             attackCooldown = 0.0f;
             specialSkill = "None";
