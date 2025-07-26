@@ -212,6 +212,11 @@ void ReceiverThread(SOCKET clientSocket) {
 
                     break;
                 }
+                case S2C_P_STAGE_CLEAR: {
+                    // 스테이지클리어 ui
+                    
+                    break;
+                }
                 case S2C_P_PLAYER_HEALTH: {
                     auto* p = reinterpret_cast<sc_packet_player_health*>(packet);
                     uint32_t id = static_cast<uint32_t>(p->playerId);

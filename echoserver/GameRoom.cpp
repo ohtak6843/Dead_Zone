@@ -54,13 +54,9 @@ void GameRoom::Update(float dt)
             // 1) currentStage 갱신
             currentStage = nextStage;
 
-            // 2) 맵 콜라이더 로드
-           /* std::ostringstream path;
-            path << "../Resources/json/Stage"
-                << std::setw(2) << std::setfill('0') << currentStage
-                << "_Collider.json";
-            mapColliders = MapColliderLoader::Load(path.str());*/
-
+             mapColliders = MapColliderLoader::Load("../Resources/json/Stage02_Collider.json");
+        std::cout << "Loaded colliders: " << mapColliders.size() << "\n";
+         
             // 3) 클라이언트에 씬 전환 알림
             sc_packet_stage_change stagePkt{};
             stagePkt.size = sizeof(stagePkt);
@@ -173,6 +169,9 @@ void GameRoom::ResolveSphereCollision(float& ax, float& ay, float& az,
 
 void GameRoom::SpawnZombies()
 {
+    if (spawnPaused)
+        return;
+
     auto now = std::chrono::steady_clock::now();
     if (zombies.size() >= 10 || now - lastSpawn < spawnInterval)
         return;
@@ -238,7 +237,7 @@ void GameRoom::UpdateZombies(float dt)
                 hpPkt.health = nearest->health;
                 for (auto* peer : players)
                      PostSendPacket(peer, &hpPkt, hpPkt.size);
-                if (nearest->health == 0) {
+                /*if (nearest->health == 0) {
                     sc_packet_player_leave diePkt{};
                     diePkt.size = sizeof(diePkt);
                     diePkt.type = S2C_P_PLAYER_LEAVE;
@@ -248,7 +247,7 @@ void GameRoom::UpdateZombies(float dt)
                     players.erase(
                             std::remove(players.begin(), players.end(), nearest),
                             players.end());    
-                }
+                }*/
           }
         }
         else if (nearest && bestDist2 <= DETECT_RADIUS2) {

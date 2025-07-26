@@ -34,6 +34,7 @@ public:
     uint8_t  currentStage = 1;
     float stageChangeTimer = -1.0f;
     int nextStage = 1;
+    bool     spawnPaused = false;
     std::vector<Zombie>              zombies;
 private:
     

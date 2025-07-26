@@ -357,16 +357,17 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
                 if (room->killCount >= killThreshold
                     && room->currentStage < maxStage)
                 {
+                    room->zombies.clear();
+                    room->spawnPaused = true;
                     room->killCount = 0;
                     room->nextStage = room->currentStage + 1;
                     room->stageChangeTimer = 10.0f;
-                   /* room->currentStage++;
-                    sc_packet_stage_change stagePkt{};
+                 
+                    sc_packet_stage_clear stagePkt{};
                     stagePkt.size = sizeof(stagePkt);
-                    stagePkt.type = S2C_P_STAGE_CHANGE;
-                    stagePkt.newStage = room->currentStage;
+                    stagePkt.type = S2C_P_STAGE_CLEAR;
                     for (auto* peer : room->players)
-                        PostSendPacket(peer, &stagePkt, stagePkt.size);*/
+                        PostSendPacket(peer, &stagePkt, stagePkt.size);
                 }
             }
         }
@@ -423,16 +424,14 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         break;
     }
     case C2S_P_STAGE_LOADED:  
-       /* mapColliders = MapColliderLoader::Load("../Resources/json/Stage01_Collider.json");
-        std::cout << "Loaded colliders: " << mapColliders.size() << "\n";*/
         if (auto* room = FindGameRoomForPlayer(pContext)) {
             if (room->currentStage == 2) {
                 for (auto* pl : room->players) {
                     pl->posY += 15;
-                    printf("1\n");
                 }
             }
             room->zombies.clear();
+            room->spawnPaused = false;
             room->killCount = 0;
             room->stageReadyCount++;
             // 방에 있는 모든 플레이어가 스테2 로드를 완료했을 때
@@ -546,7 +545,7 @@ int main() {
     CreateIoCompletionPort((HANDLE)g_listenSocket, g_hIOCP, 0, 0);
 
     try {
-        mapColliders = MapColliderLoader::Load("../Resources/json/Stage02_Collider.json");
+        mapColliders = MapColliderLoader::Load("../Resources/json/Stage01_Collider.json");
 
     }
     catch (const std::exception& e) {

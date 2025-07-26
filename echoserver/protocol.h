@@ -26,6 +26,7 @@ constexpr char S2C_P_STAGE_CHANGE = 22;
 constexpr char C2S_P_SCENE_LOADED = 23;
 constexpr char C2S_P_STAGE_LOADED = 24;
 constexpr char S2C_P_PLAYER_HEALTH = 25;
+constexpr char S2C_P_STAGE_CLEAR = 26;
 
 struct Vector3 {
     float x;
@@ -203,6 +204,11 @@ struct sc_packet_player_health {
     char       type;      
     long long  playerId;  
     int        health;    
+};
+
+struct sc_packet_stage_clear {
+    uint8_t size;
+    char    type;
 };
 
 #pragma pack(pop)
