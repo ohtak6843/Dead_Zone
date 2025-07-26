@@ -254,3 +254,17 @@ void InputMgr::LockCursor(bool flag)
 		while (ShowCursor(TRUE) < 0);
 }
 
+void InputMgr::ClearState()
+{
+	for (auto& state : _mouseStates)
+	{
+		if (state == KEY_STATE::UP)
+			state = KEY_STATE::NONE;
+	}
+
+	for (auto& state : _keyStates)
+	{
+		if (state == KEY_STATE::UP)
+			state = KEY_STATE::NONE;
+	}
+}

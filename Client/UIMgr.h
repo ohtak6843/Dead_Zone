@@ -18,6 +18,8 @@ public:
         const D2D1::ColorF& textColor = D2D1::ColorF::White,
         const D2D1::ColorF& bgColor = D2D1::ColorF(0.f, 0.f, 0.f, 0.f));
 
+	void ClearUI() { _uiMap.clear(); }
+
 private:
     unordered_map<wstring, shared_ptr<GameObject>> _uiMap;
     unordered_map<int, ComPtr<IDWriteTextFormat>> _textFormats;
