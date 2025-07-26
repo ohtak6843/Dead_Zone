@@ -319,6 +319,10 @@ void Stage02::Init()
 	}
 #pragma endregion
 
+#pragma region Load UI
+	GET_SINGLE(SceneMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
+#pragma endregion
+
 #pragma region Object
 	//{
 	//	shared_ptr<GameObject> obj = make_shared<GameObject>();
@@ -373,12 +377,8 @@ void Stage02::Init()
 	//}
 #pragma endregion
 
-#pragma region Load UI
-	GET_SINGLE(SceneMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
-#pragma endregion
-
-	INPUT->LockCursor(true);
-	gameFramework->ToggleFullScreen(true);
+	//INPUT->LockCursor(true);
+	//gameFramework->ToggleFullScreen(true);
 
 	GET_SINGLE(FmodMgr)->PlaySound();
 }

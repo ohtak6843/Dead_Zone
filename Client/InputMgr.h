@@ -87,6 +87,8 @@ public:
 	void LockCursor(bool flag);
 	bool IsCursorLocked() { return _lockCursor; }
 
+	void ClearState();
+
 private:
 	inline KEY_STATE GetMouseState(MOUSE_TYPE key) { return _mouseStates[static_cast<uint8>(key)]; }
 	inline KEY_STATE GetKeyState(KEY_TYPE key) { return _keyStates[static_cast<uint8>(key)]; }
