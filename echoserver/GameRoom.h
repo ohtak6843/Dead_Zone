@@ -33,6 +33,7 @@ public:
     int      killCount = 0;
     uint8_t  currentStage = 1;
     float stageChangeTimer = -1.0f;
+    float    gameClearTimer = -1.0f;
     int nextStage = 1;
     bool     spawnPaused = false;
     std::vector<Zombie>              zombies;

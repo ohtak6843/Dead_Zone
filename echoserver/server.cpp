@@ -354,8 +354,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
 
                 const int killThreshold = 1;
                 const int maxStage = 2;
-                if (room->killCount >= killThreshold
-                    && room->currentStage < maxStage)
+                if (room->killCount >= killThreshold && room->currentStage < maxStage) 
                 {
                     room->zombies.clear();
                     room->spawnPaused = true;
@@ -368,6 +367,18 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
                     stagePkt.type = S2C_P_STAGE_CLEAR;
                     for (auto* peer : room->players)
                         PostSendPacket(peer, &stagePkt, stagePkt.size);
+                }
+                else if (room->currentStage == maxStage && room->killCount >= 3) {
+                        room->zombies.clear();
+                    room->spawnPaused = true;
+                    room->killCount = 0;
+                    room->gameClearTimer = 10.0f;
+
+                    sc_packet_game_clear clearPkt{};
+                    clearPkt.size = sizeof(clearPkt);
+                    clearPkt.type = S2C_P_GAME_CLEAR;
+                    for (auto* peer : room->players)
+                        PostSendPacket(peer, &clearPkt, clearPkt.size);
                 }
             }
         }
