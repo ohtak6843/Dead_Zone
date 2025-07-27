@@ -26,18 +26,18 @@ void FmodMgr::SetVolumeList()
 	_volumeList[static_cast<int32>(SOUND_TYPE::STAGE02)] = 0.05f;
 
 	// Player Sound Effect
-	_volumeList[static_cast<int32>(SOUND_TYPE::PLAYER_RUN)] = 0.05f;
-	_volumeList[static_cast<int32>(SOUND_TYPE::PLAYER_PAIN)] = 0.2f;
+	_volumeList[static_cast<int32>(SOUND_TYPE::PLAYER_RUN)] = 0.02f;
+	_volumeList[static_cast<int32>(SOUND_TYPE::PLAYER_PAIN)] = 0.05f;
 	_volumeList[static_cast<int32>(SOUND_TYPE::PLAYER_DIE)] = 0.2f;
 
 	// Gun Sound Effect
-	_volumeList[static_cast<int32>(SOUND_TYPE::FIRE)] = 0.5f;
-	_volumeList[static_cast<int32>(SOUND_TYPE::RELOAD)] = 0.5f;
+	_volumeList[static_cast<int32>(SOUND_TYPE::FIRE)] = 0.1f;
+	_volumeList[static_cast<int32>(SOUND_TYPE::RELOAD)] = 0.1f;
 
 	// Zombie Sound Effect
 	_volumeList[static_cast<int32>(SOUND_TYPE::ZOMBIE_ATTACK)] = 0.2f;
 	_volumeList[static_cast<int32>(SOUND_TYPE::ZOMBIE_RUN)] = 0.5f;
-	_volumeList[static_cast<int32>(SOUND_TYPE::ZOMBIE_PAIN)] = 0.5f;
+	_volumeList[static_cast<int32>(SOUND_TYPE::ZOMBIE_PAIN)] = 0.2f;
 	_volumeList[static_cast<int32>(SOUND_TYPE::ZOMBIE_DIE)] = 0.5f;
 
 	// UI Sound Effect
@@ -74,7 +74,7 @@ void FmodMgr::LoadSounds()
 
 	// Gun Sound Effect
 	LoadSound(SOUND_TYPE::FIRE, "..\\Resources\\Sound\\AK47_Fire.mp3", false);
-	LoadSound(SOUND_TYPE::RELOAD, "..\\Resources\\Sound\\Gun_Reload.mp3", false);
+	LoadSound(SOUND_TYPE::RELOAD, "..\\Resources\\Sound\\Reload.mp3", false);
 
 	// Zombie Sound Effect
 	LoadSound(SOUND_TYPE::ZOMBIE_ATTACK, "..\\Resources\\Sound\\Zombie_Attack.mp3", false);

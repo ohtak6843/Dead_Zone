@@ -14,6 +14,8 @@
 
 #include "ParticleObject.h"
 
+#include "FmodMgr.h"
+
 Gun::Gun()
 {
 }
@@ -52,8 +54,6 @@ bool Gun::Fire()
 			_gunRecoilTime = 0.1f; // 반동 시간 초기화
 			_cameraRecoilTime = 0.5f; // 카메라 반동 시간 초기화
 
-			// TODO : 사운드 출력
-
 			return true;
 		}
 
@@ -81,7 +81,8 @@ void Gun::Reload()
 	// TODD : 장전 시간 검사 후에 장전
 	_currentAmmo = _info.ammoCapacity; // 장전된 총알 수를 최대 장전 수로 초기화
 
-	// TODO : 사운드 출력
+	// 사운드 출력
+	GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::RELOAD);
 }
 
 void Gun::Recoil(float pitchAmount, float yawAmount)

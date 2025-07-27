@@ -275,6 +275,12 @@ void LocalPlayer::ProcessMouseInput()
 
 		if (fireSuccess)
 		{
+			// 사운드 출력
+			GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::FIRE);
+		}
+
+		if (fireSuccess)
+		{
 			Vec3 hitPos;
 			shared_ptr<Zombie> zombie;
 
@@ -295,6 +301,11 @@ void LocalPlayer::ProcessMouseInput()
 						particleObj->GetParticle()->SetActive(true);
 					}
 				}
+
+				// 사운드 출력
+				bool flag = GET_SINGLE(FmodMgr)->CheckPlaying(SOUND_TYPE::ZOMBIE_PAIN);
+				if (flag == flag)
+					GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::ZOMBIE_PAIN);
 			}
 		}
 	}
