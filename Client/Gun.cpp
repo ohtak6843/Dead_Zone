@@ -14,10 +14,6 @@
 
 #include "ParticleObject.h"
 
-bool Gun::_initialized = true;
-shared_ptr<ParticleObject> Gun::_particle = nullptr;
-shared_ptr<MuzzleFlashParticle> Gun::_muzzle = nullptr;
-
 Gun::Gun()
 {
 }
@@ -42,9 +38,9 @@ void Gun::LateUpdate()
 {
 }
 
-void Gun::Fire()
+bool Gun::Fire()
 {
-	if ((1 /_info.fireRate) <= _fireElapsedTime)
+	if ((1 / _info.fireRate) <= _fireElapsedTime)
 	{
 		if (_currentAmmo > 0)
 		{
@@ -58,12 +54,12 @@ void Gun::Fire()
 
 			// TODO : 사운드 출력
 
+			return true;
 		}
 
 		if (_currentAmmo <= 0)
 		{
 			Reload(); // 장탄수 0이면 장전
-			return;
 		}
 		
 		
@@ -72,7 +68,8 @@ void Gun::Fire()
 	{
 		_fireElapsedTime += DELTA_TIME;
 	}
-	
+
+	return false;
 }
 
 void Gun::Reload()
@@ -89,8 +86,8 @@ void Gun::Reload()
 
 void Gun::Recoil(float pitchAmount, float yawAmount)
 {
-	shared_ptr<Camera> camera = GET_SINGLE(SceneMgr)->GetActiveScene()->GetMainCamera();
-	static_pointer_cast<LocalPlayer>(camera->GetGameObject())->Recoil(pitchAmount, yawAmount); // 카메라 반동 처리
+	auto p = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"LocalPlayer");
+	static_pointer_cast<LocalPlayer>(p)->Recoil(pitchAmount, yawAmount); // 플레이어 반동 처리
 }
 
 void Gun::Aiming(float aimFov, Vec3 aimPos)
@@ -120,33 +117,6 @@ void Gun::Aiming(float aimFov, Vec3 aimPos)
 	GetTransform()->SetLocalPosition(newPos);
 }
 
-void Gun::input()
-{
-	// 발사 버튼이 눌렸을 때
-	if (INPUT->GetButton(MOUSE_TYPE::LBUTTON))
-	{
-		Fire();
-	}
-
-	// 장전 버튼이 눌렸을 때
-	if (INPUT->GetButtonDown(KEY_TYPE::R))
-	{
-		Reload();
-	}
-
-	if (INPUT->GetButton(MOUSE_TYPE::RBUTTON))
-	{
-		_isAiming = true;
-		GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"Crosshair")->SetActive(false); // 조준선 비활성화
-	}
-	else
-	{
-		_isAiming = false;
-		GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"Crosshair")->SetActive(true); // 조준선 활성화
-	}
-
-}
-
 void Gun::InitializeParticle()
 {
 	// 파티클 생성
@@ -159,7 +129,6 @@ void Gun::InitializeParticle()
 	_particle->SetLayerIndex(gunLayer);
 	_particle->SetCheckFrustum(false);
 	GET_SINGLE(SceneMgr)->GetActiveScene()->AddGameObject(_particle);
-	_initialized = false;
 }
 
 void Gun::SetParticlePos(Vec3 pos)

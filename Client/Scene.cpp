@@ -80,7 +80,7 @@ void Scene::Update()
 
 void Scene::LateUpdate()
 {
-	const float gravity = 9.8f;
+	/*const float gravity = 9.8f;
 
 	for (auto& [id, group] : _players) {
 		auto & root = group[0];
@@ -97,7 +97,7 @@ void Scene::LateUpdate()
 			js.verticalVel = 0.0f;
 		}
 		root->GetTransform()->SetLocalPosition(pos);
-	}
+	}*/
 
 	for (const shared_ptr<GameObject>& gameObject : _gameObjects)
 	{
@@ -379,6 +379,24 @@ void Scene::RemovePlayer(sc_packet_player_leave* packet)
 	}
 }
 
+void Scene::UpdatePlayerHealth(sc_packet_player_health* packet)
+{
+	if (packet->playerId == GWindowInfo.local) {
+		auto& root = _localPlayer[0];
+		if (root) {
+			root->SetHp(packet->health);
+		}
+		return;
+	}
+	for (auto& [id, group] : _players)
+	{
+		if (id == packet->playerId)
+		{
+			group[0]->SetHp(packet->health);
+		}
+	}
+}
+
 void Scene::ClearPlayers()
 {
 	for (auto& [id, group] : _players) {
@@ -403,15 +421,32 @@ void Scene::ClearZombies()
 void Scene::AddZombie(sc_packet_spawn_zombie* packet)
 {
 	Vec3 position = Vec3(packet->position.x, packet->position.y, packet->position.z);
-
-	shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
-	vector<shared_ptr<Zombie>> zombieObjects = meshData->InstantiateAs<Zombie>(ColliderType::OBB);
-
-	//shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\PoliceZombie.fbx");
-	//vector<shared_ptr<PoliceZombie>> zombieObjects = meshData->InstantiateAs<PoliceZombie>(ColliderType::OBB);
-
-	//shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\EliteZombie.fbx");
-	//vector<shared_ptr<EliteZombie>> zombieObjects = meshData->InstantiateAs<EliteZombie>(ColliderType::OBB);
+	vector<shared_ptr<Zombie>> zombieObjects;
+	switch (static_cast<ZOMBIE_TYPE>(packet->zombieType))
+	{
+	case ZOMBIE_TYPE::NORMAL:
+	{
+		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
+		zombieObjects = meshData->InstantiateAs<Zombie>(ColliderType::OBB);
+		break;
+	}
+	case ZOMBIE_TYPE::POLICE:
+	{
+		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\PoliceZombie.fbx");
+		auto specificZombies = meshData->InstantiateAs<PoliceZombie>(ColliderType::OBB);
+		for (auto& z : specificZombies)
+			zombieObjects.push_back(static_pointer_cast<Zombie>(z));
+		break;
+	}
+	case ZOMBIE_TYPE::ELITE:
+	{
+		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\EliteZombie.fbx");
+		auto specificZombies = meshData->InstantiateAs<EliteZombie>(ColliderType::OBB);
+		for (auto& z : specificZombies)
+			zombieObjects.push_back(static_pointer_cast<Zombie>(z));
+		break;
+	}
+	}
 
 	for (const auto& zombieObject : zombieObjects)
 	{
@@ -432,13 +467,8 @@ void Scene::AddZombie(sc_packet_spawn_zombie* packet)
 	for (auto& zombie : zombieObjects) {
 		AddGameObject(zombie);
 	}
-	// 업 캐스팅
-	vector<shared_ptr<Zombie>> castedZombies;
-	for (const auto& pz : zombieObjects) {
-		castedZombies.push_back(static_pointer_cast<Zombie>(pz));
-	}
 
-	_zombies.push_back(castedZombies);
+	_zombies.push_back(zombieObjects);
 }
 
 void Scene::MoveZombie(sc_packet_zombie_move* packet)

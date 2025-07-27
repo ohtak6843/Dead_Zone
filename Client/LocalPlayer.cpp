@@ -236,13 +236,9 @@ void LocalPlayer::ProcessKeyInput()
 		_GunType = (_GunType + 1) % _MaxGunType;
 		if (_GunType == 0)
 		{
-			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1")->SetActive(true);
 			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47")->SetActive(false);
-
 			auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1");
 			gun->SetActive(true);
-			Vec3 pos = static_pointer_cast<M4A1>(gun)->GetNomalParticlePos();
-			static_pointer_cast<M4A1>(gun)->SetParticlePos(pos);
 
 		}
 		else if (_GunType == 1)
@@ -250,37 +246,75 @@ void LocalPlayer::ProcessKeyInput()
 			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1")->SetActive(false);
 			auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47");
 			gun->SetActive(true);
-			Vec3 pos = static_pointer_cast<AK47>(gun)->GetNomalParticlePos();
-			static_pointer_cast<AK47>(gun)->SetParticlePos(pos);
 		}
 	}
 }
 
 void LocalPlayer::ProcessMouseInput()
 {
+	wstring gunName = L"M4A1";
+
+	switch (_GunType)
+	{
+	case 0:
+		gunName = L"M4A1";
+		break;
+	case 1:
+		gunName = L"AK47";
+		break;
+	default:
+		break;
+	}
+
+	auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(gunName);
+
 	if (INPUT->GetButton(MOUSE_TYPE::LBUTTON))
 	{
-		Vec3 hitPos;
-		shared_ptr<Zombie> zombie;
+		bool fireSuccess = false;
+		fireSuccess = static_pointer_cast<Gun>(gun)->Fire();
 
-		if (GET_SINGLE(RaycastMgr)->PickZombie(gameFramework->GetWindow().width / 2, gameFramework->GetWindow().height / 2, OUT hitPos, OUT zombie)) {
-			cs_packet_attack atkPkt{};
-			atkPkt.size = sizeof(atkPkt);
-			atkPkt.type = C2S_P_ATTACK;
-			atkPkt.zombieId = zombie ? static_cast<long long>(zombie->GetID()) : -1;
-			send(gameFramework->GetWindow().sock,
-				reinterpret_cast<char*>(&atkPkt),
-				sizeof(atkPkt),
-				0);
+		if (fireSuccess)
+		{
+			Vec3 hitPos;
+			shared_ptr<Zombie> zombie;
 
-			if (zombie) {
-				shared_ptr<ParticleObject> particleObj = zombie->GetParticle();
-				if (particleObj) {
-					particleObj->GetTransform()->SetLocalPosition(hitPos);
-					particleObj->GetParticle()->SetActive(true);
+			if (GET_SINGLE(RaycastMgr)->PickZombie(gameFramework->GetWindow().width / 2, gameFramework->GetWindow().height / 2, OUT hitPos, OUT zombie)) {
+				cs_packet_attack atkPkt{};
+				atkPkt.size = sizeof(atkPkt);
+				atkPkt.type = C2S_P_ATTACK;
+				atkPkt.zombieId = zombie ? static_cast<long long>(zombie->GetID()) : -1;
+				send(gameFramework->GetWindow().sock,
+					reinterpret_cast<char*>(&atkPkt),
+					sizeof(atkPkt),
+					0);
+
+				if (zombie) {
+					shared_ptr<ParticleObject> particleObj = zombie->GetParticle();
+					if (particleObj) {
+						particleObj->GetTransform()->SetLocalPosition(hitPos);
+						particleObj->GetParticle()->SetActive(true);
+					}
 				}
 			}
 		}
+	}
+
+	// 장전 버튼이 눌렸을 때
+	if (INPUT->GetButtonDown(KEY_TYPE::R))
+	{
+		static_pointer_cast<Gun>(gun)->Reload();
+	}
+
+	// 정조준 활성화 여부
+	if (INPUT->GetButton(MOUSE_TYPE::RBUTTON))
+	{
+		static_pointer_cast<Gun>(gun)->SetAimingFlag(true);
+		GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"Crosshair")->SetActive(false); // 조준선 비활성화
+	}
+	else
+	{
+		static_pointer_cast<Gun>(gun)->SetAimingFlag(false);
+		GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"Crosshair")->SetActive(true); // 조준선 활성화
 	}
 
 	POINT deltaPos = INPUT->GetDeltaPos();

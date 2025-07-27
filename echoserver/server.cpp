@@ -183,7 +183,7 @@ void WorkerThread(HANDLE) {
             newContext->faintCount = 0;
             newContext->isFainted = false;
             newContext->moveX = newContext->moveY = newContext->moveZ = 0.0f;
-            newContext->isJumping = false;
+            newContext->isJumping = true;
             newContext->verticalVelocity = 0.0f;
 
             CreateIoCompletionPort((HANDLE)acceptedSocket, g_hIOCP, (ULONG_PTR)newContext, 0);
@@ -272,7 +272,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         pContext->moveX = 0.0f;
         pContext->moveY = 0.0f;
         pContext->moveZ = 0.0f;
-        pContext->isJumping = false;
+        pContext->isJumping = true;
         pContext->verticalVelocity = 0.0f;
 
         sc_packet_login_ok loginOk;
@@ -425,11 +425,11 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
     }
     case C2S_P_STAGE_LOADED:  
         if (auto* room = FindGameRoomForPlayer(pContext)) {
-            if (room->currentStage == 2) {
+           /* if (room->currentStage == 2) {
                 for (auto* pl : room->players) {
                     pl->posY += 15;
                 }
-            }
+            }*/
             room->zombies.clear();
             room->spawnPaused = false;
             room->killCount = 0;
