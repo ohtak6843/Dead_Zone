@@ -310,6 +310,7 @@ void GameRoom::SpawnZombies()
         z.wanderDirX = 0.0f;
         z.wanderDirZ = 0.0f;
         z.wanderTime = 0.0f;
+        z.idleTime = 0.0f;
         z.x = spawnX;  z.y = spawnY;  z.z = spawnZ;
         z.id = nextZombieId++;
         zombies.push_back(z);
@@ -349,18 +350,18 @@ void GameRoom::UpdateZombies(float dt)
         // 2) 상태 전환 
         if (nearest && bestDist2 <= ATTACK_RADIUS2) {
             SetZombieState(z, Zombie::ATTACK);
-          if (z.attackCooldown <= 0.0f) {
-              z.attackCooldown = z.attackSpeed;
-               const int dmg = z.attack;
-               int newHp = nearest->health - dmg;
-               nearest->health = (newHp > 0) ? newHp : 0;
+            if (z.attackCooldown <= 0.0f) {
+                z.attackCooldown = z.attackSpeed;
+                const int dmg = z.attack;
+                int newHp = nearest->health - dmg;
+                nearest->health = (newHp > 0) ? newHp : 0;
                 sc_packet_player_health hpPkt{};
                 hpPkt.size = sizeof(hpPkt);
                 hpPkt.type = S2C_P_PLAYER_HEALTH;
                 hpPkt.playerId = nearest->socket;
                 hpPkt.health = nearest->health;
                 for (auto* peer : players)
-                     PostSendPacket(peer, &hpPkt, hpPkt.size);
+                    PostSendPacket(peer, &hpPkt, hpPkt.size);
                 /*if (nearest->health == 0) {
                     sc_packet_player_leave diePkt{};
                     diePkt.size = sizeof(diePkt);
@@ -370,9 +371,9 @@ void GameRoom::UpdateZombies(float dt)
                          PostSendPacket(peer, &diePkt, diePkt.size);
                     players.erase(
                             std::remove(players.begin(), players.end(), nearest),
-                            players.end());    
+                            players.end());
                 }*/
-          }
+            }
         }
         else if (nearest && bestDist2 <= DETECT_RADIUS2) {
             SetZombieState(z, Zombie::WALK);
@@ -382,7 +383,7 @@ void GameRoom::UpdateZombies(float dt)
 
             // 4) 예측 위치에 물리 충돌 해제 적용
             float newX = z.x + rawDx;
-            float newY = z.y;       
+            float newY = z.y;
             float newZ = z.z + rawDz;
             /*for (const auto& col : mapColliders) {
                 PhysicsSystem::ResolveCollision(
@@ -405,24 +406,30 @@ void GameRoom::UpdateZombies(float dt)
             BroadcastZombieMove(z, appliedDx, appliedDz);
         }
         else {
-            SetZombieState(z, Zombie::WALK);
-            // 2) 새 방황 방향 및 지속시간 결정
-            if (z.wanderTime <= 0.0f) {
+            if (z.wanderTime > 0.0f) {
+                SetZombieState(z, Zombie::WALK);
+                float dx = z.wanderDirX * z.walkSpeed * dt;
+                float dz = z.wanderDirZ * z.walkSpeed * dt;
+                z.x += dx;  z.z += dz;
+                BroadcastZombieMove(z, dx, dz);
+                z.wanderTime -= dt;
+            }
+            else if (z.idleTime > 0.0f) {
+                SetZombieState(z, Zombie::IDLE);
+                z.idleTime -= dt;
+            }
+            else {
                 float angle = (rand() / (float)RAND_MAX) * 2.0f * 3.14159265f;
                 z.wanderDirX = cosf(angle);
                 z.wanderDirZ = sinf(angle);
-                z.wanderTime = 2.0f + (rand() / (float)RAND_MAX) * 3.0f; // 2~5초
+                z.wanderTime = 5.0f + (rand() / (float)RAND_MAX) * 3.0f;
+                z.idleTime = 1.0f + (rand() / (float)RAND_MAX) * 1.0f;
             }
-            float speed = z.walkSpeed; // 또는 원하는 고정값 사용
-            float dx = z.wanderDirX * speed * dt;
-            float dz = z.wanderDirZ * speed * dt;
-            z.x += dx;
-            z.z += dz;
-            BroadcastZombieMove(z, dx, dz);
-            z.wanderTime -= dt;
         }
     }
 }
+
+
 
 void GameRoom::SetZombieState(Zombie& z, Zombie::ZOMBIE_STATE newState)
 {
