@@ -121,33 +121,6 @@ void Gun::Aiming(float aimFov, Vec3 aimPos)
 	GetTransform()->SetLocalPosition(newPos);
 }
 
-void Gun::input()
-{
-	// 발사 버튼이 눌렸을 때
-	if (INPUT->GetButton(MOUSE_TYPE::LBUTTON))
-	{
-		Fire();
-	}
-
-	// 장전 버튼이 눌렸을 때
-	if (INPUT->GetButtonDown(KEY_TYPE::R))
-	{
-		Reload();
-	}
-
-	if (INPUT->GetButton(MOUSE_TYPE::RBUTTON))
-	{
-		_isAiming = true;
-		GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"Crosshair")->SetActive(false); // 조준선 비활성화
-	}
-	else
-	{
-		_isAiming = false;
-		GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"Crosshair")->SetActive(true); // 조준선 활성화
-	}
-
-}
-
 void Gun::InitializeParticle()
 {
 	// 파티클 생성

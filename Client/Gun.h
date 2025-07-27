@@ -21,8 +21,7 @@ public:
 	void Aiming(float aimFov, Vec3 aimPos);
 
 	float IsAiming() { return _isAiming; }
-
-	void input(); // 임시, 나중에 위치 변경 할 예정
+	void SetAimingFlag(bool isAiming) { _isAiming = isAiming; }
 	
 	// 파티클 관련 함수
 	void InitializeParticle();
