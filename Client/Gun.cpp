@@ -42,9 +42,9 @@ void Gun::LateUpdate()
 {
 }
 
-void Gun::Fire()
+bool Gun::Fire()
 {
-	if ((1 /_info.fireRate) <= _fireElapsedTime)
+	if ((1 / _info.fireRate) <= _fireElapsedTime)
 	{
 		if (_currentAmmo > 0)
 		{
@@ -58,12 +58,12 @@ void Gun::Fire()
 
 			// TODO : 사운드 출력
 
+			return true;
 		}
 
 		if (_currentAmmo <= 0)
 		{
 			Reload(); // 장탄수 0이면 장전
-			return;
 		}
 		
 		
@@ -72,7 +72,8 @@ void Gun::Fire()
 	{
 		_fireElapsedTime += DELTA_TIME;
 	}
-	
+
+	return false;
 }
 
 void Gun::Reload()

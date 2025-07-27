@@ -62,8 +62,6 @@ void AK47::Start()
 
 void AK47::Update()
 {
-	input(); // 임시 총기와 관련된 입력 처리
-
 	// 총 발사 시 총기 반동 처리
 	if (_gunRecoilTime > 0)
 	{

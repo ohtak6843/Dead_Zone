@@ -15,7 +15,7 @@ public:
 	virtual void Update() override;
 	virtual void LateUpdate() override;
 
-	void Fire();
+	bool Fire();
 	void Reload();
 	void Recoil(float pitchAmount, float yawAmount);
 	void Aiming(float aimFov, Vec3 aimPos);

@@ -245,24 +245,34 @@ void LocalPlayer::ProcessMouseInput()
 {
 	if (INPUT->GetButton(MOUSE_TYPE::LBUTTON))
 	{
-		Vec3 hitPos;
-		shared_ptr<Zombie> zombie;
 
-		if (GET_SINGLE(RaycastMgr)->PickZombie(gameFramework->GetWindow().width / 2, gameFramework->GetWindow().height / 2, OUT hitPos, OUT zombie)) {
-			cs_packet_attack atkPkt{};
-			atkPkt.size = sizeof(atkPkt);
-			atkPkt.type = C2S_P_ATTACK;
-			atkPkt.zombieId = zombie ? static_cast<long long>(zombie->GetID()) : -1;
-			send(gameFramework->GetWindow().sock,
-				reinterpret_cast<char*>(&atkPkt),
-				sizeof(atkPkt),
-				0);
+		bool fireSuccess = false;
+		if (_GunType == 0)
+			fireSuccess = static_pointer_cast<M4A1>(GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1"))->Fire();
+		else if (_GunType == 1)
+			fireSuccess = static_pointer_cast<AK47>(GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47"))->Fire();
 
-			if (zombie) {
-				shared_ptr<ParticleObject> particleObj = zombie->GetParticle();
-				if (particleObj) {
-					particleObj->GetTransform()->SetLocalPosition(hitPos);
-					particleObj->GetParticle()->SetActive(true);
+		if (fireSuccess)
+		{
+			Vec3 hitPos;
+			shared_ptr<Zombie> zombie;
+
+			if (GET_SINGLE(RaycastMgr)->PickZombie(gameFramework->GetWindow().width / 2, gameFramework->GetWindow().height / 2, OUT hitPos, OUT zombie)) {
+				cs_packet_attack atkPkt{};
+				atkPkt.size = sizeof(atkPkt);
+				atkPkt.type = C2S_P_ATTACK;
+				atkPkt.zombieId = zombie ? static_cast<long long>(zombie->GetID()) : -1;
+				send(gameFramework->GetWindow().sock,
+					reinterpret_cast<char*>(&atkPkt),
+					sizeof(atkPkt),
+					0);
+
+				if (zombie) {
+					shared_ptr<ParticleObject> particleObj = zombie->GetParticle();
+					if (particleObj) {
+						particleObj->GetTransform()->SetLocalPosition(hitPos);
+						particleObj->GetParticle()->SetActive(true);
+					}
 				}
 			}
 		}
