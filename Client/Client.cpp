@@ -212,27 +212,29 @@ void ReceiverThread(SOCKET clientSocket) {
 
                     break;
                 }
-                case S2C_P_STAGE_CLEAR: {
+                case S2C_P_STAGE_CLEAR:
+                {
                     // 스테이지클리어 ui
-                    auto sceneType = GET_SINGLE(SceneMgr)->GetSceneType();
+                    /*auto sceneType = GET_SINGLE(SceneMgr)->GetSceneType();
                     switch(sceneType)
                     {
 					case SCENE_TYPE::STAGE01:
                         GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"StageClear", true);
-						GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE_CLEAR);
+                        GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE_CLEAR);
                         break;
                     case SCENE_TYPE::STAGE02:
                         //GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"GameClear", true);
                         break;
-                    }
-                }
-                case S2C_P_PLAYER_HEALTH:
-                {
+                    }*/
                     
-                    break;
+                    GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"StageClear", true);
+                    GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE_CLEAR);
                 }
-                case S2C_P_GAME_CLEAR: {
+                case S2C_P_GAME_CLEAR:
+                {
                     // 게임 클리어 ui
+					GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"GameClear", true);
+					GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE_CLEAR);
                     break;
                 }
                 case S2C_P_PLAYER_HEALTH: {
