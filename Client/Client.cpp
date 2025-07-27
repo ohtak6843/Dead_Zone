@@ -228,6 +228,14 @@ void ReceiverThread(SOCKET clientSocket) {
                 }
                 case S2C_P_PLAYER_HEALTH:
                 {
+                    
+                    break;
+                }
+                case S2C_P_GAME_CLEAR: {
+                    // 게임 클리어 ui
+                    break;
+                }
+                case S2C_P_PLAYER_HEALTH: {
                     auto* p = reinterpret_cast<sc_packet_player_health*>(packet);
 					GET_SINGLE(SceneMgr)
 						->GetActiveScene()

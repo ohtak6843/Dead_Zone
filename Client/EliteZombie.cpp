@@ -15,7 +15,7 @@ void EliteZombie::SetState(ZOMBIE_STATE playerState)
 	{
 	case ZOMBIE_STATE::T_POSE:
 	{
-		uint32 index = static_cast<uint32>(ELITE_ZOMBIE_ANIMATION::T_POSE);
+		uint32 index = static_cast<uint32>(ELITE_ZOMBIE_ANIMATION::IDLE);
 		GetAnimator()->Play(index);
 		break;
 	}

@@ -68,6 +68,21 @@ void GameRoom::Update(float dt)
             stageChangeTimer = -1.0f;
         }
     }
+    if (gameClearTimer >= 0.0f) {
+        gameClearTimer -= dt;
+        if (gameClearTimer <= 0.0f) {
+            for (auto* victim : players) {
+                sc_packet_player_leave leavePkt{};
+                leavePkt.size = sizeof(leavePkt);
+                leavePkt.type = S2C_P_PLAYER_LEAVE;
+                leavePkt.playerId = victim->socket;  // 각 플레이어 고유 ID
+                for (auto* p : players) {
+                    PostSendPacket(p, &leavePkt, leavePkt.size);
+                }
+            }
+            gameClearTimer = -1.0f;  // 재발 방지
+        }
+    }
 }
 
 void GameRoom::HandlePlayerPhysics(float dt)
