@@ -16,6 +16,11 @@ constexpr float MAP_MAX_Y = 960.0f;
 constexpr float MAP_MIN_Z = -3552.0f;
 constexpr float MAP_MAX_Z = 3535.0f;
 
+constexpr float ST2_MIN_X = -2400.0f;
+constexpr float ST2_MAX_X = 2800.0f;
+constexpr float ST2_MIN_Z = 400.0f;
+constexpr float ST2_MAX_Z = 3300.0f;
+
 constexpr float PLAYER_RADIUS = 30.0f;
 constexpr float ZOMBIE_RADIUS = 30.0f;
 
@@ -53,7 +58,12 @@ void GameRoom::Update(float dt)
         if (stageChangeTimer <= 0.0f) {
             // 1) currentStage 갱신
             currentStage = nextStage;
-
+            Vector3 startPos{ 2025.0f, 0.0f, 3974.0f };
+            for (auto* pl : players) {
+                pl->posX = startPos.x;
+                pl->posY = startPos.y;
+                pl->posZ = startPos.z;
+            }
              mapColliders = MapColliderLoader::Load("../Resources/json/Stage02_Collider.json");
         std::cout << "Loaded colliders: " << mapColliders.size() << "\n";
          
@@ -75,7 +85,7 @@ void GameRoom::Update(float dt)
                 sc_packet_player_leave leavePkt{};
                 leavePkt.size = sizeof(leavePkt);
                 leavePkt.type = S2C_P_PLAYER_LEAVE;
-                leavePkt.playerId = victim->socket;  // 각 플레이어 고유 ID
+                leavePkt.playerId = victim->socket;  
                 for (auto* p : players) {
                     PostSendPacket(p, &leavePkt, leavePkt.size);
                 }
@@ -268,11 +278,25 @@ void GameRoom::SpawnZombies()
     {
         // --------------------
         // 1) 랜덤 위치 계산
-        float xRange = (MAP_MAX_X - PLAYER_RADIUS) - (MAP_MIN_X + PLAYER_RADIUS);
-        float zRange = (MAP_MAX_Z - PLAYER_RADIUS) - (MAP_MIN_Z + PLAYER_RADIUS);
-        float spawnX = MAP_MIN_X + PLAYER_RADIUS + (rand() / (float)RAND_MAX) * xRange;
-        float spawnZ = MAP_MIN_Z + PLAYER_RADIUS + (rand() / (float)RAND_MAX) * zRange;
-        float spawnY = 0.0f;
+        float spawnX, spawnZ, spawnY = 0.0f;
+        if (currentStage == 1) {
+            float xRange = (MAP_MAX_X - PLAYER_RADIUS) - (MAP_MIN_X + PLAYER_RADIUS);
+            float zRange = (MAP_MAX_Z - PLAYER_RADIUS) - (MAP_MIN_Z + PLAYER_RADIUS);
+            spawnX = MAP_MIN_X + PLAYER_RADIUS + (rand() / (float)RAND_MAX) * xRange;
+            spawnZ = MAP_MIN_Z + PLAYER_RADIUS + (rand() / (float)RAND_MAX) * zRange;
+        }
+        else if (currentStage == 2) {
+            float xRange = (ST2_MAX_X - PLAYER_RADIUS) - (ST2_MIN_X + PLAYER_RADIUS);
+            float zRange = (ST2_MAX_Z - PLAYER_RADIUS) - (ST2_MIN_Z + PLAYER_RADIUS);
+            spawnX = ST2_MIN_X + PLAYER_RADIUS + (rand() / (float)RAND_MAX) * xRange;
+            spawnZ = ST2_MIN_Z + PLAYER_RADIUS + (rand() / (float)RAND_MAX) * zRange;
+        }
+        else {
+            float xRange = (MAP_MAX_X - PLAYER_RADIUS) - (MAP_MIN_X + PLAYER_RADIUS);
+            float zRange = (MAP_MAX_Z - PLAYER_RADIUS) - (MAP_MIN_Z + PLAYER_RADIUS);
+            spawnX = MAP_MIN_X + PLAYER_RADIUS + (rand() / (float)RAND_MAX) * xRange;
+            spawnZ = MAP_MIN_Z + PLAYER_RADIUS + (rand() / (float)RAND_MAX) * zRange;
+        }
 
         // 2) 타입 확률
         int pct = rand() % 100;

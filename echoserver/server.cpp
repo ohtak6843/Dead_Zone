@@ -356,12 +356,11 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
                 const int maxStage = 2;
                 if (room->killCount >= killThreshold && room->currentStage < maxStage) 
                 {
-                    room->zombies.clear();
-                    room->spawnPaused = true;
                     room->killCount = 0;
                     room->nextStage = room->currentStage + 1;
                     room->stageChangeTimer = 10.0f;
-                 
+                    room->zombies.clear();
+                    room->spawnPaused = true;
                     sc_packet_stage_clear stagePkt{};
                     stagePkt.size = sizeof(stagePkt);
                     stagePkt.type = S2C_P_STAGE_CLEAR;
