@@ -201,6 +201,11 @@ shared_ptr<GameObject> Scene::FindGameObject(const wstring& name)
 	return nullptr;
 }
 
+void Scene::ActiveGameObject(const wstring& name, bool flag)
+{
+	FindGameObject(name)->SetActive(flag);
+}
+
 void Scene::SetLocalPlayer(vector<shared_ptr<Player>>& player)
 {
 	_localPlayer = std::move(player);

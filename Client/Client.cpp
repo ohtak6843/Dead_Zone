@@ -214,8 +214,16 @@ void ReceiverThread(SOCKET clientSocket) {
                 }
                 case S2C_P_STAGE_CLEAR: {
                     // 스테이지클리어 ui
-                    
-                    break;
+                    auto sceneType = GET_SINGLE(SceneMgr)->GetSceneType();
+                    switch(sceneType)
+                    {
+					case SCENE_TYPE::STAGE01:
+                        GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"StageClear", true);
+						break;
+                    case SCENE_TYPE::STAGE02:
+                        //GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"GameClear", true);
+                        break;
+                    }
                 }
                 case S2C_P_PLAYER_HEALTH: {
                     auto* p = reinterpret_cast<sc_packet_player_health*>(packet);

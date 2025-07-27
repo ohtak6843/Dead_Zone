@@ -51,6 +51,7 @@ public:
 
 public:
 	shared_ptr<GameObject> FindGameObject(const wstring& name);
+	void ActiveGameObject(const wstring& name, bool flag);
 
 public:
 	void SetLocalPlayer(vector<shared_ptr<Player>>& player);

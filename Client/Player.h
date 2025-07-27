@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.h"
 #include "GameInfo.h"
+#include "Gun.h"
 
 enum class PLAYER_STATE
 {
@@ -39,8 +40,12 @@ public:
 
 	void SetHp(uint32 hp) { _info.hp = hp; }
 
+	void AddGun(vector<shared_ptr<Gun>>& guns) { _guns.push_back(guns); }
+
 protected:
 	PLAYER_STATE _state;
 	PlayerInfo _info;
+
+	vector<vector<shared_ptr<Gun>>> _guns;
 };
 

@@ -380,5 +380,5 @@ void Stage02::Init()
 	INPUT->LockCursor(true);
 	gameFramework->ToggleFullScreen(true);
 
-	GET_SINGLE(FmodMgr)->PlaySound();
+	//GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE02);
 }

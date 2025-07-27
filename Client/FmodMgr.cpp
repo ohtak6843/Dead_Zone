@@ -17,9 +17,25 @@ void FmodMgr::Update()
 	_system->update();
 }
 
-void FmodMgr::PlaySound()
+void FmodMgr::PlaySound(SOUND_TYPE type)
 {
 	//_system->playSound(_sound[0], nullptr, false, &_channel[0]);
 
 	//_channel[0]->setVolume(0.05f); // º¼·ý ¼³Á¤
+}
+
+void FmodMgr::StopSound(SOUND_TYPE type)
+{
+	_channelList[static_cast<int32>(type)]->stop();
+}
+
+void FmodMgr::StopAllSounds()
+{
+	for (auto& channel : _channelList)
+	{
+		if (channel)
+		{
+			channel->stop();
+		}
+	}
 }
