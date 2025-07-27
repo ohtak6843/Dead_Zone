@@ -14,10 +14,6 @@
 
 #include "ParticleObject.h"
 
-bool Gun::_initialized = true;
-shared_ptr<ParticleObject> Gun::_particle = nullptr;
-shared_ptr<MuzzleFlashParticle> Gun::_muzzle = nullptr;
-
 Gun::Gun()
 {
 }
@@ -133,7 +129,6 @@ void Gun::InitializeParticle()
 	_particle->SetLayerIndex(gunLayer);
 	_particle->SetCheckFrustum(false);
 	GET_SINGLE(SceneMgr)->GetActiveScene()->AddGameObject(_particle);
-	_initialized = false;
 }
 
 void Gun::SetParticlePos(Vec3 pos)

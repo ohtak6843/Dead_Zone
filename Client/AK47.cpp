@@ -43,10 +43,8 @@ void AK47::Awake()
 	shared_ptr<GunInfo> info = GET_SINGLE(GameInfo)->Get<GunInfo>(L"AK47");
 	_info = *info;
 
-	if (GetInitialized())
-	{
-		InitializeParticle();
-	}
+	
+	InitializeParticle();
 
 	// 파티클 위치 설정
 	SetParticlePos(_ParticlePosition);

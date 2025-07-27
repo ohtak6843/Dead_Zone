@@ -27,13 +27,10 @@ public:
 	void InitializeParticle();
 	void SetParticlePos(Vec3 pos);
 
-	bool GetInitialized() { return _initialized; }
-
 	int32 GetCurrentAmmo() { return _currentAmmo; }
 
 private:
-	static bool _initialized; // 총기 초기화가 되었는지 확인
-	static shared_ptr<class MuzzleFlashParticle> _muzzle;
+	shared_ptr<class MuzzleFlashParticle> _muzzle;
 
 
 	float _fireElapsedTime = 0.f; // 발사 경과 시간
@@ -42,7 +39,7 @@ private:
 
 protected:
 	GunInfo _info;
-	static shared_ptr<ParticleObject> _particle;
+	shared_ptr<ParticleObject> _particle;
 	float _gunRecoilTime; // 총기 반동 시간
 	float _cameraRecoilTime; // 카메라 반동 시간
 

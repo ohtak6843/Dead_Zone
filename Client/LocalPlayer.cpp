@@ -221,13 +221,9 @@ void LocalPlayer::ProcessKeyInput()
 		_GunType = (_GunType + 1) % _MaxGunType;
 		if (_GunType == 0)
 		{
-			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1")->SetActive(true);
 			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47")->SetActive(false);
-
 			auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1");
 			gun->SetActive(true);
-			Vec3 pos = static_pointer_cast<M4A1>(gun)->GetNomalParticlePos();
-			static_pointer_cast<M4A1>(gun)->SetParticlePos(pos);
 
 		}
 		else if (_GunType == 1)
@@ -235,8 +231,6 @@ void LocalPlayer::ProcessKeyInput()
 			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1")->SetActive(false);
 			auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47");
 			gun->SetActive(true);
-			Vec3 pos = static_pointer_cast<AK47>(gun)->GetNomalParticlePos();
-			static_pointer_cast<AK47>(gun)->SetParticlePos(pos);
 		}
 	}
 }
