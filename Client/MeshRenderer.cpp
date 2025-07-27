@@ -71,18 +71,45 @@ void MeshRenderer::Render(shared_ptr<InstancingBuffer>& buffer)
 
 void MeshRenderer::RenderShadow()
 {
-	GetTransform()->PushData();
+	//GetTransform()->PushData();
 
-	shared_ptr<Material> material = GET_SINGLE(Resources)->Get<Material>(L"Shadow")->Clone();
+	//shared_ptr<Material> material = GET_SINGLE(Resources)->Get<Material>(L"Shadow")->Clone();
 
-	if (GetAnimator())
+	//if (GetAnimator())
+	//{
+	//	GetAnimator()->PushData();
+	//	material->SetInt(1, 1);
+	//}
+	//else
+	//{
+	//	material->SetInt(1, 0);
+	//}
+
+	//material->PushGraphicsData();
+	//_mesh->Render();
+	shared_ptr<Material> shadowMaterial = GET_SINGLE(Resources)->Get<Material>(L"Shadow");
+
+
+	for (uint32 i = 0; i < _materials.size(); ++i)
 	{
-		GetAnimator()->PushData();
-		material->SetInt(1, 1);
-	}
+		if (_materials[i] == nullptr)
+			continue;
 
-	material->PushGraphicsData();
-	_mesh->Render();
+		GetTransform()->PushData();
+
+		if (GetAnimator())
+		{
+			GetAnimator()->PushData();
+			shadowMaterial->SetInt(1, 1);
+		}
+		else
+		{
+			shadowMaterial->SetInt(1, 0);
+		}
+
+		shadowMaterial->PushGraphicsData();
+		_mesh->Render(1, i);
+	}
 }
 
 uint64 MeshRenderer::GetInstanceID()
