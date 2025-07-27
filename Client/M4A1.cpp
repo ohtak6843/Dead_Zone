@@ -43,11 +43,8 @@ void M4A1::Awake()
 	shared_ptr<GunInfo> info = GET_SINGLE(GameInfo)->Get<GunInfo>(L"M4A1");
 	_info = *info;
 
-	if (GetInitialized())
-	{
-		InitializeParticle();
-	}
-
+	InitializeParticle();
+	
 	// 파티클 위치 설정
 	SetParticlePos(_ParticlePosition);
 

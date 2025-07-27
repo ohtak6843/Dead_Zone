@@ -221,13 +221,9 @@ void LocalPlayer::ProcessKeyInput()
 		_GunType = (_GunType + 1) % _MaxGunType;
 		if (_GunType == 0)
 		{
-			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1")->SetActive(true);
 			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47")->SetActive(false);
-
 			auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1");
 			gun->SetActive(true);
-			Vec3 pos = static_pointer_cast<M4A1>(gun)->GetNomalParticlePos();
-			static_pointer_cast<M4A1>(gun)->SetParticlePos(pos);
 
 		}
 		else if (_GunType == 1)
@@ -235,22 +231,32 @@ void LocalPlayer::ProcessKeyInput()
 			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1")->SetActive(false);
 			auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47");
 			gun->SetActive(true);
-			Vec3 pos = static_pointer_cast<AK47>(gun)->GetNomalParticlePos();
-			static_pointer_cast<AK47>(gun)->SetParticlePos(pos);
 		}
 	}
 }
 
 void LocalPlayer::ProcessMouseInput()
 {
+	wstring gunName = L"M4A1";
+
+	switch (_GunType)
+	{
+	case 0:
+		gunName = L"M4A1";
+		break;
+	case 1:
+		gunName = L"AK47";
+		break;
+	default:
+		break;
+	}
+
+	auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(gunName);
+
 	if (INPUT->GetButton(MOUSE_TYPE::LBUTTON))
 	{
-
 		bool fireSuccess = false;
-		if (_GunType == 0)
-			fireSuccess = static_pointer_cast<M4A1>(GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1"))->Fire();
-		else if (_GunType == 1)
-			fireSuccess = static_pointer_cast<AK47>(GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47"))->Fire();
+		fireSuccess = static_pointer_cast<Gun>(gun)->Fire();
 
 		if (fireSuccess)
 		{
@@ -276,6 +282,24 @@ void LocalPlayer::ProcessMouseInput()
 				}
 			}
 		}
+	}
+
+	// 장전 버튼이 눌렸을 때
+	if (INPUT->GetButtonDown(KEY_TYPE::R))
+	{
+		static_pointer_cast<Gun>(gun)->Reload();
+	}
+
+	// 정조준 활성화 여부
+	if (INPUT->GetButton(MOUSE_TYPE::RBUTTON))
+	{
+		static_pointer_cast<Gun>(gun)->SetAimingFlag(true);
+		GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"Crosshair")->SetActive(false); // 조준선 비활성화
+	}
+	else
+	{
+		static_pointer_cast<Gun>(gun)->SetAimingFlag(false);
+		GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"Crosshair")->SetActive(true); // 조준선 활성화
 	}
 
 	POINT deltaPos = INPUT->GetDeltaPos();
