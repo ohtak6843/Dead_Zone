@@ -63,6 +63,14 @@ public:
 	void PushComputeData();
 	void Dispatch(uint32 x, uint32 y, uint32 z);
 
+	shared_ptr<Texture> GetTexture(uint8 index)
+	{
+		if (index >= MATERIAL_ARG_COUNT)
+			return nullptr;
+
+		return _textures[index];
+	}
+
 	shared_ptr<Material> Clone();
 
 private:

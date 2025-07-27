@@ -46,3 +46,19 @@ void EnableConsole()
 	std::wcin.clear();
 	std::cin.clear();
 }
+
+void WriteWString(ofstream& out, const wstring& str)
+{
+	uint32 len = static_cast<uint32>(str.length());
+	out.write(reinterpret_cast<const char*>(&len), sizeof(uint32));
+	out.write(reinterpret_cast<const char*>(str.c_str()), len * sizeof(wchar_t));
+}
+
+wstring ReadWString(ifstream& in)
+{
+	uint32 len = 0;
+	in.read(reinterpret_cast<char*>(&len), sizeof(uint32));
+	wstring str(len, L'\0');
+	in.read(reinterpret_cast<char*>(&str[0]), len * sizeof(wchar_t));
+	return str;
+}

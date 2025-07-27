@@ -62,6 +62,8 @@ inline shared_ptr<T> Resources::Load(const wstring& key, const wstring& path)
 	object->Load(path);
 	keyObjMap[key] = object;
 
+	object->SetName(key);
+
 	return object;
 }
 

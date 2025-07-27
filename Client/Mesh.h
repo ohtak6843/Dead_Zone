@@ -48,10 +48,11 @@ public:
 
 	static shared_ptr<Mesh> CreateFromFBX(const struct FbxMeshInfo* meshInfo, class FBXLoader& loader);
 
-private:
+public:
 	void CreateVertexBuffer(const vector<Vertex>& buffer);
 	void CreateIndexBuffer(const vector<uint32>& buffer);
 	void CreateBonesAndAnimations(class FBXLoader& loader);
+	void UploadAnimation();
 	Matrix GetMatrix(FbxAMatrix& matrix);
 
 public:
@@ -66,7 +67,11 @@ public:
 	shared_ptr<UploadBuffer>	GetBoneFrameDataBuffer(int32 index = 0) { return _frameBuffer[index]; } // 전체 본 프레임 정보
 	shared_ptr<UploadBuffer>	GetBoneOffsetBuffer() { return  _offsetBuffer; }
 
-private:
+
+public:
+	vector<Vertex> _rawVertices;
+	vector<vector<uint32>> _rawIndices;
+
 	ComPtr<ID3D12Resource>		_vertexBuffer;
 	D3D12_VERTEX_BUFFER_VIEW	_vertexBufferView = {};
 	uint32 _vertexCount = 0;
