@@ -28,6 +28,7 @@
 #include "TP_AK47.h"
 
 #include "SceneMgr.h"
+#include "FmodMgr.h"
 
 #include "..//echoserver//protocol.h"
 
@@ -40,6 +41,16 @@ Scene::Scene()
 
 Scene::~Scene()
 {
+}
+
+void Scene::Release()
+{
+	_gameObjects.clear();
+	_players.clear();
+	_zombies.clear();
+	_jumpStates.clear();
+	
+	_renderPass.reset();
 }
 
 void Scene::Awake()
@@ -260,10 +271,25 @@ void Scene::AddPlayer(sc_packet_player_info* packet)
 		gunObject->SetParentObject(gameObjects[0]);
 		AddGameObject(gunObject);
 	}
+
+	// 플레이어에 총 추가
+	vector<shared_ptr<Gun>> tempGuns;
+	tempGuns.reserve(gunObjects.size());
+
+	std::transform(gunObjects.begin(), gunObjects.end(), std::back_inserter(tempGuns),
+		[](const shared_ptr<TP_AK47>& mp) {
+			return static_pointer_cast<Gun>(mp); // 업캐스팅
+		});
+	gameObjects[0]->AddGun(tempGuns);
 }
 
 void Scene::MovePlayer(sc_packet_move* packet)
 {
+	//// 사운드 재생
+	//bool flag = GET_SINGLE(FmodMgr)->CheckPlaying(SOUND_TYPE::PLAYER_RUN);
+	//if (flag == false)
+	//	GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::PLAYER_RUN);
+
 	Vec3 position = Vec3(packet->position.x, packet->position.y, packet->position.z);
 	Vec3 look = Vec3(packet->look.x, packet->look.y, packet->look.z);
 
@@ -336,6 +362,15 @@ void Scene::RemovePlayer(sc_packet_player_leave* packet)
 	{
 		if (id == packet->playerId)
 		{
+			auto& guns = group[0]->GetGuns();
+			for (auto& gunGroup : guns) {
+				for (auto& gun : gunGroup) {
+					RemoveGameObject(gun);
+				}
+			}
+
+			guns.clear();
+
 			for (auto& part : group)
 				RemoveGameObject(part);
 

@@ -24,6 +24,8 @@ public:
 	virtual void LoadResources() {}
 
 	virtual void Init() {}
+	virtual void Release();
+
 	virtual void Awake();
 	virtual void Start();
 	virtual void Update();
@@ -74,7 +76,7 @@ public:
 
 	void ApplySnapshot(struct sc_packet_snapshot* packet);
 
-private:
+protected:
 	vector<shared_ptr<GameObject>>		_gameObjects;
 	
 	shared_ptr<class RenderPass>		_renderPass;

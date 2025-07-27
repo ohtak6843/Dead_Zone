@@ -2,6 +2,8 @@
 #include "EliteZombie.h"
 #include "Animator.h"
 
+#include "FmodMgr.h"
+
 void EliteZombie::SetState(ZOMBIE_STATE playerState)
 {
 	// 현재 상태와 패킷의 상태가 같으면 아무것도 하지 않음
@@ -39,12 +41,20 @@ void EliteZombie::SetState(ZOMBIE_STATE playerState)
 	{
 		uint32 index = static_cast<uint32>(ELITE_ZOMBIE_ANIMATION::ATTACK);
 		GetAnimator()->Play(index);
+
+		// 사운드 재생
+		bool flag = GET_SINGLE(FmodMgr)->CheckPlaying(SOUND_TYPE::ZOMBIE_ATTACK);
+		if (flag == false)
+			GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::ZOMBIE_ATTACK);
 		break;
 	}
 	case ZOMBIE_STATE::DIE:
 	{
 		uint32 index = static_cast<uint32>(ELITE_ZOMBIE_ANIMATION::DIE);
 		GetAnimator()->Play(index);
+
+		// 사운드 재생
+		GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::ZOMBIE_DIE);
 		break;
 	}
 	default:

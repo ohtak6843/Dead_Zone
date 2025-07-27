@@ -41,6 +41,7 @@ public:
 	void SetHp(uint32 hp) { _info.hp = hp; }
 
 	void AddGun(vector<shared_ptr<Gun>>& guns) { _guns.push_back(guns); }
+	vector<vector<shared_ptr<Gun>>>& GetGuns() { return _guns; }
 
 protected:
 	PLAYER_STATE _state;

@@ -219,7 +219,8 @@ void ReceiverThread(SOCKET clientSocket) {
                     {
 					case SCENE_TYPE::STAGE01:
                         GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"StageClear", true);
-						break;
+						GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE_CLEAR);
+                        break;
                     case SCENE_TYPE::STAGE02:
                         //GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"GameClear", true);
                         break;
@@ -235,6 +236,10 @@ void ReceiverThread(SOCKET clientSocket) {
                     }
                     // 멀티플레이어 상태에도 반영
                     
+                    // 사운드 재생
+                    bool flag = GET_SINGLE(FmodMgr)->CheckPlaying(SOUND_TYPE::PLAYER_PAIN);
+                    if (flag == false)
+                        GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::PLAYER_PAIN);
                     break;
                 }
                 default:
@@ -300,7 +305,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // 게임 프레임워크 초기화
     gameFramework->Init(GWindowInfo);
-    GET_SINGLE(SceneMgr)->LoadScene(SCENE_TYPE::TITLE);
+    GET_SINGLE(SceneMgr)->LoadScene(SCENE_TYPE::STAGE02);
 
     std::thread recvThread(ReceiverThread, g_clientSocket);
 
