@@ -147,7 +147,6 @@ void SceneMgr::RenderUI()
 			else if (gunType == 1)
 				currentAmmo = static_pointer_cast<AK47>(_activeScene->FindGameObject(L"AK47"))->GetCurrentAmmo();
 
-			currentAmmo = 30;
 			std::wstringstream wss;
 			wss << currentAmmo;
 
