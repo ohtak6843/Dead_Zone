@@ -226,13 +226,13 @@ void ReceiverThread(SOCKET clientSocket) {
                         break;
                     }
                 }
-                case S2C_P_PLAYER_HEALTH: {
+                case S2C_P_PLAYER_HEALTH:
+                {
                     auto* p = reinterpret_cast<sc_packet_player_health*>(packet);
 					GET_SINGLE(SceneMgr)
 						->GetActiveScene()
 						->UpdatePlayerHealth(p);
 
-                    
                     // 사운드 재생
                     bool flag = GET_SINGLE(FmodMgr)->CheckPlaying(SOUND_TYPE::PLAYER_PAIN);
                     if (flag == false)
