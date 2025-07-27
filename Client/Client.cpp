@@ -229,6 +229,7 @@ void ReceiverThread(SOCKET clientSocket) {
                     
                     GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"StageClear", true);
                     GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE_CLEAR);
+                    break;
                 }
                 case S2C_P_GAME_CLEAR:
                 {
