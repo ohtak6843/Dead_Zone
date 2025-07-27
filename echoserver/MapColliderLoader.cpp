@@ -47,7 +47,7 @@ std::vector<Collider> MapColliderLoader::Load(const std::string& jsonPath) {
                 height = ext * 2.0f;
             }
         }
-        if (height <= 50.0f)
+        if (height <= 10.0f)
             continue;
         cols.push_back(c);
     }

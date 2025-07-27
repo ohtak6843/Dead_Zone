@@ -57,5 +57,8 @@ private:
     void BroadcastZombieMove(const Zombie& z, float dx, float dz);
     void ClampZombiePosition(Zombie& z);
 
+    void HandleZombiePhysics(float dt);
+    void HandleZombieCollisions();
+
     void BroadcastSnapshots();
 };

@@ -69,7 +69,7 @@ void Scene::Update()
 
 void Scene::LateUpdate()
 {
-	const float gravity = 9.8f;
+	/*const float gravity = 9.8f;
 
 	for (auto& [id, group] : _players) {
 		auto & root = group[0];
@@ -86,7 +86,7 @@ void Scene::LateUpdate()
 			js.verticalVel = 0.0f;
 		}
 		root->GetTransform()->SetLocalPosition(pos);
-	}
+	}*/
 
 	for (const shared_ptr<GameObject>& gameObject : _gameObjects)
 	{

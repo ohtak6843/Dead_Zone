@@ -16,8 +16,8 @@ constexpr float MAP_MAX_Y = 960.0f;
 constexpr float MAP_MIN_Z = -3552.0f;
 constexpr float MAP_MAX_Z = 3535.0f;
 
-constexpr float PLAYER_RADIUS = 50.0f;
-constexpr float ZOMBIE_RADIUS = 50.0f;
+constexpr float PLAYER_RADIUS = 30.0f;
+constexpr float ZOMBIE_RADIUS = 30.0f;
 
 // 감지 및 공격 반경
 constexpr float DETECT_RADIUS = 500.0f;
@@ -86,8 +86,8 @@ void GameRoom::HandlePlayerPhysics(float dt)
             if (p->posY <= groundY) {
                 p->posY = groundY;
                 p->verticalVelocity = 0.0f;
-                p->isJumping = false;
-                SendLandPacket(p);
+                //p->isJumping = false;
+              //  SendLandPacket(p);
             }
             else if (p->posY < groundY) {
                 p->posY = groundY;
@@ -208,6 +208,8 @@ void GameRoom::SpawnZombies()
 
 void GameRoom::UpdateZombies(float dt)
 {
+    HandleZombiePhysics(dt);
+    HandleZombieCollisions();
     for (auto& z : zombies) {
         z.attackCooldown -= dt;
         if (z.attackCooldown < 0.0f) z.attackCooldown = 0.0f;
@@ -363,5 +365,52 @@ void GameRoom::RemoveZombieById(long long zombieId)
         });
     if (it != zombies.end()) {
         zombies.erase(it);
+    }
+}
+
+void GameRoom::HandleZombiePhysics(float dt)
+{
+    constexpr float gravity = 9.8f;  // 맵 단위에 맞춰 조정
+    for (auto& z : zombies) {
+        // 중력 가속도
+        z.verticalVelocity -= gravity * dt;
+        // Y 위치 갱신
+        z.y += z.verticalVelocity * dt;
+    }
+}
+
+// (2) 스텝업 & 벽 충돌 해제 + 착지 처리
+void GameRoom::HandleZombieCollisions()
+{
+    constexpr float VERT_OFFSET = 10.0f;  // 올라탈 때 발 높이
+    constexpr float MAX_STEP_HEIGHT = 50.0f;  // 최대 계단 높이 허용
+
+    for (auto& z : zombies) {
+        // ① 스텝업 & 벽 충돌 해제
+        for (const auto& col : mapColliders) {
+            PhysicsSystem::ResolveCollision(
+                z.x, z.y, z.z,
+                col,
+                ZOMBIE_RADIUS
+            );
+        }
+
+        // ② 착지: 현재 XZ 위 콜라이더 중 가장 높은 tileTop 찾기
+        float maxTop = MAP_MIN_Y;
+        for (const auto& col : mapColliders) {
+            if (z.x >= col.min[0] && z.x <= col.max[0] &&
+                z.z >= col.min[2] && z.z <= col.max[2])
+            {
+                float tileTop = col.max[1];
+                // 단차가 너무 크면 스텝업이 아니라 낙하하도록
+                if (tileTop - (z.y - VERT_OFFSET) <= MAX_STEP_HEIGHT)
+                    maxTop = (tileTop > maxTop ? tileTop : maxTop);
+            }
+        }
+        float landY = maxTop + VERT_OFFSET;
+        if (z.y < landY) {
+            z.y = landY;
+            z.verticalVelocity = 0.0f;
+        }
     }
 }

@@ -34,6 +34,8 @@ public:
     float walkSpeed;
     float runSpeed;
     float attackCooldown;
+    bool  isAirborne = true;      // ¶¥À» ¹þ¾î³µ´ÂÁö
+    float verticalVelocity = 0.0f;  // YÃà ¼Óµµ
 
     enum ZOMBIE_STATE : uint8_t {
         T_POSE = 0,
