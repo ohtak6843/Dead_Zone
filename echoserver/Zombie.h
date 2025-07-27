@@ -36,6 +36,9 @@ public:
     float attackCooldown;
     bool  isAirborne = true;      // ¶¥À» ¹þ¾î³µ´ÂÁö
     float verticalVelocity = 0.0f;  // YÃà ¼Óµµ
+    float wanderDirX = 0.0f;
+    float wanderDirZ = 0.0f;
+    float wanderTime = 0.0f;
 
     enum ZOMBIE_STATE : uint8_t {
         T_POSE = 0,

@@ -307,6 +307,9 @@ void GameRoom::SpawnZombies()
 
         // 3) 벡터에 추가
         Zombie z(type);
+        z.wanderDirX = 0.0f;
+        z.wanderDirZ = 0.0f;
+        z.wanderTime = 0.0f;
         z.x = spawnX;  z.y = spawnY;  z.z = spawnZ;
         z.id = nextZombieId++;
         zombies.push_back(z);
@@ -402,7 +405,21 @@ void GameRoom::UpdateZombies(float dt)
             BroadcastZombieMove(z, appliedDx, appliedDz);
         }
         else {
-            SetZombieState(z, Zombie::IDLE);
+            SetZombieState(z, Zombie::WALK);
+            // 2) 새 방황 방향 및 지속시간 결정
+            if (z.wanderTime <= 0.0f) {
+                float angle = (rand() / (float)RAND_MAX) * 2.0f * 3.14159265f;
+                z.wanderDirX = cosf(angle);
+                z.wanderDirZ = sinf(angle);
+                z.wanderTime = 2.0f + (rand() / (float)RAND_MAX) * 3.0f; // 2~5초
+            }
+            float speed = z.walkSpeed; // 또는 원하는 고정값 사용
+            float dx = z.wanderDirX * speed * dt;
+            float dz = z.wanderDirZ * speed * dt;
+            z.x += dx;
+            z.z += dz;
+            BroadcastZombieMove(z, dx, dz);
+            z.wanderTime -= dt;
         }
     }
 }
