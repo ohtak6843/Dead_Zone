@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "SceneMgr.h"
 #include "Scene.h"
+#include "Client.h"
 
 #include "Framework.h"
 #include "Material.h"
@@ -165,10 +166,8 @@ void SceneMgr::RenderUI()
 		{
 			std::wstringstream wss;
 			wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
-			auto WindowInfo = gameFramework->GetWindow();
-			auto ID = WindowInfo.local;
 			uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
-			wss << ID << " - " << hp;
+			wss << GWindowInfo.local << " - " << hp;
 			GET_SINGLE(UIMgr)->DrawTextUI(
 				wss.str(),
 				Vec2(10.f, 740.f),
