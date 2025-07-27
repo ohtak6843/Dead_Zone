@@ -19,6 +19,8 @@
 #include "Zombie.h"
 #include "ParticleObject.h"
 
+#include "FmodMgr.h"
+
 LocalPlayer::LocalPlayer()
 {
 	_name = L"MainCamera";
@@ -61,6 +63,19 @@ void LocalPlayer::LateUpdate()
 	POINT deltapos = INPUT->GetDeltaPos();
 	bool isMoving = (_moveDir.x != 0.f || _moveDir.y != 0.f || _moveDir.z != 0.f);
 	bool isAttacking = INPUT->GetButton(MOUSE_TYPE::LBUTTON);
+
+	// 사운드 출력
+	if (isMoving)
+	{
+		// 사운드 재생
+		bool flag = GET_SINGLE(FmodMgr)->CheckPlaying(SOUND_TYPE::PLAYER_RUN);
+		if (flag == false)
+			GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::PLAYER_RUN);
+	}
+	else
+	{
+		GET_SINGLE(FmodMgr)->StopSound(SOUND_TYPE::PLAYER_RUN);
+	}
 
 	if (isMoving || deltapos.x != 0.f || deltapos.y != 0.f)
 	{
@@ -260,6 +275,12 @@ void LocalPlayer::ProcessMouseInput()
 
 		if (fireSuccess)
 		{
+			// 사운드 출력
+			GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::FIRE);
+		}
+
+		if (fireSuccess)
+		{
 			Vec3 hitPos;
 			shared_ptr<Zombie> zombie;
 
@@ -280,6 +301,11 @@ void LocalPlayer::ProcessMouseInput()
 						particleObj->GetParticle()->SetActive(true);
 					}
 				}
+
+				// 사운드 출력
+				bool flag = GET_SINGLE(FmodMgr)->CheckPlaying(SOUND_TYPE::ZOMBIE_PAIN);
+				if (flag == flag)
+					GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::ZOMBIE_PAIN);
 			}
 		}
 	}

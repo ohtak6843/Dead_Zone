@@ -26,6 +26,9 @@ RenderPass::RenderPass()
 
 RenderPass::~RenderPass()
 {
+	// 모든 카메라와 라이트 제거
+	_cameras.clear();
+	_lights.clear();
 }
 
 void RenderPass::Render()

@@ -212,13 +212,30 @@ void ReceiverThread(SOCKET clientSocket) {
 
                     break;
                 }
-                case S2C_P_STAGE_CLEAR: {
+                case S2C_P_STAGE_CLEAR:
+                {
                     // 스테이지클리어 ui
+                    /*auto sceneType = GET_SINGLE(SceneMgr)->GetSceneType();
+                    switch(sceneType)
+                    {
+					case SCENE_TYPE::STAGE01:
+                        GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"StageClear", true);
+                        GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE_CLEAR);
+                        break;
+                    case SCENE_TYPE::STAGE02:
+                        //GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"GameClear", true);
+                        break;
+                    }*/
                     
+                    GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"StageClear", true);
+                    GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE_CLEAR);
                     break;
                 }
-                case S2C_P_GAME_CLEAR: {
+                case S2C_P_GAME_CLEAR:
+                {
                     // 게임 클리어 ui
+					GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"GameClear", true);
+					GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE_CLEAR);
                     break;
                 }
                 case S2C_P_PLAYER_HEALTH: {
@@ -226,7 +243,11 @@ void ReceiverThread(SOCKET clientSocket) {
 					GET_SINGLE(SceneMgr)
 						->GetActiveScene()
 						->UpdatePlayerHealth(p);
-					
+
+                    // 사운드 재생
+                    bool flag = GET_SINGLE(FmodMgr)->CheckPlaying(SOUND_TYPE::PLAYER_PAIN);
+                    if (flag == false)
+                        GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::PLAYER_PAIN);
                     break;
                 }
                 default:

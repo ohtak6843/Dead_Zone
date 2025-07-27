@@ -24,6 +24,8 @@ public:
 	virtual void LoadResources() {}
 
 	virtual void Init() {}
+	virtual void Release();
+
 	virtual void Awake();
 	virtual void Start();
 	virtual void Update();
@@ -51,6 +53,7 @@ public:
 
 public:
 	shared_ptr<GameObject> FindGameObject(const wstring& name);
+	void ActiveGameObject(const wstring& name, bool flag);
 
 public:
 	void SetLocalPlayer(vector<shared_ptr<Player>>& player);
@@ -74,7 +77,7 @@ public:
 
 	void ApplySnapshot(struct sc_packet_snapshot* packet);
 
-private:
+protected:
 	vector<shared_ptr<GameObject>>		_gameObjects;
 	
 	shared_ptr<class RenderPass>		_renderPass;

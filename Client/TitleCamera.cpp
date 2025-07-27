@@ -47,7 +47,7 @@ void TitleCamera::LateUpdate()
 	constexpr float top = 550.f;
 	constexpr float bottom = 750.f;
 
-	if (INPUT->GetButtonDown(MOUSE_TYPE::LBUTTON))
+	if (INPUT->GetButtonUp(MOUSE_TYPE::LBUTTON))
 	{
 		POINT mousePos = INPUT->GetMousePos();
 
