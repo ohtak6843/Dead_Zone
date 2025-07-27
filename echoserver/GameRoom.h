@@ -27,7 +27,7 @@ public:
 
     GameManager              gameManager;
     std::chrono::steady_clock::time_point lastSpawn;
-    std::chrono::milliseconds                spawnInterval{ 1000 };
+    std::chrono::milliseconds                spawnInterval{ 500 };
     int stageReadyCount = 0;
     void RemoveZombieById(long long zombieId);
     int      killCount = 0;

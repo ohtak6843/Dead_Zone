@@ -44,7 +44,7 @@ void GameRoom::Update(float dt)
 {
     HandlePlayerPhysics(dt);
     HandlePlayerCollisions();
-    SpawnZombies();
+	SpawnZombies();
     UpdateZombies(dt);
     BroadcastSnapshots();
     // ─── 스테이지 전환 타이머 처리 ───
@@ -146,6 +146,67 @@ void GameRoom::HandlePlayerCollisions()
     }
 }
 
+void GameRoom::HandleZombiePhysics(float dt)
+{
+    const float gravity = 9.8f;
+    const float groundY = MAP_MIN_Y;
+
+    for (auto& z : zombies) {
+        if (z.isAirborne) {
+            z.y += z.verticalVelocity * dt;
+            z.verticalVelocity -= gravity * dt;
+
+            if (z.y <= groundY) {
+                z.y = groundY;
+                z.verticalVelocity = 0.0f;
+                //p->isJumping = false;
+              //  SendLandPacket(p);
+            }
+            else if (z.y < groundY) {
+                z.y = groundY;
+            }
+        }
+        else if (z.y < groundY) {
+            z.y = groundY;
+        }
+    }
+}
+
+// (2) 스텝업 & 벽 충돌 해제 + 착지 처리
+void GameRoom::HandleZombieCollisions()
+{
+    // (1) 지면 바닥 Y만 남겨두고, 맵 경계는 mapColliders로 처리
+    const float groundY = MAP_MIN_Y;
+    for (auto& z : zombies) {
+        // 지면 아래로 떨어지지 않도록 최소 높이 고정
+        if (z.y < groundY)
+            z.y = groundY;
+
+        // 맵 콜라이더(AABB)과 구 충돌 해제
+        // mapColliders는 server.cpp에서 MapColliderLoader로 로드된 전역 변수
+        for (const auto& col : mapColliders) {
+            PhysicsSystem::ResolveCollision(
+                z.x, z.y, z.z,
+                col,
+                PLAYER_RADIUS
+            );
+        }
+    }
+
+    // (2) 플레이어끼리의 구-구 충돌 처리 
+    size_t n = zombies.size();
+    for (size_t i = 0; i < n; ++i) {
+        auto& a = zombies[i];
+        for (size_t j = i + 1; j < n; ++j) {
+            auto& b = zombies[j];
+            ResolveSphereCollision(
+                a.x, a.y, a.z,
+                b.x, b.y, b.z,
+                PLAYER_RADIUS
+            );
+        }
+    }
+}
 void GameRoom::ResolveSphereCollision(float& ax, float& ay, float& az,
     float& bx, float& by, float& bz,
     float radius)
@@ -173,37 +234,56 @@ void GameRoom::SpawnZombies()
         return;
 
     auto now = std::chrono::steady_clock::now();
-    if (zombies.size() >= 10 || now - lastSpawn < spawnInterval)
+
+    // 스테이지별 최대 & 틱당 소환 개수
+    int  maxCount = (currentStage == 1) ? 10 : 30;
+    int  batchSize = (currentStage == 1) ? 1 : 10;
+
+    // 이미 최대 마리수 도달했거나, 인터벌이 지나지 않았다면 리턴
+    if ((int)zombies.size() >= maxCount || now - lastSpawn < spawnInterval)
         return;
 
-    float xRange = (MAP_MAX_X - PLAYER_RADIUS) - (MAP_MIN_X + PLAYER_RADIUS);
-    float zRange = (MAP_MAX_Z - PLAYER_RADIUS) - (MAP_MIN_Z + PLAYER_RADIUS);
-    float spawnX = MAP_MIN_X + PLAYER_RADIUS + (static_cast<float>(rand()) / RAND_MAX) * xRange;
-    float spawnZ = MAP_MIN_Z + PLAYER_RADIUS + (static_cast<float>(rand()) / RAND_MAX) * zRange;
-    float spawnY = MAP_MIN_Y;
-
-    // 70% BASIC, 20% ELITE, 10% POLICE
-    int pct = rand() % 100;
-    ZombieType type;
-    if (pct < 70)           type = ZombieType::BASIC;
-    else if (pct < 90)      type = ZombieType::ELITE;
-    else                    type = ZombieType::POLICE;
-
-    Zombie z(type);
-    z.x = spawnX; z.y = spawnY; z.z = spawnZ;
-    z.id = nextZombieId++;
-    zombies.push_back(z);
-
+    // 마지막 소환 시각 업데이트
     lastSpawn = now;
-    sc_packet_spawn_zombie pkt{};
-    pkt.size = sizeof(pkt);
-    pkt.type = S2C_P_SPAWN_ZOMBIE;
-    pkt.zombieId = z.id;
-    pkt.position = { z.x, z.y, z.z };
-    pkt.zombieType = static_cast<unsigned char>(type);
-    //pkt.zombieType = static_cast<unsigned char>(ZombieType::BASIC);
-    for (auto* peer : players)
-        PostSendPacket(peer, &pkt, pkt.size);
+
+    // 이번 틱에 실제로 생성할 마리 수 계산
+    int remaining = maxCount - static_cast<int>(zombies.size());
+    int toSpawn = (batchSize < remaining) ? batchSize : remaining;
+    for (int i = 0; i < toSpawn; ++i)
+    {
+        // --------------------
+        // 1) 랜덤 위치 계산
+        float xRange = (MAP_MAX_X - PLAYER_RADIUS) - (MAP_MIN_X + PLAYER_RADIUS);
+        float zRange = (MAP_MAX_Z - PLAYER_RADIUS) - (MAP_MIN_Z + PLAYER_RADIUS);
+        float spawnX = MAP_MIN_X + PLAYER_RADIUS + (rand() / (float)RAND_MAX) * xRange;
+        float spawnZ = MAP_MIN_Z + PLAYER_RADIUS + (rand() / (float)RAND_MAX) * zRange;
+        float spawnY = 0.0f;
+
+        // 2) 타입 확률
+        int pct = rand() % 100;
+        ZombieType type;
+        if (pct < 70)           type = ZombieType::BASIC;
+        else if (pct < 90)      type = ZombieType::ELITE;
+        else                    type = ZombieType::POLICE;
+
+        // 3) 벡터에 추가
+        Zombie z(type);
+        z.x = spawnX;  z.y = spawnY;  z.z = spawnZ;
+        z.id = nextZombieId++;
+        zombies.push_back(z);
+
+        // 4) 클라이언트로 패킷 전송
+        sc_packet_spawn_zombie pkt{};
+        pkt.size = sizeof(pkt);
+        pkt.type = S2C_P_SPAWN_ZOMBIE;
+        pkt.zombieId = z.id;
+        pkt.position = { z.x, z.y, z.z };
+        pkt.zombieType = static_cast<unsigned char>(type);
+
+        for (auto* peer : players)
+            PostSendPacket(peer, &pkt, pkt.size);
+        // --------------------
+    }
 }
 
 void GameRoom::UpdateZombies(float dt)
@@ -262,13 +342,13 @@ void GameRoom::UpdateZombies(float dt)
             float newX = z.x + rawDx;
             float newY = z.y;       
             float newZ = z.z + rawDz;
-            for (const auto& col : mapColliders) {
+            /*for (const auto& col : mapColliders) {
                 PhysicsSystem::ResolveCollision(
                     newX, newY, newZ,
                     col,
                     ZOMBIE_RADIUS
                 );
-            }
+            }*/
 
             // 5) 실제 적용된 이동량 재계산
             float appliedDx = newX - z.x;
@@ -314,15 +394,15 @@ void GameRoom::BroadcastZombieMove(const Zombie& z, float dx, float dz)
         PostSendPacket(peer, &mvPkt, mvPkt.size);
 }
 
-void GameRoom::ClampZombiePosition(Zombie& z)
-{
-    if (z.x - ZOMBIE_RADIUS < MAP_MIN_X)  z.x = MAP_MIN_X + ZOMBIE_RADIUS;
-    else if (z.x + ZOMBIE_RADIUS > MAP_MAX_X) z.x = MAP_MAX_X - ZOMBIE_RADIUS;
-    if (z.z - ZOMBIE_RADIUS < MAP_MIN_Z)  z.z = MAP_MIN_Z + ZOMBIE_RADIUS;
-    else if (z.z + ZOMBIE_RADIUS > MAP_MAX_Z) z.z = MAP_MAX_Z - ZOMBIE_RADIUS;
-    if (z.y < MAP_MIN_Y) z.y = MAP_MIN_Y;
-    else if (z.y > MAP_MAX_Y) z.y = MAP_MAX_Y;
-}
+//void GameRoom::ClampZombiePosition(Zombie& z)
+//{
+//    if (z.x - ZOMBIE_RADIUS < MAP_MIN_X)  z.x = MAP_MIN_X + ZOMBIE_RADIUS;
+//    else if (z.x + ZOMBIE_RADIUS > MAP_MAX_X) z.x = MAP_MAX_X - ZOMBIE_RADIUS;
+//    if (z.z - ZOMBIE_RADIUS < MAP_MIN_Z)  z.z = MAP_MIN_Z + ZOMBIE_RADIUS;
+//    else if (z.z + ZOMBIE_RADIUS > MAP_MAX_Z) z.z = MAP_MAX_Z - ZOMBIE_RADIUS;
+//    if (z.y < MAP_MIN_Y) z.y = MAP_MIN_Y;
+//    else if (z.y > MAP_MAX_Y) z.y = MAP_MAX_Y;
+//}
 
 void GameRoom::BroadcastSnapshots()
 {
@@ -365,52 +445,5 @@ void GameRoom::RemoveZombieById(long long zombieId)
         });
     if (it != zombies.end()) {
         zombies.erase(it);
-    }
-}
-
-void GameRoom::HandleZombiePhysics(float dt)
-{
-    constexpr float gravity = 9.8f;  // 맵 단위에 맞춰 조정
-    for (auto& z : zombies) {
-        // 중력 가속도
-        z.verticalVelocity -= gravity * dt;
-        // Y 위치 갱신
-        z.y += z.verticalVelocity * dt;
-    }
-}
-
-// (2) 스텝업 & 벽 충돌 해제 + 착지 처리
-void GameRoom::HandleZombieCollisions()
-{
-    constexpr float VERT_OFFSET = 10.0f;  // 올라탈 때 발 높이
-    constexpr float MAX_STEP_HEIGHT = 50.0f;  // 최대 계단 높이 허용
-
-    for (auto& z : zombies) {
-        // ① 스텝업 & 벽 충돌 해제
-        for (const auto& col : mapColliders) {
-            PhysicsSystem::ResolveCollision(
-                z.x, z.y, z.z,
-                col,
-                ZOMBIE_RADIUS
-            );
-        }
-
-        // ② 착지: 현재 XZ 위 콜라이더 중 가장 높은 tileTop 찾기
-        float maxTop = MAP_MIN_Y;
-        for (const auto& col : mapColliders) {
-            if (z.x >= col.min[0] && z.x <= col.max[0] &&
-                z.z >= col.min[2] && z.z <= col.max[2])
-            {
-                float tileTop = col.max[1];
-                // 단차가 너무 크면 스텝업이 아니라 낙하하도록
-                if (tileTop - (z.y - VERT_OFFSET) <= MAX_STEP_HEIGHT)
-                    maxTop = (tileTop > maxTop ? tileTop : maxTop);
-            }
-        }
-        float landY = maxTop + VERT_OFFSET;
-        if (z.y < landY) {
-            z.y = landY;
-            z.verticalVelocity = 0.0f;
-        }
     }
 }
