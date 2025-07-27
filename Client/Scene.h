@@ -61,6 +61,7 @@ public:
 	void LandPlayer(struct sc_packet_land* packet);
 	void AnimatePlayer(struct sc_packet_state* packet);
 	void RemovePlayer(struct sc_packet_player_leave* packet);
+	void UpdatePlayerHealth(struct sc_packet_player_health* packet);
 
 	void ClearPlayers();
 	void ClearZombies();

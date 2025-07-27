@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Framework.h"
 
+
 unique_ptr<Framework> gameFramework = make_unique<Framework>();
 
 wstring s2ws(const string& s)
@@ -23,4 +24,25 @@ string ws2s(const wstring& s)
 	string r(len, '\0');
 	::WideCharToMultiByte(CP_ACP, 0, s.c_str(), slength, &r[0], len, 0, 0);
 	return r;
+}
+
+
+void EnableConsole()
+{
+	AllocConsole();
+
+	// C 표준 입출력 리디렉션
+	FILE* fp;
+	freopen_s(&fp, "CONOUT$", "w", stdout);   // 표준 출력 리디렉션
+	freopen_s(&fp, "CONOUT$", "w", stderr);   // 표준 에러 리디렉션
+	freopen_s(&fp, "CONIN$", "r", stdin);     // 표준 입력 리디렉션
+
+	// C++ 스트림 동기화
+	std::ios::sync_with_stdio(); // C++ <-> C 스트림 동기화
+	std::wcout.clear();
+	std::cout.clear();
+	std::wcerr.clear();
+	std::cerr.clear();
+	std::wcin.clear();
+	std::cin.clear();
 }

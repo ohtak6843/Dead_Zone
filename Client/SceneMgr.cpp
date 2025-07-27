@@ -148,7 +148,6 @@ void SceneMgr::RenderUI()
 			else if (gunType == 1)
 				currentAmmo = static_pointer_cast<AK47>(_activeScene->FindGameObject(L"AK47"))->GetCurrentAmmo();
 
-			currentAmmo = 30;
 			std::wstringstream wss;
 			wss << currentAmmo;
 
@@ -161,14 +160,14 @@ void SceneMgr::RenderUI()
 				D2D1::ColorF(0, 0, 0, 0.0f) // 배경 색
 			);
 		}
-
-
+		
 		// LocalPlayer HP UI
 		{
 			std::wstringstream wss;
 			wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
+			uint32 ID = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetID();
 			uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
-			wss << name << "1 - " << hp;
+			wss << ID << " - " << hp;
 			GET_SINGLE(UIMgr)->DrawTextUI(
 				wss.str(),
 				Vec2(10.f, 740.f),
@@ -195,23 +194,28 @@ void SceneMgr::RenderUI()
 			}
 		}
 
-		// TODO: 나중에 플레이어2, 3의 HP를 실제로 가져와야 함
-		// Player2 HP UI
+		//MultiPlayer HP UI
+		size_t index = 1;
+		for (const auto& pair : GetActiveScene()->GetPlayers())
 		{
+			index++;
+
+			long long name = pair.first;
+			uint32 hp = pair.second[0]->GetHp();
+
 			std::wstringstream wss;
-			wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
-			uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
-			hp = 85;
-			wss << name << "2 - " << hp;
+			wss << name << " - " << hp;
+
 			GET_SINGLE(UIMgr)->DrawTextUI(
 				wss.str(),
-				Vec2(10.f, 740.f - 60.f),
+				Vec2(10.f, 740.f - (60.f * (index - 1))),
 				Vec2(300.f, 100.f),
 				16,
 				D2D1::ColorF::White,
 				D2D1::ColorF(0, 0, 0, 0.0f)
 			);
-			auto hpber = _activeScene->FindGameObject(L"PlayerPanel_2_HP");
+
+			auto hpber = _activeScene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_HP");
 			if (hpber)
 			{
 				uint32 maxHp = 100;
@@ -229,22 +233,26 @@ void SceneMgr::RenderUI()
 			}
 		}
 
-		// Player3 HP UI
+		while (index < 3)
 		{
+			index++;
+
+			wstring name = L"???";
+			uint32 hp = 50;
+
 			std::wstringstream wss;
-			wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
-			uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
-			hp = 55;
-			wss << name << "3 - " << hp;
+			wss << name << " - " << hp;
+
 			GET_SINGLE(UIMgr)->DrawTextUI(
 				wss.str(),
-				Vec2(10.f, 740.f - 120.f),
+				Vec2(10.f, 740.f - (60.f * (index - 1))),
 				Vec2(300.f, 100.f),
 				16,
 				D2D1::ColorF::White,
 				D2D1::ColorF(0, 0, 0, 0.0f)
 			);
-			auto hpber = _activeScene->FindGameObject(L"PlayerPanel_3_HP");
+
+			auto hpber = _activeScene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_HP");
 			if (hpber)
 			{
 				uint32 maxHp = 100;
@@ -261,7 +269,10 @@ void SceneMgr::RenderUI()
 				hpber->GetTransform()->SetLocalPosition(position);
 			}
 		}
+			
+
 	}
+
 
 	gameFramework->EndD2DRender();
 }
@@ -657,6 +668,7 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		L"..\\Resources\\Texture\\Crosshair\\crosshair01.png",
 		Vec2(0.f, 0.f), // 화면 중앙
 		Vec2(50.f, 50.f), // 크기
+		1.f, // 투명도 0 ~ 1
 		scene
 	);
 
@@ -675,6 +687,7 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		L"..\\Resources\\Texture\\Icon\\Gun\\AK47 실루엣(흰색).png",
 		Vec2(520.f, -360.f), 
 		Vec2(165.f, 50.f),
+		0.5f, // 투명도 0 ~ 1
 		scene
 	);
 	GET_SINGLE(UIMgr)->CreateImageUI(
@@ -682,6 +695,7 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		L"..\\Resources\\Texture\\Icon\\Bullet\\소총탄.png",
 		Vec2(410.f, -360.f), 
 		Vec2(40.f, 40.f),
+		0.5f, // 투명도 0 ~ 1
 		scene
 	);
 

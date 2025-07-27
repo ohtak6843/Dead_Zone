@@ -219,14 +219,10 @@ void ReceiverThread(SOCKET clientSocket) {
                 }
                 case S2C_P_PLAYER_HEALTH: {
                     auto* p = reinterpret_cast<sc_packet_player_health*>(packet);
-                    uint32_t id = static_cast<uint32_t>(p->playerId);
-                    int      hp = p->health;
-
-                    if (id == GWindowInfo.local) {
-                        // GET_SINGLE(UI)->SetHealth(hp);
-                    }
-                    // 멀티플레이어 상태에도 반영
-                    
+					GET_SINGLE(SceneMgr)
+						->GetActiveScene()
+						->UpdatePlayerHealth(p);
+					
                     break;
                 }
                 default:

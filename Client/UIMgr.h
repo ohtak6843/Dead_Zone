@@ -12,7 +12,7 @@ public:
     void InitTextFormats();
 
 public:
-    void CreateImageUI(const wstring& name, const wstring& texPath, const Vec2& pos, const Vec2& size, shared_ptr<class Scene> scene);
+    void CreateImageUI(const wstring& name, const wstring& texPath, const Vec2& pos, const Vec2& size, const float alpha, shared_ptr<class Scene> scene);
     void CreateRectangleUI(const wstring& name, const Vec2& pos, const Vec2& size,const Vec4 color, shared_ptr<class Scene> scene);
     void DrawTextUI(const wstring& text, const Vec2& pos, const Vec2& size, int fontSize,
         const D2D1::ColorF& textColor = D2D1::ColorF::White,

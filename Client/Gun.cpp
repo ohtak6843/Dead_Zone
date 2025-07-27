@@ -89,8 +89,8 @@ void Gun::Reload()
 
 void Gun::Recoil(float pitchAmount, float yawAmount)
 {
-	shared_ptr<Camera> camera = GET_SINGLE(SceneMgr)->GetActiveScene()->GetMainCamera();
-	static_pointer_cast<LocalPlayer>(camera->GetGameObject())->Recoil(pitchAmount, yawAmount); // 카메라 반동 처리
+	auto p = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"LocalPlayer");
+	static_pointer_cast<LocalPlayer>(p)->Recoil(pitchAmount, yawAmount); // 플레이어 반동 처리
 }
 
 void Gun::Aiming(float aimFov, Vec3 aimPos)

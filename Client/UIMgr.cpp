@@ -23,7 +23,7 @@ void UIMgr::Update()
 
 }
 
-void UIMgr::CreateImageUI(const wstring& name, const wstring& texPath, const Vec2& pos, const Vec2& size, shared_ptr<Scene> scene = nullptr)
+void UIMgr::CreateImageUI(const wstring& name, const wstring& texPath, const Vec2& pos, const Vec2& size, const float alpha, shared_ptr<Scene> scene = nullptr)
 {
     if (_uiMap.contains(name))
         return;
@@ -43,7 +43,7 @@ void UIMgr::CreateImageUI(const wstring& name, const wstring& texPath, const Vec
     shared_ptr<Material> material = make_shared<Material>();
     material->SetShader(shader);
     material->SetTexture(0, texture);
-    material->SetColor(0, Vec4(1.f, 1.f, 1.f, 0.5f)); // 반투명
+    material->SetColor(0, Vec4(1.f, 1.f, 1.f, alpha)); // 투명도
     meshRenderer->SetMaterial(material);
 
 	UI->SetName(name);
