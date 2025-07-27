@@ -251,6 +251,16 @@ void Stage02::Init()
 		}
 
 		gameObjects[0]->SetName(L"M4A1");
+
+		// 로컬 플레이에 총 추가
+		vector<shared_ptr<Gun>> guns;
+		guns.reserve(gameObjects.size());
+
+		std::transform(gameObjects.begin(), gameObjects.end(), std::back_inserter(guns),
+			[](const shared_ptr<M4A1>& mp) {
+				return static_pointer_cast<Gun>(mp); // 업캐스팅
+			});
+		_localPlayer[0]->AddGun(guns);
 	}
 #pragma endregion
 
@@ -279,6 +289,16 @@ void Stage02::Init()
 		}
 
 		gameObjects[0]->SetName(L"AK47");
+
+		// 로컬 플레이에 총 추가
+		vector<shared_ptr<Gun>> guns;
+		guns.reserve(gameObjects.size());
+
+		std::transform(gameObjects.begin(), gameObjects.end(), std::back_inserter(guns),
+			[](const shared_ptr<AK47>& mp) {
+				return static_pointer_cast<Gun>(mp); // 업캐스팅
+			});
+		_localPlayer[0]->AddGun(guns);
 	}
 #pragma endregion
 
@@ -322,63 +342,4 @@ void Stage02::Init()
 #pragma region Load UI
 	GET_SINGLE(SceneMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
 #pragma endregion
-
-#pragma region Object
-	//{
-	//	shared_ptr<GameObject> obj = make_shared<GameObject>();
-	//	obj->SetName(L"OBJ");
-	//	obj->SetTransform(make_shared<Transform>());
-	//	obj->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
-	//	obj->GetTransform()->SetLocalPosition(Vec3(0, 200.f, -500.f));
-	//	obj->SetStatic(false);
-	//	shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
-	//	{
-	//		shared_ptr<Mesh> sphereMesh = GET_SINGLE(Resources)->LoadSphereMesh();
-	//		meshRenderer->SetMesh(sphereMesh);
-	//	}
-	//	{
-	//		shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"Deferred");
-	//		shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"Leather", L"..\\Resources\\Texture\\Leather.jpg");
-	//		shared_ptr<Texture> texture2 = GET_SINGLE(Resources)->Load<Texture>(L"Leather_Normal", L"..\\Resources\\Texture\\Leather_Normal.jpg");
-	//		shared_ptr<Material> material = make_shared<Material>();
-	//		material->SetShader(shader);
-	//		material->SetTexture(0, texture);
-	//		material->SetTexture(1, texture2);
-	//		meshRenderer->SetMaterial(material->Clone());
-	//	}
-	//	obj->SetMeshRenderer(meshRenderer);
-	//	AddGameObject(obj);
-	//}
-
-	//{
-	//	shared_ptr<GameObject> obj = make_shared<GameObject>();
-	//	obj->SetName(L"OBJ");
-	//	obj->SetTransform(make_shared<Transform>());
-	//	obj->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
-	//	obj->GetTransform()->SetLocalPosition(Vec3(0, 200.f, -2500.f));
-	//	obj->SetStatic(false);
-	//	shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
-	//	{
-	//		shared_ptr<Mesh> sphereMesh = GET_SINGLE(Resources)->LoadSphereMesh();
-	//		meshRenderer->SetMesh(sphereMesh);
-	//	}
-	//	{
-	//		shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"Deferred");
-	//		shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"Leather", L"..\\Resources\\Texture\\Leather.jpg");
-	//		shared_ptr<Texture> texture2 = GET_SINGLE(Resources)->Load<Texture>(L"Leather_Normal", L"..\\Resources\\Texture\\Leather_Normal.jpg");
-	//		shared_ptr<Material> material = make_shared<Material>();
-	//		material->SetShader(shader);
-	//		material->SetTexture(0, texture);
-	//		material->SetTexture(1, texture2);
-	//		meshRenderer->SetMaterial(material->Clone());
-	//	}
-	//	obj->SetMeshRenderer(meshRenderer);
-	//	AddGameObject(obj);
-	//}
-#pragma endregion
-
-	INPUT->LockCursor(true);
-	gameFramework->ToggleFullScreen(true);
-
-	//GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE02);
 }

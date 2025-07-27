@@ -37,6 +37,7 @@
 
 #include "UIMgr.h"
 #include "InputMgr.h"
+#include "FmodMgr.h"
 
 // TODO: 나중에 삭제
 #include "Timer.h"
@@ -107,7 +108,7 @@ void SceneMgr::RenderUI()
 		//		device->GetSolidColorBrush().Get());
 		//}
 
-		//// 플레이어 위치
+		// 플레이어 위치
 		//{
 		//	Vec2 pivot = { static_cast<float>(100), static_cast<float>(gameFramework->GetWindow().height / 2) };
 		//	D2D1_RECT_F textRect = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
@@ -288,12 +289,35 @@ void SceneMgr::LoadScene(SCENE_TYPE type)
 	_activeScene->Init();
 	_activeScene->Awake();
 	_activeScene->Start();
+
+	switch (type)
+	{
+	case SCENE_TYPE::TITLE:
+		INPUT->LockCursor(false);
+		gameFramework->ToggleFullScreen(false);
+		GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::TITLE);
+		break;
+	case SCENE_TYPE::STAGE01:
+		INPUT->LockCursor(true);
+		gameFramework->ToggleFullScreen(true);
+		GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE01);
+		break;
+	case SCENE_TYPE::STAGE02:
+		INPUT->LockCursor(true);
+		gameFramework->ToggleFullScreen(true);
+		GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE02);
+		break;
+	}
 }
 
 void SceneMgr::SwitchScene(SCENE_TYPE type)
 {
 	GET_SINGLE(UIMgr)->ClearUI(); // UI 초기화
 	GET_SINGLE(InputMgr)->ClearState();
+	GET_SINGLE(FmodMgr)->StopAllSounds(); // 모든 사운드 정지
+
+	// 기존 씬 정리
+	GET_SINGLE(SceneMgr)->GetActiveScene()->Release();
 
 	GET_SINGLE(SceneMgr)->SetSceneType(SCENE_TYPE::LOADING);
 	_activeScene = make_shared<LoadingScene>();
@@ -302,6 +326,9 @@ void SceneMgr::SwitchScene(SCENE_TYPE type)
 	_activeScene->Awake();
 	_activeScene->Start();
 	gameFramework->Update();
+
+	// 로딩 씬 정리
+	GET_SINGLE(SceneMgr)->GetActiveScene()->Release();
 
 	LoadScene(type);
 }

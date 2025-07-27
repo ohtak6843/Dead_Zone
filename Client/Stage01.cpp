@@ -252,6 +252,16 @@ void Stage01::Init()
 		}
 
 		gameObjects[0]->SetName(L"M4A1");
+
+		// 로컬 플레이에 총 추가
+		vector<shared_ptr<Gun>> guns;
+		guns.reserve(gameObjects.size());
+
+		std::transform(gameObjects.begin(), gameObjects.end(), std::back_inserter(guns),
+			[](const shared_ptr<M4A1>& mp) {
+				return static_pointer_cast<Gun>(mp); // 업캐스팅
+			});
+		_localPlayer[0]->AddGun(guns);
 	}
 #pragma endregion
 
@@ -280,6 +290,16 @@ void Stage01::Init()
 		}
 
 		gameObjects[0]->SetName(L"AK47");
+
+		// 로컬 플레이에 총 추가
+		vector<shared_ptr<Gun>> guns;
+		guns.reserve(gameObjects.size());
+
+		std::transform(gameObjects.begin(), gameObjects.end(), std::back_inserter(guns),
+			[](const shared_ptr<AK47>& mp) {
+				return static_pointer_cast<Gun>(mp); // 업캐스팅
+			});
+		_localPlayer[0]->AddGun(guns);
 	}
 #pragma endregion
 
@@ -348,7 +368,7 @@ void Stage01::Init()
 	stageClear->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
 	stageClear->SetTransform(make_shared<Transform>());
 	stageClear->GetTransform()->SetLocalScale(Vec3(600.f, 300.f, 1.f));
-	stageClear->GetTransform()->SetLocalPosition(Vec3(0.f, 200.f, 1.f));
+	stageClear->GetTransform()->SetLocalPosition(Vec3(0.f, 100.f, 1.f));
 	shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
 	{
 		shared_ptr<Mesh> mesh = GET_SINGLE(Resources)->LoadRectangleMesh();
@@ -372,7 +392,4 @@ void Stage01::Init()
 #pragma region Load UI
 	GET_SINGLE(SceneMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
 #pragma endregion
-
-	INPUT->LockCursor(true);
-	gameFramework->ToggleFullScreen(true);
 }

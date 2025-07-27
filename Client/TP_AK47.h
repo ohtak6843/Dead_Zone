@@ -1,8 +1,8 @@
 #pragma once
-#include "GameObject.h"
+#include "Gun.h"
 
 
-class TP_AK47 : public GameObject
+class TP_AK47 : public Gun
 {
 public:
 	TP_AK47();
