@@ -108,6 +108,7 @@ void ReceiverThread(SOCKET clientSocket) {
                         g_loggedIn = true;
                         g_localPlayerId = static_cast<uint32_t>(pOk->playerId);
                         GWindowInfo.local = g_localPlayerId;
+						gameFramework->SetLocalID(g_localPlayerId);
                     }
                     break;
                 }

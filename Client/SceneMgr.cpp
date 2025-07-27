@@ -165,7 +165,8 @@ void SceneMgr::RenderUI()
 		{
 			std::wstringstream wss;
 			wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
-			uint32 ID = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetID();
+			auto WindowInfo = gameFramework->GetWindow();
+			auto ID = WindowInfo.local;
 			uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
 			wss << ID << " - " << hp;
 			GET_SINGLE(UIMgr)->DrawTextUI(

@@ -16,6 +16,8 @@ public:
 
 public:
 	const WindowInfo& GetWindow() { return _window; }
+	void SetWindow(WindowInfo& info) { _window = info; }
+	void SetLocalID(uint32_t id) { _window.local = id; }
 
 	ComPtr<ID3D12Device> GetDevice() { return _device; }
 	ComPtr<IDXGIFactory4> GetDXGI() { return _factory; }
