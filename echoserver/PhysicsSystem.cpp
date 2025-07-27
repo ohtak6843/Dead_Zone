@@ -1,6 +1,6 @@
 #include "PhysicsSystem.h"
 
-constexpr float STEP_VERTICAL_OFF = 10.0f;  // 발이 땅에 붙는 높이
+constexpr float STEP_VERTICAL_OFF = 5.0f;  // 발이 땅에 붙는 높이
 constexpr float STEP_HEIGHT = 50.0f;  // 단차 허용 높이
 
 bool PhysicsSystem::SphereAABBOverlap(

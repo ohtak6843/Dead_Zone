@@ -473,13 +473,13 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
 
     void MatchmakingCheck() {
     std::lock_guard<std::mutex> lock(g_lobbyMutex);
-    while (g_lobbyQueue.size() >= 2) {
+    while (g_lobbyQueue.size() >= 1) {
         PER_SOCKET_CONTEXT* p1 = g_lobbyQueue.front(); g_lobbyQueue.pop();
-        PER_SOCKET_CONTEXT* p2 = g_lobbyQueue.front(); g_lobbyQueue.pop();
+        //PER_SOCKET_CONTEXT* p2 = g_lobbyQueue.front(); g_lobbyQueue.pop();
         /*PER_SOCKET_CONTEXT* p3 = g_lobbyQueue.front(); g_lobbyQueue.pop();*/
 
-        p1->state = p2->state = /*p3->state =*/ STATE_GAME;
-        std::vector<PER_SOCKET_CONTEXT*> players = { p1, p2/*, p3*/ };
+        p1->state = /*p2->state = p3->state =*/ STATE_GAME;
+        std::vector<PER_SOCKET_CONTEXT*> players = { p1/*, p2, p3*/ };
 
         sc_packet_game_start gameStart{};
         gameStart.size = sizeof(sc_packet_game_start);
@@ -509,7 +509,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         new GameRoom(players);
 
         printf("°ÔÀÓ·ë »ý¼º: %s, %s\n",
-            p1->username.c_str(), p2->username.c_str()/*, p3->username.c_str()*/);
+            p1->username.c_str()/*, p2->username.c_str(), p3->username.c_str()*/);
     }
 }
 
