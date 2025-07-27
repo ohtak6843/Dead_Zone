@@ -71,6 +71,8 @@ shared_ptr<Mesh> Mesh::CreateFromFBX(const FbxMeshInfo* meshInfo, FBXLoader& loa
 
 void Mesh::CreateVertexBuffer(const vector<Vertex>& buffer)
 {
+	_rawVertices = buffer;
+
 	_vertexCount = static_cast<uint32>(buffer.size());
 	uint32 bufferSize = _vertexCount * sizeof(Vertex);
 
@@ -99,6 +101,8 @@ void Mesh::CreateVertexBuffer(const vector<Vertex>& buffer)
 
 void Mesh::CreateIndexBuffer(const vector<uint32>& buffer)
 {
+	_rawIndices.push_back(buffer);
+
 	uint32 indexCount = static_cast<uint32>(buffer.size());
 	uint32 bufferSize = indexCount * sizeof(uint32);
 
@@ -246,6 +250,51 @@ void Mesh::CreateBonesAndAnimations(class FBXLoader& loader)
 		}
 	}
 #pragma endregion
+}
+
+void Mesh::UploadAnimation()
+{
+	if (_bones.empty() || _animClips.empty())
+		return;
+
+	// 1. Offset Matrix Buffer
+	const int32 boneCount = static_cast<int32>(_bones.size());
+	vector<Matrix> offsetVec(boneCount);
+	for (int32 i = 0; i < boneCount; ++i)
+		offsetVec[i] = _bones[i].matOffset;
+
+	_offsetBuffer = make_shared<UploadBuffer>();
+	_offsetBuffer->Init(sizeof(Matrix), boneCount, offsetVec.data());
+
+	// 2. Anim Frame Buffers
+	_frameBuffer.clear();
+	for (AnimClipInfo& clip : _animClips)
+	{
+		vector<AnimFrameParams> frameParams;
+		frameParams.resize(boneCount * clip.frameCount);
+
+		for (int32 b = 0; b < boneCount; ++b)
+		{
+			const auto& keyFrames = clip.keyFrames[b];
+			for (int32 f = 0; f < clip.frameCount; ++f)
+			{
+				int32 idx = f * boneCount + b;
+
+				if (f < keyFrames.size())
+				{
+					frameParams[idx] = AnimFrameParams{
+						Vec4(keyFrames[f].scale),
+						keyFrames[f].rotation,
+						Vec4(keyFrames[f].translate)
+					};
+				}
+			}
+		}
+
+		auto frameBuf = make_shared<UploadBuffer>();
+		frameBuf->Init(sizeof(AnimFrameParams), static_cast<uint32>(frameParams.size()), frameParams.data());
+		_frameBuffer.push_back(frameBuf);
+	}
 }
 
 Matrix Mesh::GetMatrix(FbxAMatrix& matrix)

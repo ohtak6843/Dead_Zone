@@ -242,3 +242,6 @@ T Lerp(const T& a, const T& b, float t)
 
 #define RadianToDegree(radian) ((radian) * (180.0f / XM_PI))
 #define DegreeToRadian(degree) ((degree) * (XM_PI / 180.0f))
+
+void WriteWString(ofstream& out, const wstring& str);
+wstring ReadWString(ifstream& in);
