@@ -43,14 +43,14 @@ public:
 	void SetRandomDirection();
 	void SetPauseDuration();
 	void Move();
-	array<shared_ptr<class ParticleObject>, 5> GetParticles() { return _particles; }
+	array<shared_ptr<class ParticleObject>, 20> GetParticles() { return _particles; }
 	shared_ptr<class ParticleObject> FindInactiveParticle();
 
 protected:
 	ZOMBIE_STATE _state;
 	ZombieInfo _info;
-	array<shared_ptr<class ParticleObject>, 5> _particles;
-	array<shared_ptr<class BloodParticle>, 5> _blood;
+	array<shared_ptr<class ParticleObject>, 20> _particles;
+	array<shared_ptr<class BloodParticle>, 20> _blood;
 
 private:
 	bool _initialized = false;
