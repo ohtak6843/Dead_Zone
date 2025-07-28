@@ -32,18 +32,20 @@ Zombie::Zombie(const wstring& infoKey)
 
 
 	// 파티클 생성
-	_particle = make_shared<ParticleObject>();
-	_particle->SetTransform(make_shared<Transform>());
-	_blood = make_shared<BloodParticle>();
-	_particle->SetParticle(_blood);
-
-
+	for (int i = 0; i < _particles.size(); ++i)
+	{
+		_blood[i] = make_shared<BloodParticle>();
+		_particles[i] = make_shared<ParticleObject>();
+		_particles[i]->SetTransform(make_shared<Transform>());
+		_particles[i]->SetCheckFrustum(false);
+		_blood[i]->SetActive(false);
+		_particles[i]->SetParticle(_blood[i]);
+		GET_SINGLE(SceneMgr)->GetActiveScene()->AddGameObject(_particles[i]);
+	}
+	
 	//_particle->GetTransform()->SetParent(GetTransform());
 	//_particle->GetTransform()->SetLocalPosition(Vec3(0.f, 13.f, 100.f));
-	_particle->SetCheckFrustum(false);
 
-	GET_SINGLE(SceneMgr)->GetActiveScene()->AddGameObject(_particle);
-	_blood->SetActive(false);
 }
 
 Zombie::~Zombie()
@@ -157,4 +159,16 @@ void Zombie::Move()
 	Vec3 direction = { 0.f, 0.f, -1.f };
 	pos += direction * _info.walkSpeed * DELTA_TIME;
 	GetTransform()->SetLocalPosition(pos);
+}
+
+shared_ptr<class ParticleObject> Zombie::FindInactiveParticle()
+{
+	for (const auto & partcle : _particles)
+	{
+		if (!partcle->GetParticle()->GetActive())
+		{
+			return partcle;
+		}
+	}
+	return nullptr;
 }

@@ -56,6 +56,7 @@ public:
 	void SetParticleType(int32 type) { _type = type; }
 
 	void SetActive(bool active) { _isActive = active; _elapsedTime = 0.0f; _accTime = 0.f; }
+	bool GetActive() const { return _isActive; }
 
 public:
 	shared_ptr<GameObject> GetGameObject() { return _gameObject.lock(); }
