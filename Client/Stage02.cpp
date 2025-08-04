@@ -21,6 +21,8 @@
 #include "JsonMgr.h"
 #include "FmodMgr.h"
 
+#include "Zombie.h"
+
 Stage02::Stage02()
 {
 }
@@ -341,5 +343,24 @@ void Stage02::Init()
 
 #pragma region Load UI
 	GET_SINGLE(SceneMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
+#pragma endregion
+
+#pragma region Test Zombie
+	shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\test.fbx");
+
+	for (int i = 0; i < 30; i++)
+	{
+		Vec3 position = Vec3(i * 100, 0.f, i* 100.f);
+		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate(ColliderType::OBB);
+
+		for (auto& gameObject : gameObjects)
+		{
+			gameObject->SetStatic(false);
+			gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 180.f, 0.f));
+			gameObject->GetTransform()->SetLocalPosition(position);
+			gameObject->GetAnimator()->Play(i % 3);
+			AddGameObject(gameObject);
+		}
+	}
 #pragma endregion
 }
