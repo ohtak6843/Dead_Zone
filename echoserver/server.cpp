@@ -58,6 +58,15 @@ void MatchmakingCheck();
 void WorkerThread(HANDLE hIOCP);
 
 void PostSendPacket(PER_SOCKET_CONTEXT* pContext, const void* packet, size_t packetSize) {
+    {
+        auto buf = reinterpret_cast<const unsigned char*>(packet);
+        unsigned char pktSize = buf[0];
+        unsigned char pktType = buf[1];
+        printf("[Send] socket=%d  Size=%u  Type=%u\n",
+            pContext->socket,
+            pktSize,
+            pktType);
+        }
     PER_IO_DATA* pIoData = new PER_IO_DATA;
     memcpy(pIoData->buffer, packet, packetSize);
     pIoData->wsabuf.buf = pIoData->buffer;
@@ -185,6 +194,7 @@ void WorkerThread(HANDLE) {
             newContext->moveX = newContext->moveY = newContext->moveZ = 0.0f;
             newContext->isJumping = true;
             newContext->verticalVelocity = 0.0f;
+            newContext->damage = 20;
 
             CreateIoCompletionPort((HANDLE)acceptedSocket, g_hIOCP, (ULONG_PTR)newContext, 0);
             PER_IO_DATA* pRecvIoData = new PER_IO_DATA;
@@ -274,6 +284,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         pContext->moveZ = 0.0f;
         pContext->isJumping = true;
         pContext->verticalVelocity = 0.0f;
+        pContext->damage = 20;
 
         sc_packet_login_ok loginOk;
         loginOk.size = sizeof(sc_packet_login_ok);
@@ -337,8 +348,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
             if (it == room->zombies.end()) break;  // 없으면 무시
 
             //  데미지 적용
-            constexpr int DAMAGE = 10;
-            it->health -= DAMAGE;
+            it->health -= pContext->damage;
 
             //  HP가 0 이하일 때만 죽음 처리
             if (it->health <= 0) {
@@ -366,6 +376,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
                     stagePkt.type = S2C_P_STAGE_CLEAR;
                     for (auto* peer : room->players)
                         PostSendPacket(peer, &stagePkt, stagePkt.size);
+                    room->SendAugmentOptions();
                 }
                 else if (room->currentStage == maxStage && room->killCount >= 3) {
                         room->zombies.clear();
@@ -385,24 +396,18 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
     }
 
     case C2S_P_JUMP: {
-        if (bytesTransferred < sizeof(cs_packet_jump) || pContext->isJumping)
-            break;
-
-        auto* req = reinterpret_cast<cs_packet_jump*>(pIoData->buffer);
-        float initialVelocity = req->initVelocity;
-
-        pContext->verticalVelocity = initialVelocity;
-        pContext->isJumping = true;
-
-        sc_packet_jump ev{};
-        ev.size = sizeof(ev);
-        ev.type = S2C_P_JUMP;
-        ev.playerId = pContext->socket;
-        ev.initVelocity = initialVelocity;
-        if (auto* room = FindGameRoomForPlayer(pContext)) {
-            for (auto* peer : room->players)
-                if (peer != pContext)
-                    PostSendPacket(peer, &ev, ev.size);
+        if (auto* room = FindGameRoomForPlayer(pContext)) {            
+                    room->killCount = 0;
+                    room->nextStage = room->currentStage + 1;
+                    room->stageChangeTimer = 10.0f;
+                    room->zombies.clear();
+                    room->spawnPaused = true;
+                    sc_packet_stage_clear stagePkt{};
+                    stagePkt.size = sizeof(stagePkt);
+                    stagePkt.type = S2C_P_STAGE_CLEAR;
+                    for (auto* peer : room->players)
+                        PostSendPacket(peer, &stagePkt, stagePkt.size);
+                             
         }
         break;
     }
@@ -474,6 +479,16 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
             }
             break;
         }
+    case C2S_P_AUGMENT_SELECT: {
+        if (bytesTransferred < sizeof(cs_packet_augment_select))
+            break;
+        auto* pkt = reinterpret_cast<cs_packet_augment_select*>(pIoData->buffer);
+        uint8_t idx = pkt->selectedIndex;
+        if (auto* room = FindGameRoomForPlayer(pContext)) {
+            room->HandleAugmentSelect(pContext, idx);
+        }
+        break;
+    }
     default: {
         printf("정의되지 않은 패킷 타입: %d\n", packetType);
         break;
@@ -481,29 +496,37 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
     }
 }
 
-    void MatchmakingCheck() {
+constexpr size_t kMaxPlayers = 1;
+
+void MatchmakingCheck() {
     std::lock_guard<std::mutex> lock(g_lobbyMutex);
-    while (g_lobbyQueue.size() >= 1) {
-        PER_SOCKET_CONTEXT* p1 = g_lobbyQueue.front(); g_lobbyQueue.pop();
-        //PER_SOCKET_CONTEXT* p2 = g_lobbyQueue.front(); g_lobbyQueue.pop();
-        /*PER_SOCKET_CONTEXT* p3 = g_lobbyQueue.front(); g_lobbyQueue.pop();*/
 
-        p1->state = /*p2->state = p3->state =*/ STATE_GAME;
-        std::vector<PER_SOCKET_CONTEXT*> players = { p1/*, p2, p3*/ };
-
-        sc_packet_game_start gameStart{};
-        gameStart.size = sizeof(sc_packet_game_start);
-        gameStart.type = S2C_P_GAME_START;
-        {
-            std::lock_guard<std::mutex> lock2(g_playersMutex);
-            for (auto* pl : players)
-                PostSendPacket(pl, &gameStart, gameStart.size);
+    while (g_lobbyQueue.size() >= kMaxPlayers) {
+        std::vector<PER_SOCKET_CONTEXT*> players;
+        players.reserve(kMaxPlayers);
+        for (size_t i = 0; i < kMaxPlayers; ++i) {
+            players.push_back(g_lobbyQueue.front());
+            g_lobbyQueue.pop();
         }
 
         for (auto* pl : players) {
-            sc_packet_player_info info{};
-            info.size = sizeof(sc_packet_player_info);
-            info.type = S2C_P_PLAYER_INFO;
+            pl->state = STATE_GAME;
+        }
+
+        sc_packet_game_start gameStart{};
+        gameStart.size = sizeof(gameStart);
+        gameStart.type = S2C_P_GAME_START;
+        {
+            std::lock_guard<std::mutex> lock2(g_playersMutex);
+            for (auto* pl : players) {
+                PostSendPacket(pl, &gameStart, gameStart.size);
+            }
+        }
+
+        sc_packet_player_info info{};
+        info.size = sizeof(info);
+        info.type = S2C_P_PLAYER_INFO;
+        for (auto* pl : players) {
             info.playerId = pl->socket;
             info.position = { pl->posX, pl->posY, pl->posZ };
             info.health = pl->health;
@@ -511,15 +534,19 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
             info.runSpeed = pl->runSpeed;
             info.faintCount = pl->faintCount;
             info.isFainted = pl->isFainted;
-
-            for (auto* peer : players)
+            for (auto* peer : players) {
                 PostSendPacket(peer, &info, info.size);
+            }
         }
 
         new GameRoom(players);
 
-        printf("게임룸 생성: %s, %s\n",
-            p1->username.c_str()/*, p2->username.c_str(), p3->username.c_str()*/);
+        std::ostringstream oss;
+        oss << "게임룸 생성:";
+        for (auto* pl : players) {
+            oss << " " << pl->username;
+        }
+        printf("%s\n", oss.str().c_str());
     }
 }
 

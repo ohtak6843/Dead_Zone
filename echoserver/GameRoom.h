@@ -7,6 +7,7 @@
 #include <vector>
 #include "MapColliderLoader.h"
 #include "Pathfinding.h"
+#include <unordered_map>
 
 // 활성 방 목록 전방 선언
 class GameRoom;
@@ -37,6 +38,10 @@ public:
     int nextStage = 1;
     bool     spawnPaused = false;
     std::vector<Zombie>              zombies;
+    std::vector<uint8_t>                          augmentOptions;
+    std::unordered_map<PER_SOCKET_CONTEXT*, bool>  hasSelected;
+    void SendAugmentOptions();
+    void HandleAugmentSelect(PER_SOCKET_CONTEXT * pContext, uint8_t idx);
 private:
     
     uint32_t                          snapshotFrameCount = 0;

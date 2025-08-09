@@ -7,6 +7,7 @@
 #include <chrono>
 #include <cmath>
 #include <limits>
+#include <random>
 #include "PhysicsSystem.h"
 
 constexpr float MAP_MIN_X = 237.0f;
@@ -51,7 +52,7 @@ void GameRoom::Update(float dt)
     HandlePlayerCollisions();
 	SpawnZombies();
     UpdateZombies(dt);
-    BroadcastSnapshots();
+    //BroadcastSnapshots();
     // ─── 스테이지 전환 타이머 처리 ───
     if (stageChangeTimer >= 0.0f) {
         stageChangeTimer -= dt;
@@ -261,8 +262,8 @@ void GameRoom::SpawnZombies()
     auto now = std::chrono::steady_clock::now();
 
     // 스테이지별 최대 & 틱당 소환 개수
-    int  maxCount = (currentStage == 1) ? 10 : 30;
-    int  batchSize = (currentStage == 1) ? 1 : 10;
+    int  maxCount = (currentStage == 1) ? 30 : 10;
+    int  batchSize = (currentStage == 1) ? 30 : 10;
 
     // 이미 최대 마리수 도달했거나, 인터벌이 지나지 않았다면 리턴
     if ((int)zombies.size() >= maxCount || now - lastSpawn < spawnInterval)
@@ -301,8 +302,8 @@ void GameRoom::SpawnZombies()
         // 2) 타입 확률
         int pct = rand() % 100;
         ZombieType type;
-        if (pct < 70)           type = ZombieType::BASIC;
-        else if (pct < 90)      type = ZombieType::ELITE;
+        if (pct < 100)           type = ZombieType::BASIC;
+        else if (pct < 0)      type = ZombieType::ELITE;
         else                    type = ZombieType::POLICE;
 
         // 3) 벡터에 추가
@@ -333,6 +334,9 @@ void GameRoom::UpdateZombies(float dt)
 {
     HandleZombiePhysics(dt);
     HandleZombieCollisions();
+    std::vector<sc_packet_zombie_snapshot::Entry> changed;
+    changed.reserve(zombies.size());
+    
     for (auto& z : zombies) {
         z.attackCooldown -= dt;
         if (z.attackCooldown < 0.0f) z.attackCooldown = 0.0f;
@@ -403,7 +407,13 @@ void GameRoom::UpdateZombies(float dt)
             // (z.y는 바닥 충돌 로직으로 이미 고정되어 있어야 합니다)
 
             // 7) 브로드캐스트
-            BroadcastZombieMove(z, appliedDx, appliedDz);
+            changed.push_back(
+                sc_packet_zombie_snapshot::Entry{
+                    static_cast<uint32_t>(z.id),     // ← 명시적 캐스트
+                    Vector3{ z.x, z.y, z.z }
+                }
+            );
+            //BroadcastZombieMove(z, appliedDx, appliedDz);
         }
         else {
             if (z.wanderTime > 0.0f) {
@@ -411,7 +421,13 @@ void GameRoom::UpdateZombies(float dt)
                 float dx = z.wanderDirX * z.walkSpeed * dt;
                 float dz = z.wanderDirZ * z.walkSpeed * dt;
                 z.x += dx;  z.z += dz;
-                BroadcastZombieMove(z, dx, dz);
+                changed.push_back(
+                    sc_packet_zombie_snapshot::Entry{
+                        static_cast<uint32_t>(z.id),     // ← 명시적 캐스트
+                        Vector3{ z.x, z.y, z.z }
+                    }
+                );
+                //BroadcastZombieMove(z, dx, dz);
                 z.wanderTime -= dt;
             }
             else if (z.idleTime > 0.0f) {
@@ -425,6 +441,34 @@ void GameRoom::UpdateZombies(float dt)
                 z.wanderTime = 5.0f + (rand() / (float)RAND_MAX) * 3.0f;
                 z.idleTime = 1.0f + (rand() / (float)RAND_MAX) * 1.0f;
             }
+        }
+    }
+    if (!changed.empty()) {
+        constexpr size_t entrySz = sizeof(sc_packet_zombie_snapshot::Entry);          // 16
+        constexpr size_t headerSz = offsetof(sc_packet_zombie_snapshot, entries);      // 3
+        constexpr size_t maxPacket = 255;                                              // uint8_t 한계
+        constexpr size_t maxEntries = (maxPacket - headerSz) / entrySz;                // =15
+
+        // i는 changed 인덱스, 한 번에 maxEntries개씩 잘라 보낸다
+        for (size_t i = 0; i < changed.size(); i += maxEntries) {
+            size_t remain = changed.size() - i;
+            // std::min 쓰지 않고 직접 비교
+            size_t chunkCount = (remain > maxEntries) ? maxEntries : remain;
+
+            size_t packetSz = headerSz + chunkCount * entrySz;
+            char* buf = reinterpret_cast<char*>(malloc(packetSz));
+            auto* pkt = reinterpret_cast<sc_packet_zombie_snapshot*>(buf);
+            pkt->size = static_cast<uint8_t>(packetSz);
+            pkt->type = S2C_P_ZOMBIE_SNAPSHOT;
+            pkt->count = static_cast<uint8_t>(chunkCount);
+
+            // 복사
+            memcpy(pkt->entries, changed.data() + i, chunkCount * entrySz);
+
+            for (auto* peer : players)
+                PostSendPacket(peer, buf, packetSz);
+
+            free(buf);
         }
     }
 }
@@ -457,49 +501,6 @@ void GameRoom::BroadcastZombieMove(const Zombie& z, float dx, float dz)
         PostSendPacket(peer, &mvPkt, mvPkt.size);
 }
 
-//void GameRoom::ClampZombiePosition(Zombie& z)
-//{
-//    if (z.x - ZOMBIE_RADIUS < MAP_MIN_X)  z.x = MAP_MIN_X + ZOMBIE_RADIUS;
-//    else if (z.x + ZOMBIE_RADIUS > MAP_MAX_X) z.x = MAP_MAX_X - ZOMBIE_RADIUS;
-//    if (z.z - ZOMBIE_RADIUS < MAP_MIN_Z)  z.z = MAP_MIN_Z + ZOMBIE_RADIUS;
-//    else if (z.z + ZOMBIE_RADIUS > MAP_MAX_Z) z.z = MAP_MAX_Z - ZOMBIE_RADIUS;
-//    if (z.y < MAP_MIN_Y) z.y = MAP_MIN_Y;
-//    else if (z.y > MAP_MAX_Y) z.y = MAP_MAX_Y;
-//}
-
-void GameRoom::BroadcastSnapshots()
-{
-    if (++snapshotFrameCount < snapshotFrameInterval) return;
-
-    uint8_t count = static_cast<uint8_t>(players.size());
-    size_t headerSize = offsetof(sc_packet_snapshot, entries);
-    size_t entrySize = sizeof(sc_packet_snapshot::Entry);
-    size_t totalSize = headerSize + count * entrySize;
-
-    char* buf = reinterpret_cast<char*>(malloc(totalSize));
-    if (!buf) {
-        std::cerr << "[Error] snapshot buf alloc failed: " << totalSize << " bytes\n";
-        snapshotFrameCount = 0;
-        return;
-    }
-
-    auto* hdr = reinterpret_cast<sc_packet_snapshot*>(buf);
-    hdr->size = static_cast<unsigned char>(totalSize);
-    hdr->type = S2C_P_SNAPSHOT;
-    hdr->count = count;
-
-    for (int i = 0; i < count; ++i) {
-        auto* p = players[i];
-        hdr->entries[i].playerId = p->socket;
-        hdr->entries[i].position = { p->posX, p->posY, p->posZ };
-    }
-
-    for (auto* peer : players)
-        PostSendPacket(peer, buf, totalSize);
-    free(buf);
-    snapshotFrameCount = 0;
-}
-
 void GameRoom::RemoveZombieById(long long zombieId)
 {
     auto it = std::find_if(zombies.begin(), zombies.end(),
@@ -508,5 +509,82 @@ void GameRoom::RemoveZombieById(long long zombieId)
         });
     if (it != zombies.end()) {
         zombies.erase(it);
+    }
+}
+
+void GameRoom::SendAugmentOptions() {
+    static const std::vector<uint8_t> allAugments = {
+        0, // 플레이어 공격력 증강
+        1, // 좀비 공격력 저하
+        2, // 플레이어 체력 회복
+        // 3,4,5... 나중에 추가할 증강체 ID
+    };
+
+    std::vector<uint8_t> pool = allAugments;
+    std::random_device rd;
+    std::mt19937       gen(rd());
+    std::shuffle(pool.begin(), pool.end(), gen);
+
+    const size_t pickN = 3;
+    augmentOptions.assign(pool.begin(), pool.begin() + pickN);
+
+    hasSelected.clear();
+
+    uint8_t cnt = static_cast<uint8_t>(augmentOptions.size());
+    size_t  hdr = offsetof(sc_packet_augment_options, options);
+    size_t  packetSize = hdr + cnt * sizeof(uint8_t);
+
+    char* buf = reinterpret_cast<char*>(malloc(packetSize));
+    auto* pkt = reinterpret_cast<sc_packet_augment_options*>(buf);
+    pkt->size = static_cast<uint8_t>(packetSize);
+    pkt->type = S2C_P_AUGMENT_OPTIONS;
+    pkt->count = cnt;
+    memcpy(pkt->options, augmentOptions.data(), cnt);
+
+    for (auto* peer : players)
+        PostSendPacket(peer, buf, packetSize);
+
+    free(buf);
+}
+
+void GameRoom::HandleAugmentSelect(PER_SOCKET_CONTEXT * pContext, uint8_t idx) {
+    if (hasSelected[pContext]) return;
+    if (idx >= augmentOptions.size()) return;
+    hasSelected[pContext] = true;
+
+    uint8_t option = augmentOptions[idx];
+    switch (option) {
+    case 0: 
+        pContext->damage *= 1.5f;
+        std::cout << "[서버] Player " << pContext->socket
+            << " 공격력 1.5배 버프 적용\n";
+        break;
+
+    case 1: // 좀비 공격력 저하
+        for (auto& z : zombies) {
+            z.attack = static_cast<int>(z.attack * 0.5f);
+        }
+        std::cout << "[서버] 모든 좀비 공격력 50% 감소 적용\n";
+        break;
+
+    case 2: // 플레이어 체력 회복
+        // 최대 체력은 100으로 가정
+        pContext->health = 100;
+        {
+            sc_packet_player_health hpPkt{};
+            hpPkt.size = sizeof(hpPkt);
+            hpPkt.type = S2C_P_PLAYER_HEALTH;
+            hpPkt.playerId = pContext->socket;
+            hpPkt.health = pContext->health;
+            for (auto* peer : players)
+                PostSendPacket(peer, &hpPkt, hpPkt.size);
+        }
+        std::cout << "[서버] Player " << pContext->socket
+            << " 체력 +50 회복 적용 (현재 " << pContext->health << ")\n";
+        break;
+
+    default:
+        std::cout << "[서버] 알 수 없는 증강체 옵션: " << int(option) << "\n";
+        break;
     }
 }
