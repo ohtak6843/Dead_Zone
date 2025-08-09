@@ -448,6 +448,14 @@ void Scene::AddZombie(sc_packet_spawn_zombie* packet)
 			zombieObjects.push_back(static_pointer_cast<Zombie>(z));
 		break;
 	}
+	case ZOMBIE_TYPE::BOSS:
+	{
+		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\EliteZombie.fbx");
+		auto specificZombies = meshData->InstantiateAs<EliteZombie>(ColliderType::OBB);
+		for (auto& z : specificZombies)
+			zombieObjects.push_back(static_pointer_cast<Zombie>(z));
+		break;
+	}
 	}
 	/*shared_ptr<Zombie> obj = make_shared<Zombie>();
 	obj->SetName(L"OBJ");

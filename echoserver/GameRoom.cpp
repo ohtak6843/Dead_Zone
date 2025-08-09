@@ -94,6 +94,9 @@ void GameRoom::Update(float dt)
             gameClearTimer = -1.0f;  // 재발 방지
         }
     }
+    if (bossPhaseRequested.exchange(false)) {
+        StartBossPhase_Internal();
+    }
 }
 
 void GameRoom::HandlePlayerPhysics(float dt)
@@ -338,6 +341,32 @@ void GameRoom::UpdateZombies(float dt)
     changed.reserve(zombies.size());
     
     for (auto& z : zombies) {
+        /*if (z.type == ZombieType::BOSS)
+        {
+            bossTimer -= dt;
+            if (bossTimer <= 0.0f) {
+                bossTimer = 10.0f;
+
+                const float waveRadius2 = 600.0f * 600.0f;
+                const int   waveDamage = 15;
+                for (auto* p : players) {
+                    float dx = p->posX - z.x;
+                    float dz = p->posZ - z.z;
+                    if (dx * dx + dz * dz <= waveRadius2) {
+                       int newHp = p->health - waveDamage;
+                       if (newHp < 0) newHp = 0;
+                            p->health = newHp;
+
+                        sc_packet_player_health hpPkt{};
+                        hpPkt.size = sizeof(hpPkt);
+                        hpPkt.type = S2C_P_PLAYER_HEALTH;
+                        hpPkt.playerId = p->socket;
+                        hpPkt.health = p->health;
+                        for (auto* peer : players) PostSendPacket(peer, &hpPkt, hpPkt.size);
+                    }
+                }
+            }
+        }*/
         z.attackCooldown -= dt;
         if (z.attackCooldown < 0.0f) z.attackCooldown = 0.0f;
 
@@ -514,10 +543,11 @@ void GameRoom::RemoveZombieById(long long zombieId)
 
 void GameRoom::SendAugmentOptions() {
     static const std::vector<uint8_t> allAugments = {
-        0, // 플레이어 공격력 증강
-        1, // 좀비 공격력 저하
-        2, // 플레이어 체력 회복
-        // 3,4,5... 나중에 추가할 증강체 ID
+      0, // 플레이어 공격력 증강
+      1, // 좀비 공격력 저하
+      2, // 플레이어 최대체력 1.5배
+      3, // 이동속도 +20%
+      4, // 좀비 이동속도 감소 0.8배
     };
 
     std::vector<uint8_t> pool = allAugments;
@@ -547,44 +577,97 @@ void GameRoom::SendAugmentOptions() {
     free(buf);
 }
 
-void GameRoom::HandleAugmentSelect(PER_SOCKET_CONTEXT * pContext, uint8_t idx) {
+void GameRoom::HandleAugmentSelect(PER_SOCKET_CONTEXT* pContext, uint8_t idx) {
     if (hasSelected[pContext]) return;
     if (idx >= augmentOptions.size()) return;
     hasSelected[pContext] = true;
 
     uint8_t option = augmentOptions[idx];
     switch (option) {
-    case 0: 
+    case 0: { // 플레이어 공격력 증강
         pContext->damage *= 1.5f;
         std::cout << "[서버] Player " << pContext->socket
-            << " 공격력 1.5배 버프 적용\n";
+            << " 공격력 x1.5 적용\n";
         break;
-
-    case 1: // 좀비 공격력 저하
+    }
+    case 1: { // 좀비 공격력 저하
         for (auto& z : zombies) {
             z.attack = static_cast<int>(z.attack * 0.5f);
         }
-        std::cout << "[서버] 모든 좀비 공격력 50% 감소 적용\n";
+        std::cout << "[서버] 좀비 공격력 x0.5 적용\n";
         break;
-
-    case 2: // 플레이어 체력 회복
-        // 최대 체력은 100으로 가정
-        pContext->health = 100;
-        {
-            sc_packet_player_health hpPkt{};
-            hpPkt.size = sizeof(hpPkt);
-            hpPkt.type = S2C_P_PLAYER_HEALTH;
-            hpPkt.playerId = pContext->socket;
-            hpPkt.health = pContext->health;
-            for (auto* peer : players)
-                PostSendPacket(peer, &hpPkt, hpPkt.size);
-        }
+    }
+    case 2: { // 플레이어 최대체력 1.5배 
+        pContext->health = static_cast<int>(pContext->health * 1.5f);
+        sc_packet_player_health hp{};
+        hp.size = sizeof(hp);
+        hp.type = S2C_P_PLAYER_HEALTH;
+        hp.playerId = pContext->socket;
+        hp.health = pContext->health;
+        for (auto* peer : players) PostSendPacket(peer, &hp, hp.size);
         std::cout << "[서버] Player " << pContext->socket
-            << " 체력 +50 회복 적용 (현재 " << pContext->health << ")\n";
+            << " 최대체력 x1.5  (" << pContext->health << ")\n";
         break;
-
+    }
+    case 3: { // 이동속도 +20%
+        pContext->walkSpeed *= 1.2f;
+        std::cout << "[서버] Player " << pContext->socket
+            << " 이동속도 +20% 적용\n";
+        break;
+    }
+    case 4: { // 좀비 이동속도 감소
+        for (auto& z : zombies) {
+            z.walkSpeed = static_cast<int>(z.walkSpeed * 0.8f);
+        }
+        std::cout << "[서버] 좀비 이동속도 x0.8 적용\n";
+        break;
+    }
     default:
         std::cout << "[서버] 알 수 없는 증강체 옵션: " << int(option) << "\n";
         break;
     }
+}
+
+void GameRoom::QueueStartBossPhase(const Vector3& pos) {
+    bossSpawnPos = pos;
+    bossPhaseRequested = true;
+}
+
+void GameRoom::SpawnBoss(float x, float y, float z)
+{
+    Zombie boss(ZombieType::BOSS);
+    boss.x = x; boss.y = y; boss.z = z;
+    boss.id = nextZombieId++;
+    boss.state = Zombie::IDLE;
+
+    zombies.push_back(boss);
+    bossId = boss.id;
+    bossSpawned = true;
+    bossTimer = 5.0f;
+
+    sc_packet_spawn_zombie pkt{};
+    pkt.size = sizeof(pkt);
+    pkt.type = S2C_P_SPAWN_ZOMBIE;
+    pkt.zombieId = boss.id;
+    pkt.position = { boss.x, boss.y, boss.z };
+    pkt.zombieType = static_cast<unsigned char>(ZombieType::BOSS);
+    for (auto* peer : players) PostSendPacket(peer, &pkt, pkt.size);
+}
+
+void GameRoom::StartBossPhase_Internal()
+{
+    spawnPaused = true;
+
+    for (const auto& z : zombies) {
+        sc_packet_zombie_die diePkt{};
+        diePkt.size = sizeof(diePkt);
+        diePkt.type = S2C_P_ZOMBIE_DIE;
+        diePkt.zombieId = z.id;
+        for (auto* peer : players) PostSendPacket(peer, &diePkt, diePkt.size);
+    }
+    zombies.clear();
+
+    SpawnBoss(bossSpawnPos.x, bossSpawnPos.y, bossSpawnPos.z);
+
+    std::cout << "[서버] 보스 페이즈 시작! bossId=" << bossId << "\n";
 }

@@ -340,55 +340,58 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         long long zid = pkt->zombieId;
 
         if (auto* room = FindGameRoomForPlayer(pContext)) {
-            //  벡터에서 해당 좀비 객체 찾기
             auto it = std::find_if(
                 room->zombies.begin(), room->zombies.end(),
                 [zid](const Zombie& z) { return z.id == zid; }
             );
-            if (it == room->zombies.end()) break;  // 없으면 무시
+            if (it == room->zombies.end()) break;
 
-            //  데미지 적용
             it->health -= pContext->damage;
 
-            //  HP가 0 이하일 때만 죽음 처리
             if (it->health <= 0) {
+                const bool wasBoss = (it->type == ZombieType::BOSS);
                 sc_packet_zombie_die diePkt{};
-                diePkt.size = static_cast<unsigned char>(sizeof(diePkt));
+                diePkt.size = sizeof(diePkt);
                 diePkt.type = S2C_P_ZOMBIE_DIE;
                 diePkt.zombieId = zid;
-                for (auto* peer : room->players)
-                    PostSendPacket(peer, &diePkt, diePkt.size);
+                for (auto* peer : room->players) PostSendPacket(peer, &diePkt, diePkt.size);
 
                 room->zombies.erase(it);
-                room->killCount++;
 
-                const int killThreshold = 1;
-                const int maxStage = 2;
-                if (room->killCount >= killThreshold && room->currentStage < maxStage) 
-                {
-                    room->killCount = 0;
-                    room->nextStage = room->currentStage + 1;
-                    room->stageChangeTimer = 10.0f;
-                    room->zombies.clear();
+                if (wasBoss) {
                     room->spawnPaused = true;
-                    sc_packet_stage_clear stagePkt{};
-                    stagePkt.size = sizeof(stagePkt);
-                    stagePkt.type = S2C_P_STAGE_CLEAR;
-                    for (auto* peer : room->players)
-                        PostSendPacket(peer, &stagePkt, stagePkt.size);
-                    room->SendAugmentOptions();
-                }
-                else if (room->currentStage == maxStage && room->killCount >= 3) {
-                        room->zombies.clear();
-                    room->spawnPaused = true;
-                    room->killCount = 0;
+                    room->bossSpawned = false;
+                    room->bossId = -1;
                     room->gameClearTimer = 10.0f;
 
                     sc_packet_game_clear clearPkt{};
                     clearPkt.size = sizeof(clearPkt);
                     clearPkt.type = S2C_P_GAME_CLEAR;
-                    for (auto* peer : room->players)
-                        PostSendPacket(peer, &clearPkt, clearPkt.size);
+                    for (auto* peer : room->players) PostSendPacket(peer, &clearPkt, clearPkt.size);
+                }
+                else {
+                    room->killCount++;
+                    const int killThresholdSt1 = 1;
+                    if (room->currentStage == 1 && room->killCount >= killThresholdSt1) {
+                        room->killCount = 0;
+                        room->nextStage = room->currentStage + 1;
+                        room->stageChangeTimer = 10.0f;
+                        room->zombies.clear();
+                        room->spawnPaused = true;
+
+                        sc_packet_stage_clear stagePkt{};
+                        stagePkt.size = sizeof(stagePkt);
+                        stagePkt.type = S2C_P_STAGE_CLEAR;
+                        for (auto* peer : room->players) PostSendPacket(peer, &stagePkt, stagePkt.size);
+
+                        room->SendAugmentOptions();
+                    }
+
+                    const int killThresholdSt2 = 3; 
+                    if (room->currentStage == 2 && !room->bossSpawned && room->killCount >= killThresholdSt2) {
+                        room->killCount = 0;
+                        room->QueueStartBossPhase({ 2025.f, 0.f, 3974.f });
+                    }
                 }
             }
         }
@@ -480,8 +483,6 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
             break;
         }
     case C2S_P_AUGMENT_SELECT: {
-        if (bytesTransferred < sizeof(cs_packet_augment_select))
-            break;
         auto* pkt = reinterpret_cast<cs_packet_augment_select*>(pIoData->buffer);
         uint8_t idx = pkt->selectedIndex;
         if (auto* room = FindGameRoomForPlayer(pContext)) {

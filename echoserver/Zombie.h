@@ -9,12 +9,11 @@ enum ZombieType {
     BASIC,              // 기본1 좀비
     POLICE,             // 경찰 좀비
     ELITE,              // 엘리트 좀비
-
+    BOSS,               // 보스 좀비
     RUNNING,            // 뛰는 좀비
     CHARGER,            // 차저 좀비
     BOOMER,             // 부머 좀비
-    HUNTER,             // 헌터 좀비
-    BOSS                // 보스 좀비
+    HUNTER              // 헌터 좀비
 };
 
 // 보스 좀비의 상태 열거형 (보스 좀비에만 해당)

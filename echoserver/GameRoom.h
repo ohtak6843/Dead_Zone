@@ -37,11 +37,18 @@ public:
     float    gameClearTimer = -1.0f;
     int nextStage = 1;
     bool     spawnPaused = false;
+    bool      bossSpawned = false;   
+    long long bossId = -1;     
+    float     bossTimer = 0.0f; // 보스 패턴 타이머
     std::vector<Zombie>              zombies;
     std::vector<uint8_t>                          augmentOptions;
     std::unordered_map<PER_SOCKET_CONTEXT*, bool>  hasSelected;
     void SendAugmentOptions();
     void HandleAugmentSelect(PER_SOCKET_CONTEXT * pContext, uint8_t idx);
+    std::atomic<bool> bossPhaseRequested{ false };
+    Vector3 bossSpawnPos{ 2025.f, 0.f, 3974.f };
+    void SpawnBoss(float x, float y, float z);
+    void QueueStartBossPhase(const Vector3& pos);
 private:
     
     uint32_t                          snapshotFrameCount = 0;
@@ -67,4 +74,5 @@ private:
     void HandleZombieCollisions();
 
     void BroadcastSnapshots();
+    void StartBossPhase_Internal();
 };
