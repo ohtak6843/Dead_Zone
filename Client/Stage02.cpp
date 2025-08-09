@@ -346,21 +346,21 @@ void Stage02::Init()
 #pragma endregion
 
 #pragma region Test Zombie
-	shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\test.fbx");
+	//shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Prisoner.fbx");
 
-	for (int i = 0; i < 30; i++)
-	{
-		Vec3 position = Vec3(i * 100, 0.f, i* 100.f);
-		vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate(ColliderType::OBB);
+	//for (int i = 0; i < 20; i++)
+	//{
+	//	Vec3 position = Vec3(i * 50, 0.f, i* 50.f);
+	//	vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate(ColliderType::OBB);
 
-		for (auto& gameObject : gameObjects)
-		{
-			gameObject->SetStatic(false);
-			gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 180.f, 0.f));
-			gameObject->GetTransform()->SetLocalPosition(position);
-			gameObject->GetAnimator()->Play(i % 3);
-			AddGameObject(gameObject);
-		}
-	}
+	//	for (auto& gameObject : gameObjects)
+	//	{
+	//		gameObject->SetStatic(false);
+	//		gameObject->GetTransform()->SetLocalRotation(Vec3(-90.f, 180.f, 0.f));
+	//		gameObject->GetTransform()->SetLocalPosition(position);
+	//		//gameObject->GetAnimator()->Play(i % 3);
+	//		AddGameObject(gameObject);
+	//	}
+	//}
 #pragma endregion
 }
