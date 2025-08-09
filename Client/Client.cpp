@@ -40,6 +40,8 @@ uint32_t g_localPlayerId = 0;
 std::atomic<bool>    g_stageChangeRequested{ false };
 std::atomic<uint8_t> g_requestedStage{ 0 };
 
+std::atomic<bool>    g_augmentActive{ false };
+std::atomic<uint8_t> g_augmentCount{ 0 };
 // 네트워크 초기화 함수
 bool InitNetwork(const std::string& serverIp) {
     WSADATA wsaData;
@@ -91,16 +93,6 @@ void ReceiverThread(SOCKET clientSocket) {
                 char* packet = buf.data() + offset;
                 uint8_t pktType = static_cast<uint8_t>(packet[1]);
 
-                std::ostringstream oss;
-                oss << "[서버 응답] Packet: Size=" << static_cast<int>(pktSize)
-                    << ", Type=" << static_cast<int>(pktType)
-                    << ", Raw Data: ";
-                for (int i = 0; i < pktSize; ++i) {
-                    oss << std::hex << std::setw(2) << std::setfill('0')
-                        << (static_cast<int>(static_cast<unsigned char>(packet[i]))) << " ";
-                }
-                std::cout << "\n" << oss.str() << std::endl;
-
                 switch (pktType) {
                 case S2C_P_LOGIN_OK: {
                     auto* pOk = reinterpret_cast<sc_packet_login_ok*>(packet);
@@ -127,6 +119,7 @@ void ReceiverThread(SOCKET clientSocket) {
                         ->MovePlayer(pMove);
                     break;
                 }
+                               /*
                 case S2C_P_JUMP: {
                     auto* pJump = reinterpret_cast<sc_packet_jump*>(packet);
                     GET_SINGLE(SceneMgr)
@@ -141,30 +134,27 @@ void ReceiverThread(SOCKET clientSocket) {
                         ->LandPlayer(pLand);
                     break;
                 }
-                case S2C_P_SNAPSHOT: {
-                    auto* pSnap = reinterpret_cast<sc_packet_snapshot*>(packet);
-                    GET_SINGLE(SceneMgr)
-                        ->GetActiveScene()
-                        ->ApplySnapshot(pSnap);
-                    break;
-                }
+                */
                 case S2C_P_SPAWN_ZOMBIE: {
                     auto * pZombie = reinterpret_cast<sc_packet_spawn_zombie*>(packet);
                     GET_SINGLE(SceneMgr)
                          ->GetActiveScene()
                          ->AddZombie(pZombie);
                     break;
-                    }
-                case S2C_P_ATTACK: {
-                    MessageBoxA(NULL, "공격 이벤트 수신", "Debug - Attack", MB_OK);
-                    break;
-                }
+                    }                
                 case S2C_P_STATE: {
                     auto* pState = reinterpret_cast<sc_packet_state*>(packet);
                     
                     GET_SINGLE(SceneMgr)
                         ->GetActiveScene()
                         ->AnimatePlayer(pState);
+                    break;
+                }
+                case S2C_P_ZOMBIE_SNAPSHOT: {
+                    auto* pZSnap = reinterpret_cast<sc_packet_zombie_snapshot*>(packet);
+                    GET_SINGLE(SceneMgr)
+                        ->GetActiveScene()
+                        ->MoveZombies(pZSnap);
                     break;
                 }
                 case S2C_P_ZOMBIE_MOVE: {
@@ -248,6 +238,12 @@ void ReceiverThread(SOCKET clientSocket) {
                     bool flag = GET_SINGLE(FmodMgr)->CheckPlaying(SOUND_TYPE::PLAYER_PAIN);
                     if (flag == false)
                         GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::PLAYER_PAIN);
+                    break;
+                }
+                case S2C_P_AUGMENT_OPTIONS: {
+                    auto* pOpt = reinterpret_cast<sc_packet_augment_options*>(packet);
+                    g_augmentCount = pOpt->count;
+                    g_augmentActive = true;
                     break;
                 }
                 default:

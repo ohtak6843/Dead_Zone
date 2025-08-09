@@ -71,6 +71,7 @@ public:
 
 	void AddZombie(struct sc_packet_spawn_zombie* packet);
 	void MoveZombie(struct sc_packet_zombie_move* packet);
+	void MoveZombies(struct sc_packet_zombie_snapshot* packet);
 	void AnimateZombie(struct sc_packet_zombie_state* packet);
 	void DieZombie(struct sc_packet_zombie_die* packet);
 	void RemoveZombieById(uint32_t zombieId);

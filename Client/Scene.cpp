@@ -448,7 +448,37 @@ void Scene::AddZombie(sc_packet_spawn_zombie* packet)
 			zombieObjects.push_back(static_pointer_cast<Zombie>(z));
 		break;
 	}
+	case ZOMBIE_TYPE::BOSS:
+	{
+		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\EliteZombie.fbx");
+		auto specificZombies = meshData->InstantiateAs<EliteZombie>(ColliderType::OBB);
+		for (auto& z : specificZombies)
+			zombieObjects.push_back(static_pointer_cast<Zombie>(z));
+		break;
 	}
+	}
+	/*shared_ptr<Zombie> obj = make_shared<Zombie>();
+	obj->SetName(L"OBJ");
+	obj->SetTransform(make_shared<Transform>());
+	obj->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
+	obj->SetStatic(false);
+	shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
+	{
+		shared_ptr<Mesh> sphereMesh = GET_SINGLE(Resources)->LoadSphereMesh();
+		meshRenderer->SetMesh(sphereMesh);
+	}
+	{
+		shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"Deferred");
+		shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"Leather", L"..\\Resources\\Texture\\Leather.jpg");
+		shared_ptr<Texture> texture2 = GET_SINGLE(Resources)->Load<Texture>(L"Leather_Normal", L"..\\Resources\\Texture\\Leather_Normal.jpg");
+		shared_ptr<Material> material = make_shared<Material>();
+		material->SetShader(shader);
+		material->SetTexture(0, texture);
+		material->SetTexture(1, texture2);
+		meshRenderer->SetMaterial(material->Clone());
+	}
+	obj->SetMeshRenderer(meshRenderer);
+	zombieObjects.push_back(obj);*/
 
 	for (const auto& zombieObject : zombieObjects)
 	{
@@ -491,6 +521,48 @@ void Scene::MoveZombie(sc_packet_zombie_move* packet)
 			rotation.y += 180.f;
 			rootTransform->SetLocalRotation(rotation);
 			return;
+		}
+	}
+}
+
+void Scene::MoveZombies(sc_packet_zombie_snapshot* packet)
+{
+	for (int i = 0; i < packet->count; ++i) {
+		const auto& e = packet->entries[i];
+		uint32_t zid = static_cast<uint32_t>(e.zombieId);
+		Vec3     newPos(e.position.x, e.position.y, e.position.z);
+
+		for (auto& group : _zombies) {
+			auto& root = group[0];
+			if (root->GetID() != zid)
+				continue;
+
+			auto t = root->GetTransform();
+
+			// 1) 이전 위치 가져오기
+			Vec3 prevPos = t->GetLocalPosition();
+
+			// 2) 방향 벡터 계산
+			Vec3 dir = newPos - prevPos;
+			float dist2 = dir.x * dir.x + dir.y * dir.y + dir.z * dir.z;
+			if (dist2 > 1e-6f) {
+				float dist = std::sqrt(dist2);
+				dir.x /= dist;
+				dir.y /= dist;
+				dir.z /= dist;
+
+				// 3) 회전(방향) 적용
+				t->LookAt(dir);
+				Vec3 rotation = t->GetLocalRotation();
+				rotation.x = -90.0f;
+				rotation.y += 180.0f;
+				t->SetLocalRotation(rotation);
+			}
+
+			// 4) 새 위치 세팅
+			t->SetLocalPosition(newPos);
+
+			break;  // 해당 좀비만 처리하고 루프 탈출
 		}
 	}
 }

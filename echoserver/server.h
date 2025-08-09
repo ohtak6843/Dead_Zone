@@ -34,6 +34,7 @@ struct PER_SOCKET_CONTEXT {
     float          moveX, moveY, moveZ;
     bool          isJumping;
     float         verticalVelocity;
+    float           damage;
     bool hasSceneReady = false;
 };
 
