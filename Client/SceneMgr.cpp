@@ -110,7 +110,7 @@ void SceneMgr::RenderPlayerUI(const long long id, const shared_ptr<class Player>
 	);
 
 	// 플레이어 이동속도
-	uint32 Speed = player->GetRunSpeed();
+	uint32 Speed = player->GetWalkSpeed();
 	wss.str(L"");
 	wss.clear();
 	wss << Speed;
@@ -223,11 +223,17 @@ void SceneMgr::RenderUI()
 		// 잔여탄 UI
 		{
 			int32 currentAmmo = 0;
-			int32 gunType = static_pointer_cast<LocalPlayer>(_activeScene->FindGameObject(L"LocalPlayer"))->getGunType();
-			if (gunType == 0)
-				currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"M4A1"))->GetCurrentAmmo();
-			else if (gunType == 1)
-				currentAmmo = static_pointer_cast<AK47>(_activeScene->FindGameObject(L"AK47"))->GetCurrentAmmo();
+			auto localPlayer = static_pointer_cast<LocalPlayer>(_activeScene->FindGameObject(L"LocalPlayer"));
+			if (localPlayer)
+			{
+				int32 gunType = localPlayer->getGunType();
+				if (gunType == 0)
+					currentAmmo = static_pointer_cast<M4A1>(_activeScene->FindGameObject(L"M4A1"))->GetCurrentAmmo();
+				else if (gunType == 1)
+					currentAmmo = static_pointer_cast<AK47>(_activeScene->FindGameObject(L"AK47"))->GetCurrentAmmo();
+			}
+			
+			
 
 			std::wstringstream wss;
 			wss << currentAmmo;

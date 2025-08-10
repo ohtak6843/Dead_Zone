@@ -224,6 +224,20 @@ void Scene::SetLocalPlayer(vector<shared_ptr<Player>>& player)
 	_localPlayer = std::move(player);
 }
 
+void Scene::SetLocalPlayerState(struct sc_packet_player_info* packet)
+{
+	Vec3 position = Vec3(packet->position.x, packet->position.y, packet->position.z);
+	_localPlayer[0]->GetTransform()->SetLocalPosition(position);
+	_localPlayer[0]->GetTransform()->SetLocalRotation(Vec3(-90.0f, 180.f, 0.0f));
+
+	// 플레이어 정보 설정
+	_localPlayer[0]->SetHp(packet->health);
+	_localPlayer[0]->SetMaxHp(packet->maxHealth);
+	_localPlayer[0]->SetAttackDamage(packet->damage);
+	_localPlayer[0]->SetWalkSpeed(packet->walkSpeed);
+	_localPlayer[0]->SetGold(packet->gold);
+}
+
 void Scene::AddPlayer(sc_packet_player_info* packet)
 {
 	//if (_players.size() >= 2)
@@ -246,6 +260,14 @@ void Scene::AddPlayer(sc_packet_player_info* packet)
 	gameObjects[0]->SetID(static_cast<uint32_t>(packet->playerId));
 	gameObjects[0]->GetTransform()->SetLocalPosition(position);
 	gameObjects[0]->GetTransform()->SetLocalRotation(Vec3(-90.0f, 180.f, 0.0f));
+
+	// 플레이어 정보 설정
+	gameObjects[0]->SetHp(packet->health);
+	gameObjects[0]->SetMaxHp(packet->maxHealth);
+	gameObjects[0]->SetAttackDamage(packet->damage);
+	gameObjects[0]->SetWalkSpeed(packet->walkSpeed);
+	gameObjects[0]->SetGold(packet->gold);
+
 
 	for (int i = 1; i < gameObjects.size(); i++)
 	{

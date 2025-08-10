@@ -18,9 +18,12 @@ void GameInfo::CreateDefaultPlayerInfo()
 				INFO_TYPE::PLAYER,
 				L"Player",
 
-				100,
-				3.f,
-				5.f,
+				100,		// 현재 체력
+				100,		// 최대 체력
+				0,			// 공격력
+				0,			// 보유 골드
+				3.f,		// 걷는 속도 (m/s)
+				5.f,		// 뛰는 속도 (m/s)
 			});
 		Add<PlayerInfo>(L"Player", info);
 	}
