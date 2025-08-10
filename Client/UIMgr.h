@@ -21,8 +21,8 @@ public:
     void InitTextFormats();
 
 public:
-    void CreateImageUI(const wstring& name, const wstring& texPath, const Vec2& pos, const Vec2& size, const float alpha, bool active, shared_ptr<class Scene> scene);
-    void CreateRectangleUI(const wstring& name, const Vec2& pos, const Vec2& size,const Vec4 color, bool active, shared_ptr<class Scene> scene);
+    void CreateImageUI(const wstring& name, const wstring& texPath, const Vec2& pos, const Vec2& size, const float alpha, bool active = true, shared_ptr<class Scene> scene = nullptr);
+    void CreateRectangleUI(const wstring& name, const Vec2& pos, const Vec2& size,const Vec4 color, bool active = true, shared_ptr<class Scene> scene = nullptr);
     void DrawTextUI(const wstring& text, const Vec2& pos, const Vec2& size,
         int fontSize = 32,
         const D2D1::ColorF& textColor = D2D1::ColorF::White,
