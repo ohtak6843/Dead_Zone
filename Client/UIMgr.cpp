@@ -85,8 +85,8 @@ void UIMgr::CreateRectangleUI(const wstring& name, const Vec2& pos, const Vec2& 
     scene->AddGameObject(panel);
 }
 
-void UIMgr::DrawTextUI(const wstring& text, const Vec2& pos, const Vec2& size, int fontSize = 32,
-    const D2D1::ColorF& textColor, const D2D1::ColorF& bgColor)
+void UIMgr::DrawTextUI(const wstring& text, const Vec2& pos, const Vec2& size, int fontSize,
+    const D2D1::ColorF& textColor, const D2D1::ColorF& bgColor, HAlign hAlign)
 {
     shared_ptr<D3D11On12Device> device = gameFramework->GetD3D11on12Device();
     auto ctx = device->GetD2DDeviceContext();
@@ -101,6 +101,8 @@ void UIMgr::DrawTextUI(const wstring& text, const Vec2& pos, const Vec2& size, i
     // ÅØ½ºÆ®
     brush->SetColor(textColor);
     auto format = _textFormats.count(fontSize) ? _textFormats[fontSize].Get() : device->GetTextFormat().Get();
+    format->SetTextAlignment(ToDW(hAlign));
+
     ctx->DrawTextW(
         text.c_str(),
         static_cast<UINT32>(text.length()),

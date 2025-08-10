@@ -1,6 +1,15 @@
 #pragma once
 #include "GameObject.h"
 
+enum class HAlign { Left, Center, Right };
+static DWRITE_TEXT_ALIGNMENT ToDW(HAlign a) {
+    switch (a) {
+    case HAlign::Center: return DWRITE_TEXT_ALIGNMENT_CENTER;
+    case HAlign::Right:  return DWRITE_TEXT_ALIGNMENT_TRAILING;
+    default:             return DWRITE_TEXT_ALIGNMENT_LEADING; // Left
+    }
+}
+
 class UIMgr
 {
     DECLARE_SINGLE(UIMgr);
@@ -14,9 +23,11 @@ public:
 public:
     void CreateImageUI(const wstring& name, const wstring& texPath, const Vec2& pos, const Vec2& size, const float alpha, bool active, shared_ptr<class Scene> scene);
     void CreateRectangleUI(const wstring& name, const Vec2& pos, const Vec2& size,const Vec4 color, bool active, shared_ptr<class Scene> scene);
-    void DrawTextUI(const wstring& text, const Vec2& pos, const Vec2& size, int fontSize,
+    void DrawTextUI(const wstring& text, const Vec2& pos, const Vec2& size,
+        int fontSize = 32,
         const D2D1::ColorF& textColor = D2D1::ColorF::White,
-        const D2D1::ColorF& bgColor = D2D1::ColorF(0.f, 0.f, 0.f, 0.f));
+        const D2D1::ColorF& bgColor = D2D1::ColorF(0.f, 0.f, 0.f, 0.f),
+        HAlign hAlign = HAlign::Left);
 
 	void ClearUI() { _uiMap.clear(); }
 
