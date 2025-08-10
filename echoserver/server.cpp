@@ -185,12 +185,11 @@ void WorkerThread(HANDLE) {
             newContext->state = STATE_LOGIN;
             newContext->username.clear();
             newContext->health = 100;
+            newContext->maxHealth = 100;
+            newContext->gold = 0;
             newContext->posX = newContext->posY = newContext->posZ = 0.0f;
             newContext->look = { 0.0f, 0.0f, 1.0f };
             newContext->walkSpeed = 300.0f;
-            newContext->runSpeed = 5.0f;
-            newContext->faintCount = 0;
-            newContext->isFainted = false;
             newContext->moveX = newContext->moveY = newContext->moveZ = 0.0f;
             newContext->isJumping = true;
             newContext->verticalVelocity = 0.0f;
@@ -271,20 +270,19 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         pContext->username = "Player_" + std::to_string(pContext->socket);
         pContext->state = STATE_LOBBY;
         pContext->health = 100;
+        pContext->maxHealth = 100;
         pContext->posX = 1185.0f;
         pContext->posY = 0.0f;
         pContext->posZ = 473.0f;
         pContext->look = { 0.0f, 0.0f, 1.0f };
         pContext->walkSpeed = 300.0f;
-        pContext->runSpeed = 5.0f;
-        pContext->faintCount = 0;
-        pContext->isFainted = false;
         pContext->moveX = 0.0f;
         pContext->moveY = 0.0f;
         pContext->moveZ = 0.0f;
         pContext->isJumping = true;
         pContext->verticalVelocity = 0.0f;
         pContext->damage = 20;
+        pContext->gold = 0;
 
         sc_packet_login_ok loginOk;
         loginOk.size = sizeof(sc_packet_login_ok);
@@ -293,9 +291,9 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         loginOk.position = { pContext->posX, pContext->posY, pContext->posZ };
         loginOk.health = pContext->health;
         loginOk.walkSpeed = pContext->walkSpeed;
-        loginOk.runSpeed = pContext->runSpeed;
-        loginOk.faintCount = pContext->faintCount;
-        loginOk.isFainted = pContext->isFainted;
+        loginOk.damage = pContext->damage;
+        loginOk.maxHealth = pContext->maxHealth;
+        loginOk.gold = pContext->gold;
 
         PostSendPacket(pContext, &loginOk, loginOk.size);
         break;
@@ -472,9 +470,9 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
                     info.position = { pl->posX, pl->posY, pl->posZ };
                     info.health = pl->health;
                     info.walkSpeed = pl->walkSpeed;
-                    info.runSpeed = pl->runSpeed;
-                    info.faintCount = pl->faintCount;
-                    info.isFainted = pl->isFainted;
+                    info.maxHealth = pl->maxHealth;
+                    info.gold = pl->gold;
+                    info.damage = pl->damage;
 
                     for (auto* peer : room->players)
                         PostSendPacket(peer, &info, info.size);
@@ -532,9 +530,9 @@ void MatchmakingCheck() {
             info.position = { pl->posX, pl->posY, pl->posZ };
             info.health = pl->health;
             info.walkSpeed = pl->walkSpeed;
-            info.runSpeed = pl->runSpeed;
-            info.faintCount = pl->faintCount;
-            info.isFainted = pl->isFainted;
+            info.maxHealth = pl->maxHealth;
+            info.gold = pl->gold;
+            info.damage = pl->damage;
             for (auto* peer : players) {
                 PostSendPacket(peer, &info, info.size);
             }

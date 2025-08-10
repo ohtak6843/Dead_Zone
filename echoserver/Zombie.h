@@ -71,7 +71,7 @@ public:
             health = 100;
             attack = 10;
             attackSpeed = 1.0f;
-            walkSpeed = 75.0f;
+            walkSpeed = 30.0f;
             runSpeed = 3.3f;
             attackCooldown = 0.0f;
             specialSkill = "None";

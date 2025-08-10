@@ -92,10 +92,10 @@ struct sc_packet_login_ok {
     long long     playerId;
     Vector3       position;
     int           health;
+    int      maxHealth;    
+    int      gold;         
+    float    damage;        
     float         walkSpeed;
-    float         runSpeed;
-    int           faintCount;
-    bool          isFainted;
 };
 
 struct sc_packet_player_info {
@@ -104,10 +104,10 @@ struct sc_packet_player_info {
     long long     playerId;
     Vector3       position;
     int           health;
+    int      maxHealth;     
+    int      gold;         
+    float    damage;        
     float         walkSpeed;
-    float         runSpeed;
-    int           faintCount;
-    bool          isFainted;
 };
 
 struct sc_packet_move {
