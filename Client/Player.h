@@ -36,6 +36,10 @@ public:
 public:
 	virtual void SetState(PLAYER_STATE state) { _state = state; }
 	uint32 GetHp() const { return _info.hp; }
+	uint32 GetMaxHp() const { return _info.hp; } // 수정하기
+	uint32 GetAttackDamage() const { return _info.hp; } // 수정하기
+	float GetWalkSpeed() const { return _info.walkSppeed; }
+	float GetRunSpeed() const { return _info.runSpeed; }
 	wstring GetName() const { return _info.name; }
 
 	void SetHp(uint32 hp) { _info.hp = hp; }

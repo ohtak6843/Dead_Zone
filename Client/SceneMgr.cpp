@@ -61,6 +61,84 @@ void SceneMgr::Render()
 	if (_activeScene)
 		_activeScene->Render();
 }
+void SceneMgr::RenderPlayerUI(const long long id, const shared_ptr<class Player>& player, const int32 index)
+{
+	if (!player) return;
+
+	std::wstringstream wss;
+	// 플레이어 ID
+	wss.str(L"");
+	wss.clear();
+	wss << id;
+	GET_SINGLE(UIMgr)->DrawTextUI(
+		wss.str(),
+		Vec2(35.f, 738.f - (60.f * index)),
+		Vec2(300.f, 100.f),
+		16,
+		D2D1::ColorF::White,
+		D2D1::ColorF(0, 0, 0, 0.0f)
+	);
+
+	// 플레이어 체력
+	uint32 hp = player->GetHp();
+	uint32 maxHp = player->GetMaxHp();
+	wss.str(L"");
+	wss.clear();
+	wss << hp << " / " << maxHp;
+	GET_SINGLE(UIMgr)->DrawTextUI(
+		wss.str(),
+		Vec2(0.f, 760.f - (60.f * index)),
+		Vec2(300.f, 100.f),
+		16,
+		D2D1::ColorF::White,
+		D2D1::ColorF(0, 0, 0, 0.0f),
+		HAlign::Center
+	);
+
+	// 플레이어 공격력
+	uint32 AD = player->GetAttackDamage();
+	wss.str(L"");
+	wss.clear();
+	wss << AD;
+	GET_SINGLE(UIMgr)->DrawTextUI(
+		wss.str(),
+		Vec2(115.f, 738.f - (60.f * index)),
+		Vec2(300.f, 100.f),
+		16,
+		D2D1::ColorF::White,
+		D2D1::ColorF(0, 0, 0, 0.0f)
+	);
+
+	// 플레이어 이동속도
+	uint32 Speed = player->GetRunSpeed();
+	wss.str(L"");
+	wss.clear();
+	wss << Speed;
+	GET_SINGLE(UIMgr)->DrawTextUI(
+		wss.str(),
+		Vec2(195.f, 738.f - (60.f * index)),
+		Vec2(300.f, 100.f),
+		16,
+		D2D1::ColorF::White,
+		D2D1::ColorF(0, 0, 0, 0.0f)
+	);
+
+	auto hpber = _activeScene->FindGameObject(L"PlayerPanel_" + to_wstring(index + 1) + L"_HP");
+	if (hpber)
+	{
+		float hpRatio = static_cast<float>(hp) / maxHp;
+
+		const float fullWidth = 270.f; // 전체 HP바 너비
+		Vec3 scale = hpber->GetTransform()->GetLocalScale();
+		scale.x = fullWidth * hpRatio;
+		hpber->GetTransform()->SetLocalScale(scale);
+
+
+		Vec3 position = hpber->GetTransform()->GetLocalPosition();
+		position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
+		hpber->GetTransform()->SetLocalPosition(position);
+	}
+}
 
 void SceneMgr::RenderUI()
 {
@@ -140,9 +218,10 @@ void SceneMgr::RenderUI()
 		//		&textRect,
 		//		device->GetSolidColorBrush().Get());
 		//}
+
+
 		// 잔여탄 UI
 		{
-			// 현재 총알 수를 가져오는 로직 이상 생김. 수정 필요
 			int32 currentAmmo = 0;
 			int32 gunType = static_pointer_cast<LocalPlayer>(_activeScene->FindGameObject(L"LocalPlayer"))->getGunType();
 			if (gunType == 0)
@@ -162,76 +241,15 @@ void SceneMgr::RenderUI()
 				D2D1::ColorF(0, 0, 0, 0.0f) // 배경 색
 			);
 		}
-		
-		// LocalPlayer HP UI
-		{
-			std::wstringstream wss;
-			wstring name = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetName();
-			uint32 hp = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"))->GetHp();
-			wss << GWindowInfo.local << " - " << hp;
-			GET_SINGLE(UIMgr)->DrawTextUI(
-				wss.str(),
-				Vec2(10.f, 740.f),
-				Vec2(300.f, 100.f),
-				16,
-				D2D1::ColorF::White,
-				D2D1::ColorF(0, 0, 0, 0.0f)
-			);
-			auto hpber = _activeScene->FindGameObject(L"PlayerPanel_1_HP");
-			if (hpber)
-			{
-				uint32 maxHp = 100;
-				float hpRatio = static_cast<float>(hp) / maxHp;
 
-				const float fullWidth = 270.f; // 전체 HP바 너비
-				Vec3 scale = hpber->GetTransform()->GetLocalScale();
-				scale.x = fullWidth * hpRatio;
-				hpber->GetTransform()->SetLocalScale(scale);
+		// Player UI
+		int32 index = 0;
+		shared_ptr<Player> player = static_pointer_cast<Player>(_activeScene->FindGameObject(L"LocalPlayer"));
+		RenderPlayerUI(GWindowInfo.local, player, index++);
 
-
-				Vec3 position = hpber->GetTransform()->GetLocalPosition();
-				position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
-				hpber->GetTransform()->SetLocalPosition(position);
-			}
-		}
-
-		//MultiPlayer HP UI
-		size_t index = 1;
 		for (const auto& pair : GetActiveScene()->GetPlayers())
 		{
-			index++;
-
-			long long name = pair.first;
-			uint32 hp = pair.second[0]->GetHp();
-
-			std::wstringstream wss;
-			wss << name << " - " << hp;
-
-			GET_SINGLE(UIMgr)->DrawTextUI(
-				wss.str(),
-				Vec2(10.f, 740.f - (60.f * (index - 1))),
-				Vec2(300.f, 100.f),
-				16,
-				D2D1::ColorF::White,
-				D2D1::ColorF(0, 0, 0, 0.0f)
-			);
-
-			auto hpber = _activeScene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_HP");
-			if (hpber)
-			{
-				uint32 maxHp = 100;
-				float hpRatio = static_cast<float>(hp) / maxHp;
-
-				const float fullWidth = 270.f; // 전체 HP바 너비
-				Vec3 scale = hpber->GetTransform()->GetLocalScale();
-				scale.x = fullWidth * hpRatio;
-				hpber->GetTransform()->SetLocalScale(scale);
-
-
-				Vec3 position = hpber->GetTransform()->GetLocalPosition();
-				position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
-				hpber->GetTransform()->SetLocalPosition(position);
-			}
+			RenderPlayerUI(pair.first, pair.second[0], index++);
 		}
 	}
 
@@ -684,94 +702,79 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 	GET_SINGLE(UIMgr)->CreateImageUI(
 		L"소총탄",
 		L"..\\Resources\\Texture\\Icon\\Bullet\\소총탄.png",
-		Vec2(410.f, -360.f), 
-		Vec2(40.f, 40.f),
+		Vec2(410.f, -360.f),  // 위치
+		Vec2(40.f, 40.f),	// 크기
 		0.5f, // 투명도 0 ~ 1
 		true, // 활성화 여부
 		scene
 	);
 
-	// 플레이어1 정보 출력
-	GET_SINGLE(UIMgr)->CreateRectangleUI(
-		L"PlayerPanel_1",					// 이름
-		Vec2(-500.f, -360.f),				// 위치
-		Vec2(300.f, 50.f),					// 크기
-		Vec4(0.5f, 0.5f, 0.5f, 0.5f),		// 색상
-		true, // 활성화 여부
-		scene
-	);
+	// 플레이어 정보 출력
+	for (int i = 0; i < 3; i++)
+	{
+		wstring playerName = L"PlayerPanel_" + to_wstring(i + 1);
 
-	GET_SINGLE(UIMgr)->CreateRectangleUI(
-		L"PlayerPanel_1_Max_Hp",			// 이름
-		Vec2(-495.f, -370.f),				// 위치
-		Vec2(270.f, 20.f),					// 크기
-		Vec4(0.0f, 0.0f, 0.0f, 1.f),		// 색상
-		true, // 활성화 여부
-		scene
-	);
-	GET_SINGLE(UIMgr)->CreateRectangleUI(
-		L"PlayerPanel_1_HP",				// 이름
-		Vec2(-495.f, -370.f),				// 위치
-		Vec2(270.f, 20.f),					// 크기
-		Vec4(1.f, 0.0f, 0.0f, 1.f),			// 색상
-		true, // 활성화 여부
-		scene
-	);
+		// 패널
+		GET_SINGLE(UIMgr)->CreateRectangleUI(
+			playerName,					// 이름
+			Vec2(-500.f, -360.f + (60 * i)),	// 위치
+			Vec2(300.f, 50.f),					// 크기
+			Vec4(0.5f, 0.5f, 0.5f, 0.5f),		// 색상
+			i == 0,								// 활성화 여부 ( 플레이어 1 빼고 전부 비활성화 )
+			scene
+		);
 
+		// HP바 배경
+		GET_SINGLE(UIMgr)->CreateRectangleUI(
+			playerName + L"_Max_HP",			// 이름
+			Vec2(-495.f, -370.f + (60 * i)),	// 위치
+			Vec2(270.f, 20.f),					// 크기
+			Vec4(0.0f, 0.0f, 0.0f, 1.f),		// 색상
+			i == 0,								// 활성화 여부 ( 플레이어 1 빼고 전부 비활성화 )
+			scene
+		);
 
-	// 플레이어2 정보 출력
-	GET_SINGLE(UIMgr)->CreateRectangleUI(
-		L"PlayerPanel_2",					// 이름
-		Vec2(-500.f, -300.f),				// 위치
-		Vec2(300.f, 50.f),					// 크기
-		Vec4(0.5f, 0.5f, 0.5f, 0.5f),		// 색상
-		false, // 활성화 여부
-		scene
-	);
+		// HP바
+		GET_SINGLE(UIMgr)->CreateRectangleUI(
+			playerName + L"_HP",				// 이름
+			Vec2(-495.f, -370.f + +(60 * i)),	// 위치
+			Vec2(270.f, 20.f),					// 크기
+			Vec4(1.f, 0.0f, 0.0f, 1.f),			// 색상
+			i == 0,								// 활성화 여부 ( 플레이어 1 빼고 전부 비활성화 )
+			scene
+		);
 
-	GET_SINGLE(UIMgr)->CreateRectangleUI(
-		L"PlayerPanel_2_Max_HP",			// 이름
-		Vec2(-495.f, -310.f),				// 위치
-		Vec2(270.f, 20.f),					// 크기
-		Vec4(0.0f, 0.0f, 0.0f, 1.f),		// 색상
-		false, // 활성화 여부
-		scene
-	);
-	GET_SINGLE(UIMgr)->CreateRectangleUI(
-		L"PlayerPanel_2_HP",				// 이름
-		Vec2(-495.f, -310.f),				// 위치
-		Vec2(270.f, 20.f),					// 크기
-		Vec4(1.f, 0.0f, 0.0f, 1.f),			// 색상
-		false, // 활성화 여부
-		scene
-	);
+		// 플레이어 아이콘
+		GET_SINGLE(UIMgr)->CreateImageUI(
+			playerName + L"_Player_ID",									// 이름
+			L"..\\Resources\\Texture\\Icon\\UI\\플레이어 아이콘.png",	// 경로
+			Vec2(-620.f, -348.f + (60 * i)),							// 위치
+			Vec2(20.f, 20.f),											// 크기
+			0.8f,														// 투명도 0 ~ 1
+			i == 0,														// 활성화 여부 ( 플레이어 1 빼고 전부 비활성화 )
+			scene
+		);
 
-
-	// 플레이어3 정보 출력
-	GET_SINGLE(UIMgr)->CreateRectangleUI(
-		L"PlayerPanel_3",					// 이름
-		Vec2(-500.f, -240.f),				// 위치
-		Vec2(300.f, 50.f),					// 크기
-		Vec4(0.5f, 0.5f, 0.5f, 0.5f),		// 색상
-		false, // 활성화 여부
-		scene
-	);
-
-	GET_SINGLE(UIMgr)->CreateRectangleUI(
-		L"PlayerPanel_3_Max_HP",			// 이름
-		Vec2(-495.f, -250.f),				// 위치
-		Vec2(270.f, 20.f),					// 크기
-		Vec4(0.0f, 0.0f, 0.0f, 1.f),		// 색상
-		false, // 활성화 여부
-		scene
-	);
-	GET_SINGLE(UIMgr)->CreateRectangleUI(
-		L"PlayerPanel_3_HP",				// 이름
-		Vec2(-495.f, -250.f),				// 위치
-		Vec2(270.f, 20.f),					// 크기
-		Vec4(1.f, 0.0f, 0.0f, 1.f),			// 색상
-		false, // 활성화 여부
-		scene
-	);
-
+		// 공격력 아이콘
+		GET_SINGLE(UIMgr)->CreateImageUI(
+			playerName + L"_Attack_LV",								// 이름
+			L"..\\Resources\\Texture\\Icon\\UI\\공격 아이콘.png",	// 경로
+			Vec2(-540.f, -348.f + (60 * i)),						// 위치
+			Vec2(20.f, 20.f),										// 크기
+			0.8f,													// 투명도 0 ~ 1
+			i == 0,													// 활성화 여부 ( 플레이어 1 빼고 전부 비활성화 )
+			scene
+		);
+	
+		// 이동속도 아이콘
+		GET_SINGLE(UIMgr)->CreateImageUI(
+			playerName + L"_Speed_LV",									// 이름
+			L"..\\Resources\\Texture\\Icon\\UI\\이동속도 아이콘.png",	// 경로
+			Vec2(-460.f, -348.f + (60 * i)),							// 위치
+			Vec2(20.f, 20.f),											// 크기
+			0.8f,														// 투명도 0 ~ 1
+			i == 0,														// 활성화 여부 ( 플레이어 1 빼고 전부 비활성화 )
+			scene
+		);
+	}
 }

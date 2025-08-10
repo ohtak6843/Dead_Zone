@@ -291,6 +291,9 @@ void Scene::AddPlayer(sc_packet_player_info* packet)
 	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index))->SetActive(true);
 	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_HP")->SetActive(true);
 	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Max_HP")->SetActive(true);
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Player_ID")->SetActive(true);
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Attack_LV")->SetActive(true);
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Speed_LV")->SetActive(true);
 	
 }
 
@@ -393,6 +396,9 @@ void Scene::RemovePlayer(sc_packet_player_leave* packet)
 			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index))->SetActive(false);
 			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_HP")->SetActive(false);
 			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Max_HP")->SetActive(false);
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Player_ID")->SetActive(false);
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Attack_LV")->SetActive(false);
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Speed_LV")->SetActive(false);
 		}
 	}
 }

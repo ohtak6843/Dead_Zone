@@ -24,6 +24,7 @@ public:
 	void Update();
 	void Render();
 	void RenderUI();
+	void RenderPlayerUI(const long long id, const shared_ptr<class Player>& player, const int32 index);
 	
 	void LoadScene(SCENE_TYPE type);
 	void SwitchScene(SCENE_TYPE type);
