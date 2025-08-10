@@ -39,6 +39,11 @@ public:
     float wanderDirZ = 0.0f;
     float wanderTime = 0.0f;
     float idleTime = 0.0f;
+    bool  isJumping = false;  
+    float jumpVX = 0.f;     
+    float jumpVY = 0.f;      
+    float jumpVZ = 0.f;      
+    float jumpTime = 0.f;     
 
     enum ZOMBIE_STATE : uint8_t {
         T_POSE = 0,
@@ -47,7 +52,8 @@ public:
         RUN = 3,
         ATTACK = 4,
         DIE = 5,
-        END = 6
+        JUMP=6,
+        END = 7
     }state = IDLE;
     std::string specialSkill;
 
@@ -131,7 +137,7 @@ public:
             health = 500000;
             attack = 50;
             attackSpeed = 0.8f;
-            walkSpeed = 3.0f;
+            walkSpeed = 75.0f;
             runSpeed = 3.0f;
             attackCooldown = 0.0f;
             specialSkill = "Boss Basic Skill";

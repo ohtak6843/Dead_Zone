@@ -46,7 +46,7 @@ public:
     void SendAugmentOptions();
     void HandleAugmentSelect(PER_SOCKET_CONTEXT * pContext, uint8_t idx);
     std::atomic<bool> bossPhaseRequested{ false };
-    Vector3 bossSpawnPos{ 2025.f, 0.f, 3974.f };
+    Vector3 bossSpawnPos{ 200.f, 0.f, 2000.f };
     void SpawnBoss(float x, float y, float z);
     void QueueStartBossPhase(const Vector3& pos);
 private:

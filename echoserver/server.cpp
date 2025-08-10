@@ -390,7 +390,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
                     const int killThresholdSt2 = 3; 
                     if (room->currentStage == 2 && !room->bossSpawned && room->killCount >= killThresholdSt2) {
                         room->killCount = 0;
-                        room->QueueStartBossPhase({ 2025.f, 0.f, 3974.f });
+                        room->QueueStartBossPhase(room->bossSpawnPos);
                     }
                 }
             }

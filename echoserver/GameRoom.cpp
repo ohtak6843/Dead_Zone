@@ -21,7 +21,7 @@ constexpr float ST2_MIN_X = -2400.0f;
 constexpr float ST2_MAX_X = 2800.0f;
 constexpr float ST2_MIN_Z = 400.0f;
 constexpr float ST2_MAX_Z = 3300.0f;
-
+constexpr float ST2_MIN_Y = -20;
 constexpr float PLAYER_RADIUS = 30.0f;
 constexpr float ZOMBIE_RADIUS = 30.0f;
 
@@ -30,6 +30,16 @@ constexpr float DETECT_RADIUS = 500.0f;
 constexpr float ATTACK_RADIUS = 100.0f;
 const float   DETECT_RADIUS2 = DETECT_RADIUS * DETECT_RADIUS;
 const float   ATTACK_RADIUS2 = ATTACK_RADIUS * ATTACK_RADIUS;
+
+constexpr float BOSS_JUMP_COOLDOWN = 10.0f;  
+constexpr float BOSS_JUMP_RADIUS = 700.0f; 
+constexpr float BOSS_JUMP_OFFSET = 120.0f; 
+constexpr float BOSS_JUMP_TIME = 0.8f; 
+constexpr float G = 9.8f;
+
+inline float GetGroundY(int currentStage) {
+    return (currentStage == 2) ? ST2_MIN_Y : MAP_MIN_Y;
+}
 
 std::vector<GameRoom*> activeRooms;
 
@@ -177,23 +187,16 @@ void GameRoom::HandlePlayerCollisions()
 
 void GameRoom::HandleZombiePhysics(float dt)
 {
-    const float gravity = 9.8f;
-    const float groundY = MAP_MIN_Y;
+    const float groundY = GetGroundY(currentStage);
 
     for (auto& z : zombies) {
+        if (z.isJumping) continue; // ← was isLeaping
+
         if (z.isAirborne) {
             z.y += z.verticalVelocity * dt;
-            z.verticalVelocity -= gravity * dt;
-
-            if (z.y <= groundY) {
-                z.y = groundY;
-                z.verticalVelocity = 0.0f;
-                //p->isJumping = false;
-              //  SendLandPacket(p);
-            }
-            else if (z.y < groundY) {
-                z.y = groundY;
-            }
+            z.verticalVelocity -= G * dt;
+            if (z.y <= groundY) { z.y = groundY; z.verticalVelocity = 0.0f; }
+            else if (z.y < groundY) { z.y = groundY; }
         }
         else if (z.y < groundY) {
             z.y = groundY;
@@ -293,6 +296,7 @@ void GameRoom::SpawnZombies()
             float xRange = (ST2_MAX_X - PLAYER_RADIUS) - (ST2_MIN_X + PLAYER_RADIUS);
             float zRange = (ST2_MAX_Z - PLAYER_RADIUS) - (ST2_MIN_Z + PLAYER_RADIUS);
             spawnX = ST2_MIN_X + PLAYER_RADIUS + (rand() / (float)RAND_MAX) * xRange;
+            spawnY = ST2_MIN_Y;
             spawnZ = ST2_MIN_Z + PLAYER_RADIUS + (rand() / (float)RAND_MAX) * zRange;
         }
         else {
@@ -324,7 +328,7 @@ void GameRoom::SpawnZombies()
         pkt.size = sizeof(pkt);
         pkt.type = S2C_P_SPAWN_ZOMBIE;
         pkt.zombieId = z.id;
-        pkt.position = { z.x, z.y, z.z };
+        pkt.position = { z.x, z.y + ((currentStage == 2) ? -10.0f : 0.0f), z.z };
         pkt.zombieType = static_cast<unsigned char>(type);
 
         for (auto* peer : players)
@@ -335,40 +339,91 @@ void GameRoom::SpawnZombies()
 
 void GameRoom::UpdateZombies(float dt)
 {
+    const float ySendOffset = (currentStage == 2) ? -15.0f : 0.0f;
     HandleZombiePhysics(dt);
     HandleZombieCollisions();
     std::vector<sc_packet_zombie_snapshot::Entry> changed;
     changed.reserve(zombies.size());
     
     for (auto& z : zombies) {
-        /*if (z.type == ZombieType::BOSS)
-        {
+        z.attackCooldown -= dt;
+        if (z.attackCooldown < 0.0f) z.attackCooldown = 0.0f;
+
+        if (z.type == ZombieType::BOSS) {
+            if (z.isJumping) { 
+                z.x += z.jumpVX * dt;
+                z.z += z.jumpVZ * dt;
+                z.y += z.jumpVY * dt;
+                z.jumpVY -= G * dt;    
+                z.jumpTime -= dt;
+
+                const float groundY = GetGroundY(currentStage);
+                bool landed = (z.y <= groundY) || (z.jumpTime <= 0.f);
+                if (landed) {
+                    z.y = groundY;
+                    z.isJumping = false;
+                    SetZombieState(z, Zombie::WALK); 
+
+                    changed.push_back({ (uint32_t)z.id, Vector3{ z.x, z.y, z.z } });
+
+                    const float waveR2 = 300.f * 300.f;
+                    const int   waveDmg = 15;
+                    for (auto* p : players) {
+                        float dx = p->posX - z.x, dz = p->posZ - z.z;
+                        if (dx * dx + dz * dz <= waveR2) {
+                            int nh = p->health - waveDmg; if (nh < 0) nh = 0;
+                            p->health = nh;
+
+                            sc_packet_player_health hp{};
+                            hp.size = sizeof(hp);
+                            hp.type = S2C_P_PLAYER_HEALTH;
+                            hp.playerId = p->socket;
+                            hp.health = p->health;
+                            for (auto* peer : players) PostSendPacket(peer, &hp, hp.size);
+                        }
+                    }
+                }
+                else {
+                    changed.push_back({ (uint32_t)z.id, Vector3{ z.x, z.y, z.z } });
+                }
+                continue;
+            }
+
             bossTimer -= dt;
             if (bossTimer <= 0.0f) {
-                bossTimer = 10.0f;
-
-                const float waveRadius2 = 600.0f * 600.0f;
-                const int   waveDamage = 15;
+                PER_SOCKET_CONTEXT* target = nullptr;
+                float best2 = std::numeric_limits<float>::infinity();
+                const float R2 = BOSS_JUMP_RADIUS * BOSS_JUMP_RADIUS;
                 for (auto* p : players) {
                     float dx = p->posX - z.x;
                     float dz = p->posZ - z.z;
-                    if (dx * dx + dz * dz <= waveRadius2) {
-                       int newHp = p->health - waveDamage;
-                       if (newHp < 0) newHp = 0;
-                            p->health = newHp;
+                    float d2 = dx * dx + dz * dz;
+                    if (d2 <= R2 && d2 < best2) { best2 = d2; target = p; }
+                }
 
-                        sc_packet_player_health hpPkt{};
-                        hpPkt.size = sizeof(hpPkt);
-                        hpPkt.type = S2C_P_PLAYER_HEALTH;
-                        hpPkt.playerId = p->socket;
-                        hpPkt.health = p->health;
-                        for (auto* peer : players) PostSendPacket(peer, &hpPkt, hpPkt.size);
-                    }
+                if (target) {
+                    float ang = (rand() / (float)RAND_MAX) * 2.f * 3.14159265f;
+                    float tx = target->posX + std::cos(ang) * BOSS_JUMP_OFFSET;
+                    float tz = target->posZ + std::sin(ang) * BOSS_JUMP_OFFSET;
+                    float ty = GetGroundY(currentStage);
+
+                    const float T = BOSS_JUMP_TIME;
+                    z.jumpVX = (tx - z.x) / T;
+                    z.jumpVZ = (tz - z.z) / T;
+                    z.jumpVY = (ty - z.y + 0.5f * G * T * T) / T;
+
+                    z.isJumping = true;
+                    z.jumpTime = T + 0.2f;           
+                    SetZombieState(z, Zombie::ATTACK);  //임시   
+
+                    bossTimer = BOSS_JUMP_COOLDOWN;
+                    continue; 
+                }
+                else {
+                    bossTimer = 0.2f; 
                 }
             }
-        }*/
-        z.attackCooldown -= dt;
-        if (z.attackCooldown < 0.0f) z.attackCooldown = 0.0f;
+        }
 
         // 1) 가장 가까운 플레이어 찾기 
         PER_SOCKET_CONTEXT* nearest = nullptr;
@@ -438,8 +493,8 @@ void GameRoom::UpdateZombies(float dt)
             // 7) 브로드캐스트
             changed.push_back(
                 sc_packet_zombie_snapshot::Entry{
-                    static_cast<uint32_t>(z.id),     // ← 명시적 캐스트
-                    Vector3{ z.x, z.y, z.z }
+        static_cast<uint32_t>(z.id),
+        Vector3{ z.x, z.y + ySendOffset, z.z } 
                 }
             );
             //BroadcastZombieMove(z, appliedDx, appliedDz);
@@ -452,8 +507,8 @@ void GameRoom::UpdateZombies(float dt)
                 z.x += dx;  z.z += dz;
                 changed.push_back(
                     sc_packet_zombie_snapshot::Entry{
-                        static_cast<uint32_t>(z.id),     // ← 명시적 캐스트
-                        Vector3{ z.x, z.y, z.z }
+            static_cast<uint32_t>(z.id),
+            Vector3{ z.x, z.y + ySendOffset, z.z }
                     }
                 );
                 //BroadcastZombieMove(z, dx, dz);
@@ -649,7 +704,7 @@ void GameRoom::SpawnBoss(float x, float y, float z)
     pkt.size = sizeof(pkt);
     pkt.type = S2C_P_SPAWN_ZOMBIE;
     pkt.zombieId = boss.id;
-    pkt.position = { boss.x, boss.y, boss.z };
+    pkt.position = { boss.x, boss.y + ((currentStage == 2) ? -10.0f : 0.0f), boss.z };
     pkt.zombieType = static_cast<unsigned char>(ZombieType::BOSS);
     for (auto* peer : players) PostSendPacket(peer, &pkt, pkt.size);
 }
