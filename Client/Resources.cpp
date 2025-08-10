@@ -5,6 +5,11 @@
 
 void Resources::Init()
 {
+	LoadPointMesh();
+	LoadRectangleMesh();
+	LoadCubeMesh();
+	LoadSphereMesh();
+
 	CreateDefaultShader();
 	CreateDefaultMaterial();
 }

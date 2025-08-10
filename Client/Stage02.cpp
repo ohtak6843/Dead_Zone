@@ -21,6 +21,8 @@
 #include "JsonMgr.h"
 #include "FmodMgr.h"
 
+#include "Zombie.h"
+
 Stage02::Stage02()
 {
 }
@@ -33,12 +35,13 @@ void Stage02::LoadResources()
 {
 	// 맵 로드
 	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Abandoned_Factory.fbx");
+	
 
 	// 플레이어 로드
 	//GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Soldado.fbx");
 
 	// 좀비 로드
-	//GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\SkeletonZombie.fbx");
 }
 
 void Stage02::Init()
@@ -341,5 +344,24 @@ void Stage02::Init()
 
 #pragma region Load UI
 	GET_SINGLE(SceneMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
+#pragma endregion
+
+#pragma region Test Zombie
+	//shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\WarZombie.fbx");
+
+	//for (int i = 0; i < 20; i++)
+	//{
+	//	Vec3 position = Vec3(i * 50, 0.f, i* 50.f);
+	//	vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate(ColliderType::OBB);
+
+	//	for (auto& gameObject : gameObjects)
+	//	{
+	//		gameObject->SetStatic(false);
+	//		gameObject->GetTransform()->SetLocalRotation(Vec3(-90.f, 180.f, 0.f));
+	//		gameObject->GetTransform()->SetLocalPosition(position);
+	//		//gameObject->GetAnimator()->Play(i % 3);
+	//		AddGameObject(gameObject);
+	//	}
+	//}
 #pragma endregion
 }

@@ -28,12 +28,13 @@ struct PER_SOCKET_CONTEXT {
     int            health;
     float          posX, posY, posZ;
     Vector3        look;
-    float          walkSpeed, runSpeed;
-    int            faintCount;
-    bool           isFainted;
+    float          walkSpeed;
     float          moveX, moveY, moveZ;
     bool          isJumping;
     float         verticalVelocity;
+    float           damage;
+    int   maxHealth;
+    int   gold;
     bool hasSceneReady = false;
 };
 

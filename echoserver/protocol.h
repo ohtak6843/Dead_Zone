@@ -28,6 +28,9 @@ constexpr char C2S_P_STAGE_LOADED = 24;
 constexpr char S2C_P_PLAYER_HEALTH = 25;
 constexpr char S2C_P_STAGE_CLEAR = 26;
 constexpr char S2C_P_GAME_CLEAR = 27;
+constexpr char S2C_P_ZOMBIE_SNAPSHOT = 29;
+constexpr char S2C_P_AUGMENT_OPTIONS = 30;  
+constexpr char C2S_P_AUGMENT_SELECT = 31;   
 
 struct Vector3 {
     float x;
@@ -89,10 +92,10 @@ struct sc_packet_login_ok {
     long long     playerId;
     Vector3       position;
     int           health;
+    int      maxHealth;    
+    int      gold;         
+    float    damage;        
     float         walkSpeed;
-    float         runSpeed;
-    int           faintCount;
-    bool          isFainted;
 };
 
 struct sc_packet_player_info {
@@ -101,10 +104,10 @@ struct sc_packet_player_info {
     long long     playerId;
     Vector3       position;
     int           health;
+    int      maxHealth;     
+    int      gold;         
+    float    damage;        
     float         walkSpeed;
-    float         runSpeed;
-    int           faintCount;
-    bool          isFainted;
 };
 
 struct sc_packet_move {
@@ -215,6 +218,31 @@ struct sc_packet_stage_clear {
 struct sc_packet_game_clear {
     uint8_t size;
     char    type;
+};
+
+struct sc_packet_zombie_snapshot {
+    uint8_t size;      // 전체 패킷 크기(Byte)
+    char    type;      // == S2C_P_ZOMBIE_SNAPSHOT
+    uint8_t count;     // 뒤에 오는 Entry 개수
+
+    // count개의 좀비 정보를 이어 붙임
+    struct Entry {
+        uint32_t zombieId;
+        Vector3  position;
+    } entries[0];
+};
+
+struct sc_packet_augment_options {
+    uint8_t  size;      // 전체 패킷 크기
+    char     type;      // == S2C_P_AUGMENT_OPTIONS
+    uint8_t  count;     // 뒤에 붙은 옵션 개수
+    uint8_t  options[0]; // 0: 플레이어 공격력 증강
+};
+
+struct cs_packet_augment_select {
+    uint8_t size;         
+    char    type;         
+    uint8_t selectedIndex;
 };
 
 #pragma pack(pop)
