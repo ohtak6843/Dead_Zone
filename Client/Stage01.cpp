@@ -41,8 +41,8 @@ void Stage01::LoadResources()
 	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Soldado.fbx");
 
 	// 좀비 로드
-	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
-	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\PoliceZombie.fbx");
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Prisoner.fbx");
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\WarZombie.fbx");
 	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\EliteZombie.fbx");
 }
 

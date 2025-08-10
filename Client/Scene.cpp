@@ -428,13 +428,13 @@ void Scene::AddZombie(sc_packet_spawn_zombie* packet)
 	{
 	case ZOMBIE_TYPE::NORMAL:
 	{
-		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
+		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Prisoner.fbx");
 		zombieObjects = meshData->InstantiateAs<Zombie>(ColliderType::OBB);
 		break;
 	}
 	case ZOMBIE_TYPE::POLICE:
 	{
-		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\PoliceZombie.fbx");
+		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\WarZombie.fbx");
 		auto specificZombies = meshData->InstantiateAs<PoliceZombie>(ColliderType::OBB);
 		for (auto& z : specificZombies)
 			zombieObjects.push_back(static_pointer_cast<Zombie>(z));

@@ -309,7 +309,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // 게임 프레임워크 초기화
     gameFramework->Init(GWindowInfo);
-    GET_SINGLE(SceneMgr)->LoadScene(SCENE_TYPE::STAGE02);
+    GET_SINGLE(SceneMgr)->LoadScene(SCENE_TYPE::TITLE);
 
     std::thread recvThread(ReceiverThread, g_clientSocket);
 

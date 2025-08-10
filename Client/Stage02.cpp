@@ -35,12 +35,13 @@ void Stage02::LoadResources()
 {
 	// 맵 로드
 	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Abandoned_Factory.fbx");
+	
 
 	// 플레이어 로드
 	//GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Soldado.fbx");
 
 	// 좀비 로드
-	//GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\SkeletonZombie.fbx");
 }
 
 void Stage02::Init()
@@ -346,7 +347,7 @@ void Stage02::Init()
 #pragma endregion
 
 #pragma region Test Zombie
-	//shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Prisoner.fbx");
+	//shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\WarZombie.fbx");
 
 	//for (int i = 0; i < 20; i++)
 	//{
