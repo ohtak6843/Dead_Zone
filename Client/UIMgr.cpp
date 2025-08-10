@@ -23,7 +23,7 @@ void UIMgr::Update()
 
 }
 
-void UIMgr::CreateImageUI(const wstring& name, const wstring& texPath, const Vec2& pos, const Vec2& size, const float alpha, shared_ptr<Scene> scene = nullptr)
+void UIMgr::CreateImageUI(const wstring& name, const wstring& texPath, const Vec2& pos, const Vec2& size, const float alpha, bool active = true, shared_ptr<Scene> scene = nullptr)
 {
     if (_uiMap.contains(name))
         return;
@@ -48,6 +48,7 @@ void UIMgr::CreateImageUI(const wstring& name, const wstring& texPath, const Vec
 
 	UI->SetName(name);
     UI->SetMeshRenderer(meshRenderer);
+    UI->SetActive(active);
     _uiMap.insert({ name, UI });
 
 	if (scene == nullptr)
@@ -55,7 +56,7 @@ void UIMgr::CreateImageUI(const wstring& name, const wstring& texPath, const Vec
     scene->AddGameObject(UI);
 }
 
-void UIMgr::CreateRectangleUI(const wstring& name, const Vec2& pos, const Vec2& size, const Vec4 color, shared_ptr<class Scene> scene = nullptr)
+void UIMgr::CreateRectangleUI(const wstring& name, const Vec2& pos, const Vec2& size, const Vec4 color, bool active = true, shared_ptr<class Scene> scene = nullptr)
 {
     if (_uiMap.contains(name))
         return;
@@ -76,6 +77,7 @@ void UIMgr::CreateRectangleUI(const wstring& name, const Vec2& pos, const Vec2& 
 
     panel->SetName(name);
     panel->SetMeshRenderer(meshRenderer);
+	panel->SetActive(active);
     _uiMap.insert({ name, panel });
 
     if (scene == nullptr)

@@ -283,6 +283,15 @@ void Scene::AddPlayer(sc_packet_player_info* packet)
 			return static_pointer_cast<Gun>(mp); // 업캐스팅
 		});
 	gameObjects[0]->AddGun(tempGuns);
+	
+	// UI 패널 활성화
+	auto scene = GET_SINGLE(SceneMgr)->GetActiveScene();
+	int32 index = _players.size() + 1; // 현재 플레이어의 인덱스
+	auto Panel = scene->FindGameObject(L"PlayerPanel_" + to_wstring(index));
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index))->SetActive(true);
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_HP")->SetActive(true);
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Max_HP")->SetActive(true);
+	
 }
 
 void Scene::MovePlayer(sc_packet_move* packet)
@@ -377,6 +386,13 @@ void Scene::RemovePlayer(sc_packet_player_leave* packet)
 				RemoveGameObject(part);
 
 			_players.erase(id);
+
+			// UI 패널 비활성화 ( 해당 함수가 불러지지 않아서 확인을 하지 못함. 추후 확인 필요)
+			auto scene = GET_SINGLE(SceneMgr)->GetActiveScene();
+			int32 index = _players.size() + 1; // 현재 플레이어의 인덱스
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index))->SetActive(false);
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_HP")->SetActive(false);
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Max_HP")->SetActive(false);
 		}
 	}
 }

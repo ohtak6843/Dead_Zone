@@ -233,45 +233,6 @@ void SceneMgr::RenderUI()
 				hpber->GetTransform()->SetLocalPosition(position);
 			}
 		}
-
-		while (index < 3)
-		{
-			index++;
-
-			wstring name = L"???";
-			uint32 hp = 50;
-
-			std::wstringstream wss;
-			wss << name << " - " << hp;
-
-			GET_SINGLE(UIMgr)->DrawTextUI(
-				wss.str(),
-				Vec2(10.f, 740.f - (60.f * (index - 1))),
-				Vec2(300.f, 100.f),
-				16,
-				D2D1::ColorF::White,
-				D2D1::ColorF(0, 0, 0, 0.0f)
-			);
-
-			auto hpber = _activeScene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_HP");
-			if (hpber)
-			{
-				uint32 maxHp = 100;
-				float hpRatio = static_cast<float>(hp) / maxHp;
-
-				const float fullWidth = 270.f; // 전체 HP바 너비
-				Vec3 scale = hpber->GetTransform()->GetLocalScale();
-				scale.x = fullWidth * hpRatio;
-				hpber->GetTransform()->SetLocalScale(scale);
-
-
-				Vec3 position = hpber->GetTransform()->GetLocalPosition();
-				position.x = -495.f - (fullWidth * (1.f - hpRatio) * 0.5f);  // 왼쪽 기준 보정
-				hpber->GetTransform()->SetLocalPosition(position);
-			}
-		}
-			
-
 	}
 
 
@@ -696,6 +657,7 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		Vec2(0.f, 0.f), // 화면 중앙
 		Vec2(50.f, 50.f), // 크기
 		1.f, // 투명도 0 ~ 1
+		true, // 활성화 여부
 		scene
 	);
 
@@ -706,6 +668,7 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		Vec2(490.f, -360.f),
 		Vec2(300.f, 50.f),
 		Vec4(0.5f, 0.5f, 0.5f, 0.5f), // 반투명 검정색
+		true, // 활성화 여부
 		scene
 	);
 
@@ -715,6 +678,7 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		Vec2(520.f, -360.f), 
 		Vec2(165.f, 50.f),
 		0.5f, // 투명도 0 ~ 1
+		true, // 활성화 여부
 		scene
 	);
 	GET_SINGLE(UIMgr)->CreateImageUI(
@@ -723,6 +687,7 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		Vec2(410.f, -360.f), 
 		Vec2(40.f, 40.f),
 		0.5f, // 투명도 0 ~ 1
+		true, // 활성화 여부
 		scene
 	);
 
@@ -732,6 +697,7 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		Vec2(-500.f, -360.f),				// 위치
 		Vec2(300.f, 50.f),					// 크기
 		Vec4(0.5f, 0.5f, 0.5f, 0.5f),		// 색상
+		true, // 활성화 여부
 		scene
 	);
 
@@ -740,6 +706,7 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		Vec2(-495.f, -370.f),				// 위치
 		Vec2(270.f, 20.f),					// 크기
 		Vec4(0.0f, 0.0f, 0.0f, 1.f),		// 색상
+		true, // 활성화 여부
 		scene
 	);
 	GET_SINGLE(UIMgr)->CreateRectangleUI(
@@ -747,6 +714,7 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		Vec2(-495.f, -370.f),				// 위치
 		Vec2(270.f, 20.f),					// 크기
 		Vec4(1.f, 0.0f, 0.0f, 1.f),			// 색상
+		true, // 활성화 여부
 		scene
 	);
 
@@ -757,14 +725,16 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		Vec2(-500.f, -300.f),				// 위치
 		Vec2(300.f, 50.f),					// 크기
 		Vec4(0.5f, 0.5f, 0.5f, 0.5f),		// 색상
+		false, // 활성화 여부
 		scene
 	);
 
 	GET_SINGLE(UIMgr)->CreateRectangleUI(
-		L"PlayerPanel_2_Max_Hp",			// 이름
+		L"PlayerPanel_2_Max_HP",			// 이름
 		Vec2(-495.f, -310.f),				// 위치
 		Vec2(270.f, 20.f),					// 크기
 		Vec4(0.0f, 0.0f, 0.0f, 1.f),		// 색상
+		false, // 활성화 여부
 		scene
 	);
 	GET_SINGLE(UIMgr)->CreateRectangleUI(
@@ -772,6 +742,7 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		Vec2(-495.f, -310.f),				// 위치
 		Vec2(270.f, 20.f),					// 크기
 		Vec4(1.f, 0.0f, 0.0f, 1.f),			// 색상
+		false, // 활성화 여부
 		scene
 	);
 
@@ -782,14 +753,16 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		Vec2(-500.f, -240.f),				// 위치
 		Vec2(300.f, 50.f),					// 크기
 		Vec4(0.5f, 0.5f, 0.5f, 0.5f),		// 색상
+		false, // 활성화 여부
 		scene
 	);
 
 	GET_SINGLE(UIMgr)->CreateRectangleUI(
-		L"PlayerPanel_3_Max_Hp",			// 이름
+		L"PlayerPanel_3_Max_HP",			// 이름
 		Vec2(-495.f, -250.f),				// 위치
 		Vec2(270.f, 20.f),					// 크기
 		Vec4(0.0f, 0.0f, 0.0f, 1.f),		// 색상
+		false, // 활성화 여부
 		scene
 	);
 	GET_SINGLE(UIMgr)->CreateRectangleUI(
@@ -797,23 +770,8 @@ void SceneMgr::LoadUIImage(shared_ptr<Scene> scene)
 		Vec2(-495.f, -250.f),				// 위치
 		Vec2(270.f, 20.f),					// 크기
 		Vec4(1.f, 0.0f, 0.0f, 1.f),			// 색상
+		false, // 활성화 여부
 		scene
 	);
 
-	
-
-
-	//for (size_t i = 0; i < 20; i++)
-	//{
-	//	// 플레이어 정보 출력
-	//	GET_SINGLE(UIMgr)->CreateImageUI(
-	//		L"소총탄",
-	//		L"..\\Resources\\Texture\\Icon\\Bullet\\소총탄.png",
-	//		Vec2(410.f, -360.f),
-	//		Vec2(40.f, 40.f),
-	//		scene
-	//	);
-	//}
-
-	
 }
