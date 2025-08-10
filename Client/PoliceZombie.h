@@ -8,7 +8,6 @@ enum class POLICE_ZOMBIE_ANIMATION
 	DIE,
 	IDLE,
 	RUN,
-	T_POSE,
 
 	END
 };

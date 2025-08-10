@@ -20,6 +20,8 @@
 #include "InputMgr.h"
 #include "JsonMgr.h"
 
+#include "Zombie.h"
+
 Stage01::Stage01()
 {
 }
@@ -31,14 +33,16 @@ Stage01::~Stage01()
 void Stage01::LoadResources()
 {
 	// 맵 로드
-	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Factory1Items.fbx");
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Factory1_Roof.fbx");
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Factory1_Base.fbx");
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Factory1_Debris.fbx");
 
 	// 플레이어 로드
 	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Soldado.fbx");
 
 	// 좀비 로드
-	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\NormalZombie.fbx");
-	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\PoliceZombie.fbx");
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Prisoner.fbx");
+	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\WarZombie.fbx");
 	GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\EliteZombie.fbx");
 }
 
@@ -364,5 +368,23 @@ void Stage01::Init()
 
 #pragma region Load UI
 	GET_SINGLE(SceneMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
+#pragma endregion
+
+#pragma region Test Zombie
+	//shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Zombie3.fbx");
+
+	//for (int i = 0; i < 20; i++)
+	//{
+	//	Vec3 position = Vec3(i * 30, 0.f, i * 30.f);
+	//	vector<shared_ptr<GameObject>> gameObjects = meshData->Instantiate(ColliderType::OBB);
+
+	//	for (auto& gameObject : gameObjects)
+	//	{
+	//		gameObject->SetStatic(false);
+	//		gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 180.f, 0.f));
+	//		gameObject->GetTransform()->SetLocalPosition(position);
+	//		AddGameObject(gameObject);
+	//	}
+	//}
 #pragma endregion
 }

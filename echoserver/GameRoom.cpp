@@ -268,8 +268,8 @@ void GameRoom::SpawnZombies()
     auto now = std::chrono::steady_clock::now();
 
     // 스테이지별 최대 & 틱당 소환 개수
-    int  maxCount = (currentStage == 1) ? 30 : 10;
-    int  batchSize = (currentStage == 1) ? 30 : 10;
+    int  maxCount = (currentStage == 1) ? 10 : 20;
+    int  batchSize = (currentStage == 1) ? 10 : 20;
 
     // 이미 최대 마리수 도달했거나, 인터벌이 지나지 않았다면 리턴
     if ((int)zombies.size() >= maxCount || now - lastSpawn < spawnInterval)
