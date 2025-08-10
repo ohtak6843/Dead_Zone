@@ -31,6 +31,10 @@ public:
 
 	void ClearUI() { _uiMap.clear(); }
 
+public:
+	void LoadUIImage(shared_ptr<class Scene> scene);
+    void RenderUI();
+    void RenderPlayerUI(const long long id, const shared_ptr<class Player>& player, const int32 index);
 private:
     unordered_map<wstring, shared_ptr<GameObject>> _uiMap;
     unordered_map<int, ComPtr<IDWriteTextFormat>> _textFormats;
