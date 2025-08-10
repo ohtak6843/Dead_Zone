@@ -63,20 +63,29 @@ inline vector<shared_ptr<T>> MeshData::InstantiateAs(ColliderType colliderType)
 
 		for (uint32 i = 0; i < info.materials.size(); i++)
 		{
-			if (info.mesh->IsAnimMesh())
-			{
-				info.materials[i]->SetInt(0, 0);
-				gameObject->GetMeshRenderer()->SetMaterial(info.materials[i]->Clone(), i);
-				
-				//info.materials[i]->SetInt(0, 1);
-				//gameObject->GetMeshRenderer()->SetMaterial(info.materials[i], i);
-			}
-			else
-			{
-				info.materials[i]->SetInt(0, 1);
-				gameObject->GetMeshRenderer()->SetMaterial(info.materials[i], i);
-			}
+			//info.materials[i]->SetInt(0, 0);
+			//gameObject->GetMeshRenderer()->SetMaterial(info.materials[i], i);
+			gameObject->GetMeshRenderer()->SetMaterial(info.materials[i]->Clone(), i);
 		}
+
+#pragma region Test Instancing
+		//for (uint32 i = 0; i < info.materials.size(); i++)
+		//{
+		//	if (info.mesh->IsAnimMesh())
+		//	{
+		//		info.materials[i]->SetInt(0, 0);
+		//		gameObject->GetMeshRenderer()->SetMaterial(info.materials[i]->Clone(), i);
+		//		
+		//		//info.materials[i]->SetInt(0, 1);
+		//		//gameObject->GetMeshRenderer()->SetMaterial(info.materials[i], i);
+		//	}
+		//	else
+		//	{
+		//		info.materials[i]->SetInt(0, 1);
+		//		gameObject->GetMeshRenderer()->SetMaterial(info.materials[i], i);
+		//	}
+		//}
+#pragma endregion
 
 		if (info.mesh->IsAnimMesh())
 		{

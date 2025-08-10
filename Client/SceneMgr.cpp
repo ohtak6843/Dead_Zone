@@ -35,6 +35,7 @@
 #include "TitleScene.h"
 #include "Stage01.h"
 #include "Stage02.h"
+#include "Stage03.h"
 
 #include "UIMgr.h"
 #include "InputMgr.h"
@@ -75,7 +76,7 @@ void SceneMgr::RenderUI()
 
 	brush->SetColor(D2D1::ColorF(D2D1::ColorF::White)); // 텍스트 색 설정
 
-	if (_activeScene && (_sceneType == SCENE_TYPE::STAGE01 || _sceneType == SCENE_TYPE::STAGE02))
+	if (_activeScene && (_sceneType != SCENE_TYPE::TITLE && _sceneType != SCENE_TYPE::LOADING))
 	{
 		//// 플레이어 보는 방향
 		//{
@@ -294,6 +295,10 @@ void SceneMgr::LoadScene(SCENE_TYPE type)
 		GET_SINGLE(SceneMgr)->SetSceneType(SCENE_TYPE::STAGE02);
 		_activeScene = make_shared<Stage02>();
 		break;
+	case SCENE_TYPE::STAGE03:
+		GET_SINGLE(SceneMgr)->SetSceneType(SCENE_TYPE::STAGE03);
+		_activeScene = make_shared<Stage03>();
+		break;
 	}
 
 	_activeScene->LoadResources();
@@ -317,6 +322,11 @@ void SceneMgr::LoadScene(SCENE_TYPE type)
 		INPUT->LockCursor(true);
 		gameFramework->ToggleFullScreen(true);
 		GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE02);
+		break;
+	case SCENE_TYPE::STAGE03:
+		INPUT->LockCursor(true);
+		gameFramework->ToggleFullScreen(true);
+		//GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE03);
 		break;
 	}
 }

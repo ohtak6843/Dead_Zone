@@ -264,24 +264,24 @@ void LocalPlayer::ProcessKeyInput()
 		GetTransform()->LookAt(Vec3(0.f, 0.f, -1.f));
 	}
 
-	if (INPUT->GetButtonDown(KEY_TYPE::F))
-	{
-		// 테스트용 임시로 대충 만듦
-		_GunType = (_GunType + 1) % _MaxGunType;
-		if (_GunType == 0)
-		{
-			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47")->SetActive(false);
-			auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1");
-			gun->SetActive(true);
+	//if (INPUT->GetButtonDown(KEY_TYPE::F))
+	//{
+	//	// 테스트용 임시로 대충 만듦
+	//	_GunType = (_GunType + 1) % _MaxGunType;
+	//	if (_GunType == 0)
+	//	{
+	//		GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47")->SetActive(false);
+	//		auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1");
+	//		gun->SetActive(true);
 
-		}
-		else if (_GunType == 1)
-		{
-			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1")->SetActive(false);
-			auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47");
-			gun->SetActive(true);
-		}
-	}
+	//	}
+	//	else if (_GunType == 1)
+	//	{
+	//		GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1")->SetActive(false);
+	//		auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47");
+	//		gun->SetActive(true);
+	//	}
+	//}
 }
 
 void LocalPlayer::ProcessMouseInput()
