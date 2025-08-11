@@ -231,6 +231,7 @@
     <ClInclude Include="TitleScene.h" />
     <ClInclude Include="UICamera.h" />
     <ClInclude Include="UIMgr.h" />
+    <ClInclude Include="UIObject.h" />
     <ClInclude Include="UploadBuffer.h" />
     <ClInclude Include="DescriptorHeap.h" />
     <ClInclude Include="targetver.h" />
@@ -303,6 +304,7 @@
     <ClCompile Include="TitleScene.cpp" />
     <ClCompile Include="UICamera.cpp" />
     <ClCompile Include="UIMgr.cpp" />
+    <ClCompile Include="UIObject.cpp" />
     <ClCompile Include="UploadBuffer.cpp" />
     <ClCompile Include="DescriptorHeap.cpp" />
     <ClCompile Include="LocalPlayer.cpp" />
