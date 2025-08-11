@@ -276,8 +276,8 @@ void GameRoom::SpawnZombies()
 
     auto now = std::chrono::steady_clock::now();
 
-    int  maxCount = (currentStage == 1) ? 3 : 5;
-    int  batchSize = (currentStage == 1) ? 3 : 5;
+    int  maxCount = (currentStage == 1) ? 10 : 15;
+    int  batchSize = (currentStage == 1) ? 10 : 15;
 
     if ((int)zombies.size() >= maxCount || now - lastSpawn < spawnInterval)
         return;
@@ -389,6 +389,7 @@ void GameRoom::UpdateZombies(float dt)
                 continue;
             }
 
+            // 점프 공격
             bossTimer -= dt;
             if (bossTimer <= 0.0f) {
                 PER_SOCKET_CONTEXT* target = nullptr;
@@ -414,7 +415,7 @@ void GameRoom::UpdateZombies(float dt)
 
                     z.isJumping = true;
                     z.jumpTime = T + 0.2f;           
-                    SetZombieState(z, Zombie::ATTACK);  //임시   
+                    SetZombieState(z, Zombie::JUMP);
 
                     bossTimer = BOSS_JUMP_COOLDOWN;
                     continue; 

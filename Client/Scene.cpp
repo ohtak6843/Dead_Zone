@@ -24,6 +24,7 @@
 #include "Zombie.h"
 #include "PoliceZombie.h"
 #include "EliteZombie.h"
+#include "BossZombie.h"
 
 #include "TP_AK47.h"
 
@@ -450,8 +451,8 @@ void Scene::AddZombie(sc_packet_spawn_zombie* packet)
 	}
 	case ZOMBIE_TYPE::BOSS:
 	{
-		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\EliteZombie.fbx");
-		auto specificZombies = meshData->InstantiateAs<EliteZombie>(ColliderType::OBB);
+		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\SkeletonZombie.fbx");
+		auto specificZombies = meshData->InstantiateAs<BossZombie>(ColliderType::OBB);
 		for (auto& z : specificZombies)
 			zombieObjects.push_back(static_pointer_cast<Zombie>(z));
 		break;

@@ -10,6 +10,8 @@ enum class ZOMBIE_STATE
 	RUN,
 	ATTACK,
 	DIE,
+	JUMP,
+	SCREAM,
 
 	END
 };
