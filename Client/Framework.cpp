@@ -73,17 +73,34 @@ void Framework::Update()
 		SCENE_TYPE nextSceneType = GET_SINGLE(SceneMgr)->GetNextSceneType();
 		GET_SINGLE(SceneMgr)->SetChangeScene(false);
 		GET_SINGLE(SceneMgr)->SwitchScene(nextSceneType);
-		if (nextSceneType == SCENE_TYPE::STAGE01) {
+		switch (nextSceneType)
+		{
+		case SCENE_TYPE::STAGE01:
+		{
 			cs_packet_generic ready{ static_cast<unsigned char>(sizeof(cs_packet_generic)),C2S_P_SCENE_LOADED };
 			send(gameFramework->GetWindow().sock,
 				reinterpret_cast<char*>(&ready),
 				sizeof(ready), 0);
+			break;
 		}
-		if (nextSceneType == SCENE_TYPE::STAGE02) {
-			cs_packet_stage_loaded ready2{sizeof(cs_packet_stage_loaded),C2S_P_STAGE_LOADED};
+		case SCENE_TYPE::STAGE02:
+		{
+			cs_packet_stage_loaded ready2{ sizeof(cs_packet_stage_loaded),C2S_P_STAGE_LOADED };
 			send(gameFramework->GetWindow().sock,
 				reinterpret_cast<char*>(&ready2),
 				sizeof(ready2), 0);
+			break;
+		}
+		case SCENE_TYPE::STAGE03:
+		{
+			cs_packet_stage_loaded ready3{ sizeof(cs_packet_stage_loaded),C2S_P_STAGE_LOADED };
+			send(gameFramework->GetWindow().sock,
+				reinterpret_cast<char*>(&ready3),
+				sizeof(ready3), 0);
+			break;
+		}
+		default:
+			break;
 		}
 	}
 }

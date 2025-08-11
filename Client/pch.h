@@ -245,3 +245,12 @@ T Lerp(const T& a, const T& b, float t)
 
 void WriteWString(ofstream& out, const wstring& str);
 wstring ReadWString(ifstream& in);
+
+enum class CARD_TYPE
+{
+	PLAYER_DMG_UP,
+	ZOMBIE_DMG_DOWN,
+	PLAYER_HP_UP,
+	PLAYER_SPEED_UP,
+	ZOMBIE_SPEED_DOWN,
+};

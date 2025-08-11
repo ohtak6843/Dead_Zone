@@ -367,6 +367,37 @@ void Stage01::Init()
 	AddGameObject(stageClear);
 #pragma endregion
 
+#pragma region Augment UI
+	for (int i = 0; i < 3; i++)
+	{
+		shared_ptr<GameObject> stageClear = make_shared<GameObject>();
+		wstring name = L"Augment_" + to_wstring(i + 1);
+		stageClear->SetName(name);
+		stageClear->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
+		stageClear->SetTransform(make_shared<Transform>());
+		stageClear->GetTransform()->SetLocalScale(Vec3(350.f, 525.f, 1.f));
+		stageClear->GetTransform()->SetLocalPosition(Vec3(-300.f + 300 * i, 0.f, 1.f));
+		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
+		{
+			shared_ptr<Mesh> mesh = GET_SINGLE(Resources)->LoadRectangleMesh();
+			meshRenderer->SetMesh(mesh);
+		}
+		{
+			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"AlphaTexture");
+			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"PLAYER_DMG_UP", L"..\\Resources\\Texture\\Augment\\좀비 이동속도 감소 카드.png");
+			shared_ptr<Material> material = make_shared<Material>();
+			material->SetShader(shader);
+			material->SetTexture(0, texture);
+			meshRenderer->SetMaterial(material);
+		}
+		stageClear->SetMeshRenderer(meshRenderer);
+		stageClear->SetCheckFrustum(false);
+		stageClear->SetActive(false);
+
+		AddGameObject(stageClear);
+	}
+#pragma endregion
+
 #pragma region Load UI
 	GET_SINGLE(UIMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
 #pragma endregion

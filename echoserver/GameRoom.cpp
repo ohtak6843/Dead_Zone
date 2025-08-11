@@ -22,7 +22,7 @@ constexpr float ST2_MAX_X = 2800.0f;
 constexpr float ST2_MIN_Z = 400.0f;
 constexpr float ST2_MAX_Z = 3300.0f;
 constexpr float ST2_MIN_Y = 0.0f;
-constexpr float PLAYER_RADIUS = 20.0f;
+constexpr float PLAYER_RADIUS = 30.0f;
 constexpr float ZOMBIE_RADIUS = 20.0f;
 
 constexpr float DETECT_RADIUS = 500.0f;
@@ -31,10 +31,17 @@ const float   DETECT_RADIUS2 = DETECT_RADIUS * DETECT_RADIUS;
 const float   ATTACK_RADIUS2 = ATTACK_RADIUS * ATTACK_RADIUS;
 
 constexpr float BOSS_JUMP_COOLDOWN = 10.0f;  
-constexpr float BOSS_JUMP_RADIUS = 700.0f; 
-constexpr float BOSS_JUMP_OFFSET = 120.0f; 
-constexpr float BOSS_JUMP_TIME = 0.8f; 
+constexpr float BOSS_JUMP_RADIUS = 50000.0f; 
+constexpr float BOSS_JUMP_OFFSET = 0.0f; 
+constexpr float BOSS_JUMP_TIME = 2.4f; 
 constexpr float G = 9.8f;
+
+constexpr float BOSS_SCREAM_COOLDOWN = 23.0f;  
+constexpr float BOSS_SCREAM_WINDUP = 1.0f;   
+constexpr float BOSS_SCREAM_RADIUS = 600.0f; 
+constexpr int   BOSS_SCREAM_DAMAGE = 15;    
+constexpr int   BOSS_SCREAM_SPAWN_N = 5;     
+constexpr float BOSS_SCREAM_DURATION = 2.8f;
 
 inline float GetGroundY(int currentStage) {
     return (currentStage == 2) ? ST2_MIN_Y : MAP_MIN_Y;
@@ -66,21 +73,48 @@ void GameRoom::Update(float dt)
         stageChangeTimer -= dt;
         if (stageChangeTimer <= 0.0f) {
             currentStage = nextStage;
-            Vector3 startPos{ 2025.0f, 0.0f, 3974.0f };
+            stageReadyCount = 0;   
+
+            Vector3 startPos{};
+            const char* colliderFile = nullptr;
+
+            if (currentStage == 1) {
+                startPos = { 1185.f, 0.f, 473.f };
+                colliderFile = "../Resources/json/Stage01_Collider.json";
+                
+            }
+            else if (currentStage == 2) {
+                startPos = { 2025.f, 0.f, 3974.f };
+                colliderFile = "../Resources/json/Stage02_Collider.json";
+                
+            }
+            else if (currentStage == 3) {
+                startPos = {100.f, 0.f, 100.f };
+                colliderFile = "../Resources/json/Stage03_Collider.json";
+                        
+            }
+
             for (auto* pl : players) {
                 pl->posX = startPos.x;
                 pl->posY = startPos.y;
                 pl->posZ = startPos.z;
             }
-             mapColliders = MapColliderLoader::Load("../Resources/json/Stage02_Collider.json");
-        std::cout << "Loaded colliders: " << mapColliders.size() << "\n";
-         
+
+            try {
+                mapColliders = MapColliderLoader::Load(colliderFile);
+                std::cout << "Loaded colliders: " << mapColliders.size() << "\n";
+            }
+            catch (const std::exception& e) {
+                std::cerr << "맵 콜라이더 로드 실패: " << e.what() << std::endl;
+            }
+
             sc_packet_stage_change stagePkt{};
             stagePkt.size = sizeof(stagePkt);
             stagePkt.type = S2C_P_STAGE_CHANGE;
             stagePkt.newStage = (uint8_t)currentStage;
             for (auto* peer : players)
                 PostSendPacket(peer, &stagePkt, stagePkt.size);
+
             stageChangeTimer = -1.0f;
         }
     }
@@ -249,8 +283,8 @@ void GameRoom::SpawnZombies()
 
     auto now = std::chrono::steady_clock::now();
 
-    int  maxCount = (currentStage == 1) ? 10 : 20;
-    int  batchSize = (currentStage == 1) ? 10 : 20;
+    int  maxCount = (currentStage == 1) ? 10 : 15;
+    int  batchSize = (currentStage == 1) ? 10 : 15;
 
     if ((int)zombies.size() >= maxCount || now - lastSpawn < spawnInterval)
         return;
@@ -285,8 +319,8 @@ void GameRoom::SpawnZombies()
 
         int pct = rand() % 100;
         ZombieType type;
-        if (pct < 0)           type = ZombieType::BASIC;
-        else if (pct < 0)      type = ZombieType::ELITE;
+        if (pct < 50)           type = ZombieType::BASIC;
+        else if (pct < 80)      type = ZombieType::ELITE;
         else                    type = ZombieType::POLICE;
 
         Zombie z(type);
@@ -312,7 +346,7 @@ void GameRoom::SpawnZombies()
 
 void GameRoom::UpdateZombies(float dt)
 {
-    const float ySendOffset = (currentStage == 2) ? -15.0f : 0.0f;
+    const float ySendOffset = (currentStage == 2 || currentStage==3) ? -15.0f : 0.0f;
     HandleZombiePhysics(dt);
     HandleZombieCollisions();
     std::vector<sc_packet_zombie_snapshot::Entry> changed;
@@ -323,6 +357,79 @@ void GameRoom::UpdateZombies(float dt)
         if (z.attackCooldown < 0.0f) z.attackCooldown = 0.0f;
 
         if (z.type == ZombieType::BOSS) {
+            if (z.isRecovering) {
+                z.recoverTimer -= dt;
+                changed.push_back({ (uint32_t)z.id, Vector3{ z.x, z.y + ySendOffset, z.z } });
+                if (z.recoverTimer <= 0.f) {
+                    z.isRecovering = false;
+                    SetZombieState(z, Zombie::WALK);
+                }
+                continue; 
+            }
+
+            if (z.isScreaming) {
+                if (z.screamWindup > 0.f) {
+                    z.screamWindup -= dt;
+                    changed.push_back({ (uint32_t)z.id, Vector3{ z.x, z.y + ySendOffset, z.z } });
+
+                    if (z.screamWindup <= 0.f) {
+                        const float R2 = BOSS_SCREAM_RADIUS * BOSS_SCREAM_RADIUS;
+                        for (auto* p : players) {
+                            float dx = p->posX - z.x, dz = p->posZ - z.z;
+                            if (dx * dx + dz * dz <= R2) {
+                                int nh = p->health - BOSS_SCREAM_DAMAGE;
+                                if (nh < 0) nh = 0;
+                                p->health = nh;
+
+                                sc_packet_player_health hp{};
+                                hp.size = sizeof(hp);
+                                hp.type = S2C_P_PLAYER_HEALTH;
+                                hp.playerId = p->socket;
+                                hp.health = p->health;
+                                for (auto* peer : players) PostSendPacket(peer, &hp, hp.size);
+                            }
+                        }
+                        SpawnMinionsAround(z, BOSS_SCREAM_SPAWN_N, 80.f, 150.f);
+                    }
+                    continue; 
+                }
+
+                z.screamTimer -= dt;
+                changed.push_back({ (uint32_t)z.id, Vector3{ z.x, z.y + ySendOffset, z.z } });
+
+                if (z.screamTimer <= 0.f) {
+                    z.isScreaming = false;
+                    z.screamTimer = BOSS_SCREAM_COOLDOWN; 
+                    z.isRecovering = true;
+                    z.recoverTimer = 0.5f;            
+                    SetZombieState(z, Zombie::IDLE);
+                }
+                continue; 
+            }
+            z.screamTimer -= dt;
+            if (z.screamTimer <= 0.f && !z.isJumping && !z.isPreJump && !z.isRecovering) {
+                z.isScreaming = true;
+                z.screamWindup = BOSS_SCREAM_WINDUP;     
+                z.screamTimer = BOSS_SCREAM_DURATION;   
+                SetZombieState(z, Zombie::SCREAM);
+                changed.push_back({ (uint32_t)z.id, Vector3{ z.x, z.y + ySendOffset, z.z } });
+                continue;
+            }
+
+            if (z.isPreJump) {
+                z.preJumpTimer -= dt;
+                if (z.preJumpTimer <= 0.f) {
+                    const float T = BOSS_JUMP_TIME;
+                    z.jumpVX = (z.destX - z.x) / T;
+                    z.jumpVZ = (z.destZ - z.z) / T;
+                    z.jumpVY = (z.destY - z.y + 0.5f * G * T * T) / T;
+
+                    z.isPreJump = false;
+                    z.isJumping = true;
+                    z.jumpTime = T + 0.2f;
+                }
+                continue;
+            }
             if (z.isJumping) { 
                 z.x += z.jumpVX * dt;
                 z.z += z.jumpVZ * dt;
@@ -335,7 +442,9 @@ void GameRoom::UpdateZombies(float dt)
                 if (landed) {
                     z.y = groundY;
                     z.isJumping = false;
-                    SetZombieState(z, Zombie::WALK); 
+                    z.isRecovering = true;
+                    z.recoverTimer = 1.0f;
+                    SetZombieState(z, Zombie::IDLE);
 
                     changed.push_back({ (uint32_t)z.id, Vector3{ z.x, z.y, z.z } });
 
@@ -362,6 +471,7 @@ void GameRoom::UpdateZombies(float dt)
                 continue;
             }
 
+            // 점프 공격
             bossTimer -= dt;
             if (bossTimer <= 0.0f) {
                 PER_SOCKET_CONTEXT* target = nullptr;
@@ -380,17 +490,20 @@ void GameRoom::UpdateZombies(float dt)
                     float tz = target->posZ + std::sin(ang) * BOSS_JUMP_OFFSET;
                     float ty = GetGroundY(currentStage);
 
-                    const float T = BOSS_JUMP_TIME;
-                    z.jumpVX = (tx - z.x) / T;
-                    z.jumpVZ = (tz - z.z) / T;
-                    z.jumpVY = (ty - z.y + 0.5f * G * T * T) / T;
+                    z.destX = tx; z.destY = ty; z.destZ = tz;
 
-                    z.isJumping = true;
-                    z.jumpTime = T + 0.2f;           
-                    SetZombieState(z, Zombie::ATTACK);  //임시   
+                    z.isPreJump = true;
+                    z.preJumpTimer = 0.1f;
+
+                    z.isJumping = false;
+                    z.jumpVX = z.jumpVZ = z.jumpVY = 0.f;
+                    z.jumpTime = 0.f;
+
+                    SetZombieState(z, Zombie::JUMP);
 
                     bossTimer = BOSS_JUMP_COOLDOWN;
-                    continue; 
+
+                    continue;
                 }
                 else {
                     bossTimer = 0.2f; 
@@ -665,6 +778,12 @@ void GameRoom::SpawnBoss(float x, float y, float z)
     zombies.push_back(boss);
     bossId = boss.id;
     bossSpawned = true;
+    boss.screamTimer = BOSS_SCREAM_COOLDOWN;
+    boss.isScreaming = false;
+    boss.screamWindup = 0.f;
+    boss.isRecovering = false;
+    boss.recoverTimer = 0.f;
+
     bossTimer = 5.0f;
 
     sc_packet_spawn_zombie pkt{};
@@ -679,7 +798,7 @@ void GameRoom::SpawnBoss(float x, float y, float z)
 void GameRoom::StartBossPhase_Internal()
 {
     spawnPaused = true;
-
+    bossKilled = false;
     for (const auto& z : zombies) {
         sc_packet_zombie_die diePkt{};
         diePkt.size = sizeof(diePkt);
@@ -692,4 +811,82 @@ void GameRoom::StartBossPhase_Internal()
     SpawnBoss(bossSpawnPos.x, bossSpawnPos.y, bossSpawnPos.z);
 
     std::cout << "[서버] 보스 페이즈 시작! bossId=" << bossId << "\n";
+}
+
+void GameRoom::SpawnMinionsAround(const Zombie& boss, int count,
+    float innerR, float outerR)
+{
+    for (int i = 0; i < count; ++i) {
+        bool placed = false;
+
+        // 여러 번 시도해서 벽 안 겹치도록
+        for (int tries = 0; tries < 8 && !placed; ++tries) {
+            float ang = (rand() / (float)RAND_MAX) * 2.f * 3.14159265f;
+            float r = innerR + (rand() / (float)RAND_MAX) * (outerR - innerR);
+
+            float x = boss.x + std::cos(ang) * r;
+            float z = boss.z + std::sin(ang) * r;
+            float y = GetGroundY(currentStage);
+
+            // 맵 콜라이더와 겹치면 밀려나므로, 많이 밀리면 실패로 보고 재시도
+            float cx = x, cy = y, cz = z;
+            for (const auto& col : mapColliders) {
+                PhysicsSystem::ResolveCollision(cx, cy, cz, col, ZOMBIE_RADIUS);
+            }
+            float dx = cx - x, dz = cz - z;
+            if (dx * dx + dz * dz > 1.0f) continue; // 벽/오브젝트 안이었다고 판단 → 다시
+
+            // 보스와 너무 겹치지 않도록
+            float bbx = boss.x - cx, bbz = boss.z - cz;
+            if (bbx * bbx + bbz * bbz < (ZOMBIE_RADIUS * 2) * (ZOMBIE_RADIUS * 2)) continue;
+
+            // 플레이어와도 살짝 거리 두기(옵션)
+            bool tooCloseToPlayer = false;
+            for (auto* p : players) {
+                float px = p->posX - cx, pz = p->posZ - cz;
+                if (px * px + pz * pz < (PLAYER_RADIUS + ZOMBIE_RADIUS) * (PLAYER_RADIUS + ZOMBIE_RADIUS)) {
+                    tooCloseToPlayer = true; break;
+                }
+            }
+            if (tooCloseToPlayer) continue;
+
+            // 최종 배치
+            ZombieType type = ZombieType::BASIC;
+            Zombie nz(type);
+            nz.x = cx; nz.y = cy; nz.z = cz;
+            nz.id = nextZombieId++;
+            nz.wanderDirX = nz.wanderDirZ = 0.f;
+            nz.wanderTime = nz.idleTime = 0.f;
+            zombies.push_back(nz);
+
+            sc_packet_spawn_zombie pkt{};
+            pkt.size = sizeof(pkt);
+            pkt.type = S2C_P_SPAWN_ZOMBIE;
+            pkt.zombieId = nz.id;
+            // 스냅샷과 규칙을 맞추려면 2/3스테이지 모두 오프셋 주는 걸 권장
+            float yOff = (currentStage == 2 || currentStage == 3) ? -15.0f : 0.0f;
+            pkt.position = { nz.x, nz.y + yOff, nz.z };
+            pkt.zombieType = static_cast<unsigned char>(type);
+            for (auto* peer : players) PostSendPacket(peer, &pkt, pkt.size);
+
+            placed = true;
+        }
+
+        // 여러 번 실패하면 보스 아주 근처에 강제 배치
+        if (!placed) {
+            Zombie nz(ZombieType::BASIC);
+            nz.x = boss.x + 40.f; nz.y = GetGroundY(currentStage); nz.z = boss.z;
+            nz.id = nextZombieId++;
+            zombies.push_back(nz);
+
+            sc_packet_spawn_zombie pkt{};
+            pkt.size = sizeof(pkt);
+            pkt.type = S2C_P_SPAWN_ZOMBIE;
+            pkt.zombieId = nz.id;
+            float yOff = (currentStage == 2 || currentStage == 3) ? -15.0f : 0.0f;
+            pkt.position = { nz.x, nz.y + yOff, nz.z };
+            pkt.zombieType = static_cast<unsigned char>(ZombieType::BASIC);
+            for (auto* peer : players) PostSendPacket(peer, &pkt, pkt.size);
+        }
+    }
 }

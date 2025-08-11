@@ -45,6 +45,16 @@ public:
     float jumpVZ = 0.f;      
     float jumpTime = 0.f;     
 
+    bool  isPreJump = false;
+    float preJumpTimer = 0.f;
+    float destX = 0.f, destY = 0.f, destZ = 0.f;
+
+    bool  isScreaming = false;
+    float screamTimer = 0.f;
+    float screamWindup = 0.f;
+
+    bool  isRecovering = false;
+    float recoverTimer = 0.f;
     enum ZOMBIE_STATE : uint8_t {
         T_POSE = 0,
         IDLE = 1,
@@ -53,7 +63,8 @@ public:
         ATTACK = 4,
         DIE = 5,
         JUMP=6,
-        END = 7
+        SCREAM=7,
+        END = 8
     }state = IDLE;
     std::string specialSkill;
 

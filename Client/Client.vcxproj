@@ -177,6 +177,7 @@
     <ClInclude Include="Animator.h" />
     <ClInclude Include="BaseCollider.h" />
     <ClInclude Include="BloodParticle.h" />
+    <ClInclude Include="BossZombie.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraObject.h" />
     <ClInclude Include="Client.h" />
@@ -227,6 +228,7 @@
     <ClInclude Include="SphereCollider.h" />
     <ClInclude Include="Stage01.h" />
     <ClInclude Include="Stage02.h" />
+    <ClInclude Include="Stage03.h" />
     <ClInclude Include="TitleCamera.h" />
     <ClInclude Include="TitleScene.h" />
     <ClInclude Include="UICamera.h" />
@@ -248,6 +250,7 @@
     <ClCompile Include="Animator.cpp" />
     <ClCompile Include="BaseCollider.cpp" />
     <ClCompile Include="BloodParticle.cpp" />
+    <ClCompile Include="BossZombie.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraObject.cpp" />
     <ClCompile Include="Client.cpp" />
@@ -300,6 +303,7 @@
     <ClCompile Include="SphereCollider.cpp" />
     <ClCompile Include="Stage01.cpp" />
     <ClCompile Include="Stage02.cpp" />
+    <ClCompile Include="Stage03.cpp" />
     <ClCompile Include="TitleCamera.cpp" />
     <ClCompile Include="TitleScene.cpp" />
     <ClCompile Include="UICamera.cpp" />

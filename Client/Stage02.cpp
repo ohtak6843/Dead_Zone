@@ -143,40 +143,6 @@ void Stage02::Init()
 	}
 #pragma endregion
 
-#pragma region UI_Test
-	//for (int32 i = 0; i < 6; i++)
-	//{
-	//	shared_ptr<GameObject> obj = make_shared<GameObject>();
-	//	obj->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI")); // UI
-	//	obj->SetTransform(make_shared<Transform>());
-	//	obj->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
-	//	obj->GetTransform()->SetLocalPosition(Vec3(-350.f + (i * 120), 250.f, 500.f));
-	//	shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
-	//	{
-	//		shared_ptr<Mesh> mesh = GET_SINGLE(Resources)->LoadRectangleMesh();
-	//		meshRenderer->SetMesh(mesh);
-	//	}
-	//	{
-	//		shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"Texture");
-
-	//		shared_ptr<Texture> texture;
-	//		if (i < 3)
-	//			texture = gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::G_BUFFER)->GetRTTexture(i);
-	//		else if (i < 5)
-	//			texture = gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::LIGHTING)->GetRTTexture(i - 3);
-	//		else
-	//			texture = gameFramework->GetRTGroup(RENDER_TARGET_GROUP_TYPE::SHADOW)->GetRTTexture(0);
-
-	//		shared_ptr<Material> material = make_shared<Material>();
-	//		material->SetShader(shader);
-	//		material->SetTexture(0, texture);
-	//		meshRenderer->SetMaterial(material);
-	//	}
-	//	obj->SetMeshRenderer(meshRenderer);
-	//	AddGameObject(obj);
-	//}
-#pragma endregion
-
 #pragma region Local Player
 	{
 		vector<shared_ptr<LocalPlayer>> localPlayers;
@@ -318,7 +284,7 @@ void Stage02::Init()
 
 #pragma region StageClear UI
 	shared_ptr<GameObject> stageClear = make_shared<GameObject>();
-	stageClear->SetName(L"GameClear");
+	stageClear->SetName(L"StageClear");
 	stageClear->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
 	stageClear->SetTransform(make_shared<Transform>());
 	stageClear->GetTransform()->SetLocalScale(Vec3(600.f, 300.f, 1.f));
@@ -330,7 +296,7 @@ void Stage02::Init()
 	}
 	{
 		shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"AlphaTexture");
-		shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"GameClear", L"..\\Resources\\Texture\\GameClear.png");
+		shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"StageClear", L"..\\Resources\\Texture\\StageClear.png");
 		shared_ptr<Material> material = make_shared<Material>();
 		material->SetShader(shader);
 		material->SetTexture(0, texture);
@@ -341,6 +307,37 @@ void Stage02::Init()
 	stageClear->SetActive(false);
 
 	AddGameObject(stageClear);
+#pragma endregion
+
+#pragma region Augment UI
+	for (int i = 0; i < 3; i++)
+	{
+		shared_ptr<GameObject> stageClear = make_shared<GameObject>();
+		wstring name = L"Augment_" + to_wstring(i + 1);
+		stageClear->SetName(name);
+		stageClear->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
+		stageClear->SetTransform(make_shared<Transform>());
+		stageClear->GetTransform()->SetLocalScale(Vec3(350.f, 525.f, 1.f));
+		stageClear->GetTransform()->SetLocalPosition(Vec3(-300.f + 300 * i, 0.f, 1.f));
+		shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
+		{
+			shared_ptr<Mesh> mesh = GET_SINGLE(Resources)->LoadRectangleMesh();
+			meshRenderer->SetMesh(mesh);
+		}
+		{
+			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"AlphaTexture");
+			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"PLAYER_DMG_UP", L"..\\Resources\\Texture\\Augment\\좀비 이동속도 감소 카드.png");
+			shared_ptr<Material> material = make_shared<Material>();
+			material->SetShader(shader);
+			material->SetTexture(0, texture);
+			meshRenderer->SetMaterial(material);
+		}
+		stageClear->SetMeshRenderer(meshRenderer);
+		stageClear->SetCheckFrustum(false);
+		stageClear->SetActive(false);
+
+		AddGameObject(stageClear);
+	}
 #pragma endregion
 
 #pragma region Load UI

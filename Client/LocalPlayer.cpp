@@ -21,9 +21,6 @@
 
 #include "FmodMgr.h"
 
-extern std::atomic<bool>    g_augmentActive;
-extern std::atomic<uint8_t> g_augmentCount;
-
 LocalPlayer::LocalPlayer()
 {
 	_name = L"MainCamera";
@@ -191,38 +188,7 @@ void LocalPlayer::LateUpdate()
 		lastState = newState;
 	}
 
-	if (g_augmentActive) {
-		SOCKET sock = gameFramework->GetWindow().sock;
-		// 1번 키
-		if (INPUT->GetButtonDown(KEY_TYPE::KEY_1) && g_augmentCount >= 1) {
-			cs_packet_augment_select selPkt{};
-			selPkt.size = sizeof(selPkt);
-			selPkt.type = C2S_P_AUGMENT_SELECT;
-			selPkt.selectedIndex = 0;
-			send(sock, reinterpret_cast<char*>(&selPkt), selPkt.size, 0);
-			g_augmentActive = false;
-		}
-		// 2번 키
-		else if (INPUT->GetButtonDown(KEY_TYPE::KEY_2) && g_augmentCount >= 2) {
-			cs_packet_augment_select selPkt{};
-			selPkt.size = sizeof(selPkt);
-			selPkt.type = C2S_P_AUGMENT_SELECT;
-			selPkt.selectedIndex = 1;
-			send(sock, reinterpret_cast<char*>(&selPkt), selPkt.size, 0);
-			g_augmentActive = false;
-		}
-		// 3번 키
-		else if (INPUT->GetButtonDown(KEY_TYPE::KEY_3) && g_augmentCount >= 3) {
-			cs_packet_augment_select selPkt{};
-			selPkt.size = sizeof(selPkt);
-			selPkt.type = C2S_P_AUGMENT_SELECT;
-			selPkt.selectedIndex = 2;
-			send(sock, reinterpret_cast<char*>(&selPkt), selPkt.size, 0);
-			g_augmentActive = false;
-		}
-	}
-
-	GetTransform()->SetLocalPosition(pos); //서버권위
+	//GetTransform()->SetLocalPosition(pos); //서버권위
 }
 
 void LocalPlayer::ProcessKeyInput()
@@ -264,24 +230,24 @@ void LocalPlayer::ProcessKeyInput()
 		GetTransform()->LookAt(Vec3(0.f, 0.f, -1.f));
 	}
 
-	if (INPUT->GetButtonDown(KEY_TYPE::F))
-	{
-		// 테스트용 임시로 대충 만듦
-		_GunType = (_GunType + 1) % _MaxGunType;
-		if (_GunType == 0)
-		{
-			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47")->SetActive(false);
-			auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1");
-			gun->SetActive(true);
+	//if (INPUT->GetButtonDown(KEY_TYPE::F))
+	//{
+	//	// 테스트용 임시로 대충 만듦
+	//	_GunType = (_GunType + 1) % _MaxGunType;
+	//	if (_GunType == 0)
+	//	{
+	//		GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47")->SetActive(false);
+	//		auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1");
+	//		gun->SetActive(true);
 
-		}
-		else if (_GunType == 1)
-		{
-			GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1")->SetActive(false);
-			auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47");
-			gun->SetActive(true);
-		}
-	}
+	//	}
+	//	else if (_GunType == 1)
+	//	{
+	//		GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"M4A1")->SetActive(false);
+	//		auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(L"AK47");
+	//		gun->SetActive(true);
+	//	}
+	//}
 }
 
 void LocalPlayer::ProcessMouseInput()

@@ -88,6 +88,9 @@ PS_OUT PS_Main(VS_OUT input)
         float3x3 matTBN = { input.viewTangent, input.viewBinormal, input.viewNormal };
         viewNormal = normalize(mul(tangentSpaceNormal, matTBN));
     }
+    
+    if (color.a == 0.f)
+        discard;
 
     output.position = float4(input.viewPos.xyz, 0.f);
     output.normal = float4(viewNormal.xyz, 0.f);
