@@ -40,6 +40,7 @@ uint32_t g_localPlayerId = 0;
 std::atomic<bool>    g_stageChangeRequested{ false };
 std::atomic<uint8_t> g_requestedStage{ 0 };
 
+std::array<uint8_t, 3> g_augmentSlots = { 0,0,0 };
 std::atomic<bool>    g_augmentActive{ false };
 std::atomic<uint8_t> g_augmentCount{ 0 };
 // 네트워크 초기화 함수
@@ -251,6 +252,8 @@ void ReceiverThread(SOCKET clientSocket) {
                 case S2C_P_AUGMENT_OPTIONS: {
                     auto* pOpt = reinterpret_cast<sc_packet_augment_options*>(packet);
                     g_augmentCount = pOpt->count;
+                    for (uint8_t i = 0; i < pOpt->count && i < g_augmentSlots.size(); ++i)
+                        g_augmentSlots[i] = pOpt->options[i];   
                     g_augmentActive = true;
                     break;
                 }
