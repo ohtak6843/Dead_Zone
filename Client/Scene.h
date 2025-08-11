@@ -55,6 +55,9 @@ public:
 	shared_ptr<GameObject> FindGameObject(const wstring& name);
 	void ActiveGameObject(const wstring& name, bool flag);
 
+	void SetAugments(bool flag, array<uint8_t, 3> opt);
+	void ShowAugments(bool flag);
+
 public:
 	void SetLocalPlayer(vector<shared_ptr<Player>>& player);
 

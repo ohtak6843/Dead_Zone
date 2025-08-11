@@ -199,33 +199,22 @@ void ReceiverThread(SOCKET clientSocket) {
                 case S2C_P_STAGE_CHANGE: {
                     auto* p = reinterpret_cast<sc_packet_stage_change*>(packet);
                     GET_SINGLE(SceneMgr)->SetChangeScene(true);
-
-                    if (p->newStage == 1) {
+                    switch (p->newStage)
+                    {
+                    case 1:
                         GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE01);
-                    }
-                    else if (p->newStage == 2) {
-                        GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE02);
-                    }
-                    else if (p->newStage == 3) {
-                        GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE03);
+                        break;
+                    case 2:
+						GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE02);
+						break;
+                    case 3:
+						GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE03);
+                        break;
                     }
                     break;
                 }
                 case S2C_P_STAGE_CLEAR:
                 {
-                    // 스테이지클리어 ui
-                    /*auto sceneType = GET_SINGLE(SceneMgr)->GetSceneType();
-                    switch(sceneType)
-                    {
-					case SCENE_TYPE::STAGE01:
-                        GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"StageClear", true);
-                        GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE_CLEAR);
-                        break;
-                    case SCENE_TYPE::STAGE02:
-                        //GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"GameClear", true);
-                        break;
-                    }*/
-                    
                     GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"StageClear", true);
                     GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE_CLEAR);
                     break;
@@ -255,6 +244,8 @@ void ReceiverThread(SOCKET clientSocket) {
                     for (uint8_t i = 0; i < pOpt->count && i < g_augmentSlots.size(); ++i)
                         g_augmentSlots[i] = pOpt->options[i];   
                     g_augmentActive = true;
+
+					GET_SINGLE(SceneMgr)->GetActiveScene()->SetAugments(true, g_augmentSlots);
                     break;
                 }
                 default:

@@ -220,6 +220,56 @@ void Scene::ActiveGameObject(const wstring& name, bool flag)
 		obj->SetActive(flag);
 }
 
+void Scene::SetAugments(bool flag, array<uint8_t, 3> opt)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		wstring name = L"Augment_" + std::to_wstring(i + 1);
+		shared_ptr<GameObject> obj = FindGameObject(name);
+		if (!obj) continue;
+
+		CARD_TYPE cardType = static_cast<CARD_TYPE>(opt[i]);
+		shared_ptr<Texture> texture;
+		switch (cardType)
+		{
+		case CARD_TYPE::PLAYER_DMG_UP:
+			texture = GET_SINGLE(Resources)->Load<Texture>(L"PLAYER_DMG_UP", L"..\\Resources\\Texture\\Augment\\플레이어 공격력 증가 카드.png");
+			break;
+		case CARD_TYPE::ZOMBIE_DMG_DOWN:
+			texture = GET_SINGLE(Resources)->Load<Texture>(L"ZOMBIE_DMG_DOWN", L"..\\Resources\\Texture\\Augment\\좀비 공격력 감소 카드.png"); 
+			break;
+		case CARD_TYPE::PLAYER_HP_UP:
+			texture = GET_SINGLE(Resources)->Load<Texture>(L"PLAYER_HP_UP", L"..\\Resources\\Texture\\Augment\\플레이어 최대체력 증가 카드.png");
+			break;
+		case CARD_TYPE::PLAYER_SPEED_UP:
+			texture = GET_SINGLE(Resources)->Load<Texture>(L"PLAYER_SPEED_UP", L"..\\Resources\\Texture\\Augment\\플레이어 이동속도 증가 카드.png");
+			break;
+		case CARD_TYPE::ZOMBIE_SPEED_DOWN:
+			texture = GET_SINGLE(Resources)->Load<Texture>(L"ZOMBIE_SPEED_DOWN", L"..\\Resources\\Texture\\Augment\\좀비 이동속도 감소 카드.png");
+			break;
+		default:
+			break;
+		}
+
+		if(texture != nullptr)
+			obj->GetMeshRenderer()->GetMaterial()->SetTexture(0, texture);
+
+		obj->SetActive(flag); // Augment 오브젝트 활성화/비활성화
+	}
+}
+
+void Scene::ShowAugments(bool flag)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		wstring name = L"Augment_" + std::to_wstring(i + 1);
+		shared_ptr<GameObject> obj = FindGameObject(name);
+		if (!obj) continue;
+
+		obj->SetActive(flag); // Augment 오브젝트 활성화/비활성화
+	}
+}
+
 void Scene::SetLocalPlayer(vector<shared_ptr<Player>>& player)
 {
 	_localPlayer = std::move(player);

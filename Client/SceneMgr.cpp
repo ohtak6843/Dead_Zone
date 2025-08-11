@@ -141,6 +141,8 @@ void SceneMgr::RenderUI()
 		//		&textRect,
 		//		device->GetSolidColorBrush().Get());
 		//}
+
+
 		// 잔여탄 UI
 		{
 			// 현재 총알 수를 가져오는 로직 이상 생김. 수정 필요
