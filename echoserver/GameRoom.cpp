@@ -32,8 +32,8 @@ const float   ATTACK_RADIUS2 = ATTACK_RADIUS * ATTACK_RADIUS;
 
 constexpr float BOSS_JUMP_COOLDOWN = 10.0f;  
 constexpr float BOSS_JUMP_RADIUS = 50000.0f; 
-constexpr float BOSS_JUMP_OFFSET = 120.0f; 
-constexpr float BOSS_JUMP_TIME = 0.8f; 
+constexpr float BOSS_JUMP_OFFSET = 0.0f; 
+constexpr float BOSS_JUMP_TIME = 2.4f; 
 constexpr float G = 9.8f;
 
 inline float GetGroundY(int currentStage) {
@@ -350,6 +350,20 @@ void GameRoom::UpdateZombies(float dt)
         if (z.attackCooldown < 0.0f) z.attackCooldown = 0.0f;
 
         if (z.type == ZombieType::BOSS) {
+            if (z.isPreJump) {
+                z.preJumpTimer -= dt;
+                if (z.preJumpTimer <= 0.f) {
+                    const float T = BOSS_JUMP_TIME;
+                    z.jumpVX = (z.destX - z.x) / T;
+                    z.jumpVZ = (z.destZ - z.z) / T;
+                    z.jumpVY = (z.destY - z.y + 0.5f * G * T * T) / T;
+
+                    z.isPreJump = false;
+                    z.isJumping = true;
+                    z.jumpTime = T + 0.2f;
+                }
+                continue;
+            }
             if (z.isJumping) { 
                 z.x += z.jumpVX * dt;
                 z.z += z.jumpVZ * dt;
@@ -408,17 +422,20 @@ void GameRoom::UpdateZombies(float dt)
                     float tz = target->posZ + std::sin(ang) * BOSS_JUMP_OFFSET;
                     float ty = GetGroundY(currentStage);
 
-                    const float T = BOSS_JUMP_TIME;
-                    z.jumpVX = (tx - z.x) / T;
-                    z.jumpVZ = (tz - z.z) / T;
-                    z.jumpVY = (ty - z.y + 0.5f * G * T * T) / T;
+                    z.destX = tx; z.destY = ty; z.destZ = tz;
 
-                    z.isJumping = true;
-                    z.jumpTime = T + 0.2f;           
+                    z.isPreJump = true;
+                    z.preJumpTimer = 0.1f;
+
+                    z.isJumping = false;
+                    z.jumpVX = z.jumpVZ = z.jumpVY = 0.f;
+                    z.jumpTime = 0.f;
+
                     SetZombieState(z, Zombie::JUMP);
 
                     bossTimer = BOSS_JUMP_COOLDOWN;
-                    continue; 
+
+                    continue;
                 }
                 else {
                     bossTimer = 0.2f; 

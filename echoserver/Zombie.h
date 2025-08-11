@@ -45,6 +45,10 @@ public:
     float jumpVZ = 0.f;      
     float jumpTime = 0.f;     
 
+    bool  isPreJump = false;
+    float preJumpTimer = 0.f;
+    float destX = 0.f, destY = 0.f, destZ = 0.f;
+
     enum ZOMBIE_STATE : uint8_t {
         T_POSE = 0,
         IDLE = 1,

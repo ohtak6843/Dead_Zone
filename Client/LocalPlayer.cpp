@@ -222,7 +222,7 @@ void LocalPlayer::LateUpdate()
 		}
 	}
 
-	GetTransform()->SetLocalPosition(pos); //서버권위
+	//GetTransform()->SetLocalPosition(pos); //서버권위
 }
 
 void LocalPlayer::ProcessKeyInput()

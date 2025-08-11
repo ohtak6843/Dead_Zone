@@ -245,3 +245,11 @@ T Lerp(const T& a, const T& b, float t)
 
 void WriteWString(ofstream& out, const wstring& str);
 wstring ReadWString(ifstream& in);
+
+static const std::unordered_map<uint8_t, const wchar_t*> kAugNames = {
+	{0, L"공격력 +50%"},
+	{1, L"좀비 약화"},
+	{2, L"최대 체력 +50%"},
+	{3, L"이동속도 +20%"},
+	{4, L"좀비 느려짐"},
+};
