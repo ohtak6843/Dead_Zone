@@ -277,6 +277,9 @@
     <ClInclude Include="BossZombie.h">
       <Filter>Game\GameObject\Zombie</Filter>
     </ClInclude>
+    <ClInclude Include="UIObject.h">
+      <Filter>Game\GameObject\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc">
@@ -489,6 +492,9 @@
     </ClCompile>
     <ClCompile Include="BossZombie.cpp">
       <Filter>Game\GameObject\Zombie</Filter>
+    </ClCompile>
+    <ClCompile Include="UIObject.cpp">
+      <Filter>Game\GameObject\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

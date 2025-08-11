@@ -124,7 +124,7 @@ void UIMgr::RenderUI()
 
 	brush->SetColor(D2D1::ColorF(D2D1::ColorF::White)); // ÅØ½ºÆ® »ö ¼³Á¤
 
-	if (scene && (sceneType == SCENE_TYPE::STAGE01 || sceneType == SCENE_TYPE::STAGE02))
+	if (scene && (sceneType != SCENE_TYPE::TITLE || sceneType == SCENE_TYPE::LOADING))
 	{
 		// ÀÜ¿©Åº UI
 		{
