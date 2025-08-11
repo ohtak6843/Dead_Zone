@@ -347,6 +347,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
             it->health -= pContext->damage;
 
             if (it->health <= 0) {
+                bool wasBoss = (it->type == ZombieType::BOSS);
                 sc_packet_zombie_die diePkt{};
                 diePkt.size = static_cast<unsigned char>(sizeof(diePkt));
                 diePkt.type = S2C_P_ZOMBIE_DIE;
@@ -356,6 +357,11 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
 
                 room->zombies.erase(it);
                 room->killCount++;
+                
+                if (wasBoss) {
+                    room->bossKilled = true;  
+                    std::cout << "[서버] 보스 처치\n";
+                }
 
                 const int killThreshold = 1;   
                 const int maxStage = 3;       
@@ -380,9 +386,9 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
                     for (auto* peer : room->players)
                         PostSendPacket(peer, &stagePkt, stagePkt.size);
 
-                    room->SendAugmentOptions();  // 원하면 유지/삭제
+                    room->SendAugmentOptions();  
                 }
-                else if (room->currentStage == maxStage && room->killCount >= 1 /*보스 처치 조건*/) {
+                else if (room->currentStage == maxStage && room->bossKilled) {
                     room->zombies.clear();
                     room->spawnPaused = true;
                     room->killCount = 0;

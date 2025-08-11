@@ -40,6 +40,7 @@ public:
     bool      bossSpawned = false;   
     long long bossId = -1;     
     float     bossTimer = 0.0f; // 보스 패턴 타이머
+    bool bossKilled = false;
     std::vector<Zombie>              zombies;
     std::vector<uint8_t>                          augmentOptions;
     std::unordered_map<PER_SOCKET_CONTEXT*, bool>  hasSelected;
@@ -69,7 +70,8 @@ private:
     void SetZombieState(Zombie& z, Zombie::ZOMBIE_STATE newState);
     void BroadcastZombieMove(const Zombie& z, float dx, float dz);
     void ClampZombiePosition(Zombie& z);
-
+    void SpawnMinionsAround(const Zombie& boss, int count,
+        float innerR, float outerR);
     void HandleZombiePhysics(float dt);
     void HandleZombieCollisions();
 
