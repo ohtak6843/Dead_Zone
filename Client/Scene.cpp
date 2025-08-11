@@ -504,7 +504,10 @@ void Scene::AddZombie(sc_packet_spawn_zombie* packet)
 		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\SkeletonZombie.fbx");
 		auto specificZombies = meshData->InstantiateAs<BossZombie>(ColliderType::OBB);
 		for (auto& z : specificZombies)
+		{
+			z->GetTransform()->SetLocalScale(Vec3(1.5f, 1.5f, 1.5f));
 			zombieObjects.push_back(static_pointer_cast<Zombie>(z));
+		}
 		break;
 	}
 	}

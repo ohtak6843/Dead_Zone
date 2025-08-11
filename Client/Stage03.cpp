@@ -72,7 +72,7 @@ void Stage03::Init()
 		camera->SetName(L"Player_Camera");
 		camera->SetTransform(make_shared<Transform>());
 		camera->SetCamera(make_shared<Camera>());
-		camera->GetCamera()->SetFar(10000.f);
+		camera->GetCamera()->SetFar(20000.f);
 		camera->GetCamera()->SetFOV(90.f);
 		camera->GetTransform()->SetLocalPosition(Vec3(0.f, 0.f, 0.f));
 		uint8 layerIndex = GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI");
@@ -308,10 +308,13 @@ void Stage03::Init()
 		for (auto& gameObject : gameObjects)
 		{
 			gameObject->SetStatic(false);
-			gameObject->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
+			gameObject->GetTransform()->SetLocalScale(Vec3(200.f, 200.f, 200.f));
 			gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 0.f, 0.f));
 			AddGameObject(gameObject);
 		}
+
+		GET_SINGLE(JsonMgr)->SaveMapCollider(L"..\\Resources\\Json\\Stage03_Collider.json", gameObjects);
+
 	}
 
 	{
@@ -321,7 +324,7 @@ void Stage03::Init()
 		for (auto& gameObject : gameObjects)
 		{
 			gameObject->SetStatic(false);
-			gameObject->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
+			gameObject->GetTransform()->SetLocalScale(Vec3(200.f, 200.f, 200.f));
 			gameObject->GetTransform()->SetLocalRotation(Vec3(0.f, 0.f, 0.f));
 			AddGameObject(gameObject);
 		}
