@@ -14,6 +14,7 @@
 #include "M4A1.h"
 #include "AK47.h"
 #include "Client.h"
+#include "UIObject.h"
 
 void UIMgr::Init()
 {
@@ -24,8 +25,6 @@ void UIMgr::Init()
 void UIMgr::Update()
 {
     // UI 동적 업데이트
-
-
 }
 
 void UIMgr::RenderPlayerUI(const long long id, const shared_ptr<Player>& player, const int32 index)
@@ -127,71 +126,6 @@ void UIMgr::RenderUI()
 
 	if (scene && (sceneType == SCENE_TYPE::STAGE01 || sceneType == SCENE_TYPE::STAGE02))
 	{
-		//// 플레이어 보는 방향
-		//{
-		//	Vec2 pivot = { static_cast<float>(gameFramework->GetWindow().width - 100), static_cast<float>(gameFramework->GetWindow().height / 2) };
-		//	D2D1_RECT_F textRect = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
-
-		//	// LightPos
-		//	std::wstringstream wss;
-		//	wstring text = L"P_X : ";
-		//	Vec3 pLook = _activeScene->FindGameObject(L"LocalPlayer")->GetTransform()->GetLook();
-		//	wss.str(L"");
-		//	wss.clear();
-		//	wss << std::fixed << std::setprecision(2) << pLook.x;
-		//	text += wss.str();
-		//	text += L"\nP_Y : ";
-		//	wss.str(L"");
-		//	wss.clear();
-		//	wss << std::fixed << std::setprecision(2) << pLook.y;
-		//	text += wss.str();
-		//	text += L"\nP_Z : ";
-		//	wss.str(L"");
-		//	wss.clear();
-		//	wss << std::fixed << std::setprecision(2) << pLook.z;
-		//	text += wss.str();
-
-		//	device->GetD2DDeviceContext()->DrawTextW(
-		//		text.c_str(),
-		//		static_cast<uint32>(text.size()),
-		//		device->GetTextFormat().Get(),
-		//		&textRect,
-		//		device->GetSolidColorBrush().Get());
-		//}
-
-		// 플레이어 위치
-		//{
-		//	Vec2 pivot = { static_cast<float>(100), static_cast<float>(gameFramework->GetWindow().height / 2) };
-		//	D2D1_RECT_F textRect = D2D1::RectF(pivot.x - 100, pivot.y - 200, pivot.x + 100, pivot.y + 200);
-
-		//	// LightPos
-		//	std::wstringstream wss;
-		//	wstring text = L"P_X : ";
-		//	Vec3 pLook = _activeScene->FindGameObject(L"LocalPlayer")->GetTransform()->GetWorldPosition();
-		//	wss.str(L"");
-		//	wss.clear();
-		//	wss << std::fixed << std::setprecision(2) << pLook.x;
-		//	text += wss.str();
-		//	text += L"\nP_Y : ";
-		//	wss.str(L"");
-		//	wss.clear();
-		//	wss << std::fixed << std::setprecision(2) << pLook.y;
-		//	text += wss.str();
-		//	text += L"\nP_Z : ";
-		//	wss.str(L"");
-		//	wss.clear();
-		//	wss << std::fixed << std::setprecision(2) << pLook.z;
-		//	text += wss.str();
-
-		//	device->GetD2DDeviceContext()->DrawTextW(
-		//		text.c_str(),
-		//		static_cast<uint32>(text.size()),
-		//		device->GetTextFormat().Get(),
-		//		&textRect,
-		//		device->GetSolidColorBrush().Get());
-		//}
-
-
 		// 잔여탄 UI
 		{
 			int32 currentAmmo = 0;
@@ -235,12 +169,12 @@ void UIMgr::RenderUI()
 	gameFramework->EndD2DRender();
 }
 
-void UIMgr::CreateImageUI(const wstring& name, const wstring& texPath, const Vec2& pos, const Vec2& size, const float alpha, bool active, shared_ptr<Scene> scene)
+void UIMgr::CreateImageUI(const wstring& name, const wstring& texPath, const Vec2& pos, const Vec2& size, const float alpha, bool active, int32 uiType, shared_ptr<Scene> scene)
 {
     if (_uiMap.contains(name))
         return;
 
-    shared_ptr<GameObject> UI = make_shared<GameObject>();
+    shared_ptr<UIObject> UI = make_shared<UIObject>();
     UI->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
     UI->SetTransform(make_shared<Transform>());
     UI->GetTransform()->SetLocalPosition(Vec3(pos.x, pos.y, 100.f));
@@ -268,16 +202,16 @@ void UIMgr::CreateImageUI(const wstring& name, const wstring& texPath, const Vec
     scene->AddGameObject(UI);
 }
 
-void UIMgr::CreateRectangleUI(const wstring& name, const Vec2& pos, const Vec2& size, const Vec4 color, bool active, shared_ptr<class Scene> scene)
+void UIMgr::CreateRectangleUI(const wstring& name, const Vec2& pos, const Vec2& size, const Vec4 color, bool active, int32 uiType, shared_ptr<class Scene> scene)
 {
     if (_uiMap.contains(name))
         return;
 
-    shared_ptr<GameObject> panel= make_shared<GameObject>();
-    panel->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
-    panel->SetTransform(make_shared<Transform>());
-    panel->GetTransform()->SetLocalPosition(Vec3(pos.x, pos.y, 100.f));
-    panel->GetTransform()->SetLocalScale(Vec3(size.x, size.y, 1.f));
+    shared_ptr<UIObject> UI= make_shared<UIObject>();
+	UI->SetLayerIndex(GET_SINGLE(SceneMgr)->LayerNameToIndex(L"UI"));
+	UI->SetTransform(make_shared<Transform>());
+	UI->GetTransform()->SetLocalPosition(Vec3(pos.x, pos.y, 100.f));
+	UI->GetTransform()->SetLocalScale(Vec3(size.x, size.y, 1.f));
 
     shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
     meshRenderer->SetMesh(GET_SINGLE(Resources)->LoadRectangleMesh());
@@ -287,14 +221,14 @@ void UIMgr::CreateRectangleUI(const wstring& name, const Vec2& pos, const Vec2& 
     material->SetColor(0, color);
     meshRenderer->SetMaterial(material);
 
-    panel->SetName(name);
-    panel->SetMeshRenderer(meshRenderer);
-	panel->SetActive(active);
-    _uiMap.insert({ name, panel });
+	UI->SetName(name);
+	UI->SetMeshRenderer(meshRenderer);
+	UI->SetActive(active);
+    _uiMap.insert({ name, UI });
 
     if (scene == nullptr)
         scene = GET_SINGLE(SceneMgr)->GetActiveScene();
-    scene->AddGameObject(panel);
+    scene->AddGameObject(UI);
 }
 
 void UIMgr::DrawTextUI(const wstring& text, const Vec2& pos, const Vec2& size, int fontSize,
@@ -345,16 +279,59 @@ void UIMgr::InitTextFormats()
     }
 }
 
-shared_ptr<GameObject> UIMgr::GetUI(const wstring& name)
+shared_ptr<UIObject> UIMgr::GetUI(const wstring& name)
 {
     if (_uiMap.contains(name))
         return _uiMap[name];
     return nullptr;
 }
 
+shared_ptr<UIObject> UIMgr::SelectUI(POINT pos)
+{
+	// 화면 중심(0,0) 기준 좌표로 변환
+	const auto& win = gameFramework->GetWindow();
+	float cx = win.width * 0.5f;
+	float cy = win.height * 0.5f;
+
+	// 윈도우 좌표(좌상단 원점, 아래+Y) → UI 좌표(중심 원점, 위+Y)
+	Vec2 uiPos = {
+		pos.x - cx,
+		(win.height - pos.y) - cy
+	};
+
+	shared_ptr<UIObject> selected = nullptr;
+
+	for (auto& [name, ui] : _uiMap)
+	{
+		if (!ui || !ui->IsActive())
+			continue;
+
+		auto t = ui->GetTransform();
+		Vec3 pos = t->GetLocalPosition();
+		Vec3 scale = t->GetLocalScale();
+
+		float halfW = scale.x * 0.5f;
+		float halfH = scale.y * 0.5f;
+
+		if (uiPos.x >= pos.x - halfW && uiPos.x <= pos.x + halfW &&
+			uiPos.y >= pos.y - halfH && uiPos.y <= pos.y + halfH)
+		{
+			selected = ui;
+			break;
+		}
+	}
+
+	return selected;
+}
 
 void UIMgr::LoadUIImage(shared_ptr<Scene> scene)
 {
+	if (scene == nullptr)
+		scene = GET_SINGLE(SceneMgr)->GetActiveScene();
+
+	// UI 초기화
+	//ClearUI(); 현재 다른곳에서 처리
+
 	// 조준선 UI 생성
 	CreateImageUI(
 		L"Crosshair",
@@ -363,6 +340,7 @@ void UIMgr::LoadUIImage(shared_ptr<Scene> scene)
 		Vec2(50.f, 50.f), // 크기
 		1.f, // 투명도 0 ~ 1
 		true, // 활성화 여부
+		static_cast<int32>(UI_TYPE::CROSSHAIR), // UI 타입
 		scene
 	);
 
@@ -374,6 +352,7 @@ void UIMgr::LoadUIImage(shared_ptr<Scene> scene)
 		Vec2(300.f, 50.f),
 		Vec4(0.5f, 0.5f, 0.5f, 0.5f), // 반투명 검정색
 		true, // 활성화 여부
+		static_cast<int32>(UI_TYPE::PANEL), // UI 타입
 		scene
 	);
 
@@ -384,6 +363,7 @@ void UIMgr::LoadUIImage(shared_ptr<Scene> scene)
 		Vec2(165.f, 50.f),
 		0.5f, // 투명도 0 ~ 1
 		true, // 활성화 여부
+		static_cast<int32>(UI_TYPE::IMAGE), // UI 타입
 		scene
 	);
 	CreateImageUI(
@@ -393,6 +373,7 @@ void UIMgr::LoadUIImage(shared_ptr<Scene> scene)
 		Vec2(40.f, 40.f),	// 크기
 		0.5f, // 투명도 0 ~ 1
 		true, // 활성화 여부
+		static_cast<int32>(UI_TYPE::IMAGE), // UI 타입
 		scene
 	);
 
@@ -408,6 +389,7 @@ void UIMgr::LoadUIImage(shared_ptr<Scene> scene)
 			Vec2(300.f, 50.f),					// 크기
 			Vec4(0.5f, 0.5f, 0.5f, 0.5f),		// 색상
 			i == 0,								// 활성화 여부 ( 플레이어 1 빼고 전부 비활성화 )
+			static_cast<int32>(UI_TYPE::PANEL),	// UI 타입
 			scene
 		);
 
@@ -418,6 +400,7 @@ void UIMgr::LoadUIImage(shared_ptr<Scene> scene)
 			Vec2(270.f, 20.f),					// 크기
 			Vec4(0.0f, 0.0f, 0.0f, 1.f),		// 색상
 			i == 0,								// 활성화 여부 ( 플레이어 1 빼고 전부 비활성화 )
+			static_cast<int32>(UI_TYPE::BAR),	// UI 타입
 			scene
 		);
 
@@ -428,6 +411,7 @@ void UIMgr::LoadUIImage(shared_ptr<Scene> scene)
 			Vec2(270.f, 20.f),					// 크기
 			Vec4(1.f, 0.0f, 0.0f, 1.f),			// 색상
 			i == 0,								// 활성화 여부 ( 플레이어 1 빼고 전부 비활성화 )
+			static_cast<int32>(UI_TYPE::BAR),	// UI 타입
 			scene
 		);
 
@@ -439,6 +423,7 @@ void UIMgr::LoadUIImage(shared_ptr<Scene> scene)
 			Vec2(20.f, 20.f),											// 크기
 			0.8f,														// 투명도 0 ~ 1
 			i == 0,														// 활성화 여부 ( 플레이어 1 빼고 전부 비활성화 )
+			static_cast<int32>(UI_TYPE::ICON),							// UI 타입
 			scene
 		);
 
@@ -450,6 +435,7 @@ void UIMgr::LoadUIImage(shared_ptr<Scene> scene)
 			Vec2(20.f, 20.f),										// 크기
 			0.8f,													// 투명도 0 ~ 1
 			i == 0,													// 활성화 여부 ( 플레이어 1 빼고 전부 비활성화 )
+			static_cast<int32>(UI_TYPE::ICON),						// UI 타입
 			scene
 		);
 
@@ -461,6 +447,7 @@ void UIMgr::LoadUIImage(shared_ptr<Scene> scene)
 			Vec2(20.f, 20.f),											// 크기
 			0.8f,														// 투명도 0 ~ 1
 			i == 0,														// 활성화 여부 ( 플레이어 1 빼고 전부 비활성화 )
+			static_cast<int32>(UI_TYPE::ICON),							// UI 타입
 			scene
 		);
 	}
