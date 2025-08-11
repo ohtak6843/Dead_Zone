@@ -363,8 +363,15 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
                 if (room->killCount >= killThreshold && room->currentStage < maxStage) {
                     room->killCount = 0;
                     room->nextStage = room->currentStage + 1;  
-                    room->stageChangeTimer = 10.0f;
+                    for (const auto& z : room->zombies) {
+                        sc_packet_zombie_die diePkt{};
+                        diePkt.size = sizeof(diePkt);
+                        diePkt.type = S2C_P_ZOMBIE_DIE;
+                        diePkt.zombieId = z.id;
+                        for (auto* peer : room->players) PostSendPacket(peer, &diePkt, diePkt.size);
+                    }
                     room->zombies.clear();
+                    room->stageChangeTimer = 10.0f;
                     room->spawnPaused = true;
 
                     sc_packet_stage_clear stagePkt{};

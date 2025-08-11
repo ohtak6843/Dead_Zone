@@ -66,7 +66,7 @@ void GameRoom::Update(float dt)
         stageChangeTimer -= dt;
         if (stageChangeTimer <= 0.0f) {
             currentStage = nextStage;
-            stageReadyCount = 0;                 // ★ 로드 카운트 리셋
+            stageReadyCount = 0;   
 
             Vector3 startPos{};
             const char* colliderFile = nullptr;
@@ -74,17 +74,17 @@ void GameRoom::Update(float dt)
             if (currentStage == 1) {
                 startPos = { 1185.f, 0.f, 473.f };
                 colliderFile = "../Resources/json/Stage01_Collider.json";
-                spawnPaused = false;
+                
             }
             else if (currentStage == 2) {
                 startPos = { 2025.f, 0.f, 3974.f };
                 colliderFile = "../Resources/json/Stage02_Collider.json";
-                spawnPaused = false;
+                
             }
             else if (currentStage == 3) {
                 startPos = {100.f, 0.f, 100.f };
                 colliderFile = "../Resources/json/Stage03_Collider.json";
-                spawnPaused = true;          
+                        
             }
 
             for (auto* pl : players) {
@@ -276,8 +276,8 @@ void GameRoom::SpawnZombies()
 
     auto now = std::chrono::steady_clock::now();
 
-    int  maxCount = (currentStage == 1) ? 3 : 1;
-    int  batchSize = (currentStage == 1) ? 3 : 1;
+    int  maxCount = (currentStage == 1) ? 3 : 5;
+    int  batchSize = (currentStage == 1) ? 3 : 5;
 
     if ((int)zombies.size() >= maxCount || now - lastSpawn < spawnInterval)
         return;
