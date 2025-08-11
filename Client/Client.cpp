@@ -198,8 +198,16 @@ void ReceiverThread(SOCKET clientSocket) {
                 case S2C_P_STAGE_CHANGE: {
                     auto* p = reinterpret_cast<sc_packet_stage_change*>(packet);
                     GET_SINGLE(SceneMgr)->SetChangeScene(true);
-                    GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE02);
 
+                    if (p->newStage == 1) {
+                        GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE01);
+                    }
+                    else if (p->newStage == 2) {
+                        GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE02);
+                    }
+                    else if (p->newStage == 3) {
+                        GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE03);
+                    }
                     break;
                 }
                 case S2C_P_STAGE_CLEAR:

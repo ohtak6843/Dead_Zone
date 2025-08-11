@@ -85,6 +85,12 @@ void Framework::Update()
 				reinterpret_cast<char*>(&ready2),
 				sizeof(ready2), 0);
 		}
+		if (nextSceneType == SCENE_TYPE::STAGE03) {
+			cs_packet_stage_loaded ready3{ sizeof(cs_packet_stage_loaded),C2S_P_STAGE_LOADED };
+			send(gameFramework->GetWindow().sock,
+				reinterpret_cast<char*>(&ready3),
+				sizeof(ready3), 0);
+		}
 	}
 }
 

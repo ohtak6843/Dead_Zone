@@ -31,7 +31,7 @@ const float   DETECT_RADIUS2 = DETECT_RADIUS * DETECT_RADIUS;
 const float   ATTACK_RADIUS2 = ATTACK_RADIUS * ATTACK_RADIUS;
 
 constexpr float BOSS_JUMP_COOLDOWN = 10.0f;  
-constexpr float BOSS_JUMP_RADIUS = 700.0f; 
+constexpr float BOSS_JUMP_RADIUS = 50000.0f; 
 constexpr float BOSS_JUMP_OFFSET = 120.0f; 
 constexpr float BOSS_JUMP_TIME = 0.8f; 
 constexpr float G = 9.8f;
@@ -66,21 +66,48 @@ void GameRoom::Update(float dt)
         stageChangeTimer -= dt;
         if (stageChangeTimer <= 0.0f) {
             currentStage = nextStage;
-            Vector3 startPos{ 2025.0f, 0.0f, 3974.0f };
+            stageReadyCount = 0;                 // ★ 로드 카운트 리셋
+
+            Vector3 startPos{};
+            const char* colliderFile = nullptr;
+
+            if (currentStage == 1) {
+                startPos = { 1185.f, 0.f, 473.f };
+                colliderFile = "../Resources/json/Stage01_Collider.json";
+                spawnPaused = false;
+            }
+            else if (currentStage == 2) {
+                startPos = { 2025.f, 0.f, 3974.f };
+                colliderFile = "../Resources/json/Stage02_Collider.json";
+                spawnPaused = false;
+            }
+            else if (currentStage == 3) {
+                startPos = {100.f, 0.f, 100.f };
+                colliderFile = "../Resources/json/Stage03_Collider.json";
+                spawnPaused = true;          
+            }
+
             for (auto* pl : players) {
                 pl->posX = startPos.x;
                 pl->posY = startPos.y;
                 pl->posZ = startPos.z;
             }
-             mapColliders = MapColliderLoader::Load("../Resources/json/Stage02_Collider.json");
-        std::cout << "Loaded colliders: " << mapColliders.size() << "\n";
-         
+
+            try {
+                mapColliders = MapColliderLoader::Load(colliderFile);
+                std::cout << "Loaded colliders: " << mapColliders.size() << "\n";
+            }
+            catch (const std::exception& e) {
+                std::cerr << "맵 콜라이더 로드 실패: " << e.what() << std::endl;
+            }
+
             sc_packet_stage_change stagePkt{};
             stagePkt.size = sizeof(stagePkt);
             stagePkt.type = S2C_P_STAGE_CHANGE;
             stagePkt.newStage = (uint8_t)currentStage;
             for (auto* peer : players)
                 PostSendPacket(peer, &stagePkt, stagePkt.size);
+
             stageChangeTimer = -1.0f;
         }
     }
@@ -249,8 +276,8 @@ void GameRoom::SpawnZombies()
 
     auto now = std::chrono::steady_clock::now();
 
-    int  maxCount = (currentStage == 1) ? 10 : 20;
-    int  batchSize = (currentStage == 1) ? 10 : 20;
+    int  maxCount = (currentStage == 1) ? 3 : 1;
+    int  batchSize = (currentStage == 1) ? 3 : 1;
 
     if ((int)zombies.size() >= maxCount || now - lastSpawn < spawnInterval)
         return;
@@ -285,8 +312,8 @@ void GameRoom::SpawnZombies()
 
         int pct = rand() % 100;
         ZombieType type;
-        if (pct < 0)           type = ZombieType::BASIC;
-        else if (pct < 0)      type = ZombieType::ELITE;
+        if (pct < 50)           type = ZombieType::BASIC;
+        else if (pct < 30)      type = ZombieType::ELITE;
         else                    type = ZombieType::POLICE;
 
         Zombie z(type);
@@ -312,7 +339,7 @@ void GameRoom::SpawnZombies()
 
 void GameRoom::UpdateZombies(float dt)
 {
-    const float ySendOffset = (currentStage == 2) ? -15.0f : 0.0f;
+    const float ySendOffset = (currentStage == 2 || currentStage==3) ? -15.0f : 0.0f;
     HandleZombiePhysics(dt);
     HandleZombieCollisions();
     std::vector<sc_packet_zombie_snapshot::Entry> changed;

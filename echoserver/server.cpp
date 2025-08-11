@@ -347,49 +347,45 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
             it->health -= pContext->damage;
 
             if (it->health <= 0) {
-                const bool wasBoss = (it->type == ZombieType::BOSS);
                 sc_packet_zombie_die diePkt{};
-                diePkt.size = sizeof(diePkt);
+                diePkt.size = static_cast<unsigned char>(sizeof(diePkt));
                 diePkt.type = S2C_P_ZOMBIE_DIE;
                 diePkt.zombieId = zid;
-                for (auto* peer : room->players) PostSendPacket(peer, &diePkt, diePkt.size);
+                for (auto* peer : room->players)
+                    PostSendPacket(peer, &diePkt, diePkt.size);
 
                 room->zombies.erase(it);
+                room->killCount++;
 
-                if (wasBoss) {
+                const int killThreshold = 1;   
+                const int maxStage = 3;       
+
+                if (room->killCount >= killThreshold && room->currentStage < maxStage) {
+                    room->killCount = 0;
+                    room->nextStage = room->currentStage + 1;  
+                    room->stageChangeTimer = 10.0f;
+                    room->zombies.clear();
                     room->spawnPaused = true;
-                    room->bossSpawned = false;
-                    room->bossId = -1;
+
+                    sc_packet_stage_clear stagePkt{};
+                    stagePkt.size = sizeof(stagePkt);
+                    stagePkt.type = S2C_P_STAGE_CLEAR;
+                    for (auto* peer : room->players)
+                        PostSendPacket(peer, &stagePkt, stagePkt.size);
+
+                    room->SendAugmentOptions();  // 원하면 유지/삭제
+                }
+                else if (room->currentStage == maxStage && room->killCount >= 1 /*보스 처치 조건*/) {
+                    room->zombies.clear();
+                    room->spawnPaused = true;
+                    room->killCount = 0;
                     room->gameClearTimer = 10.0f;
 
                     sc_packet_game_clear clearPkt{};
                     clearPkt.size = sizeof(clearPkt);
                     clearPkt.type = S2C_P_GAME_CLEAR;
-                    for (auto* peer : room->players) PostSendPacket(peer, &clearPkt, clearPkt.size);
-                }
-                else {
-                    room->killCount++;
-                    const int killThresholdSt1 = 1;
-                    if (room->currentStage == 1 && room->killCount >= killThresholdSt1) {
-                        room->killCount = 0;
-                        room->nextStage = room->currentStage + 1;
-                        room->stageChangeTimer = 10.0f;
-                        room->zombies.clear();
-                        room->spawnPaused = true;
-
-                        sc_packet_stage_clear stagePkt{};
-                        stagePkt.size = sizeof(stagePkt);
-                        stagePkt.type = S2C_P_STAGE_CLEAR;
-                        for (auto* peer : room->players) PostSendPacket(peer, &stagePkt, stagePkt.size);
-
-                        room->SendAugmentOptions();
-                    }
-
-                    const int killThresholdSt2 = 3; 
-                    if (room->currentStage == 2 && !room->bossSpawned && room->killCount >= killThresholdSt2) {
-                        room->killCount = 0;
-                        room->QueueStartBossPhase(room->bossSpawnPos);
-                    }
+                    for (auto* peer : room->players)
+                        PostSendPacket(peer, &clearPkt, clearPkt.size);
                 }
             }
         }
@@ -441,27 +437,18 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
     }
     case C2S_P_STAGE_LOADED:  
         if (auto* room = FindGameRoomForPlayer(pContext)) {
-           /* if (room->currentStage == 2) {
-                for (auto* pl : room->players) {
-                    pl->posY += 15;
-                }
-            }*/
             room->zombies.clear();
-            room->spawnPaused = false;
+            room->spawnPaused = (room->currentStage == 3);
             room->killCount = 0;
             room->stageReadyCount++;
-            // 방에 있는 모든 플레이어가 스테2 로드를 완료했을 때
-            
             
             if (room->stageReadyCount == (int)room->players.size()) {
-                // 1) 스테이지 시작 신호 보내기 (optional: 재활용)
                 sc_packet_game_start gs{};
                 gs.size = sizeof(gs);
-                gs.type = S2C_P_GAME_START;  // 또는 S2C_P_STAGE_START 별도 타입
+                gs.type = S2C_P_GAME_START;  
                 for (auto* pl : room->players)
                     PostSendPacket(pl, &gs, gs.size);
 
-                // 2) 플레이어 정보 초기화용 패킷 전송
                 for (auto* pl : room->players) {
                     sc_packet_player_info info{};
                     info.size = sizeof(info);
@@ -476,6 +463,9 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
 
                     for (auto* peer : room->players)
                         PostSendPacket(peer, &info, info.size);
+                }
+                if (room->currentStage == 3) {
+                    room->QueueStartBossPhase(room->bossSpawnPos);
                 }
             }
             break;
