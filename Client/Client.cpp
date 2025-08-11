@@ -110,6 +110,12 @@ void ReceiverThread(SOCKET clientSocket) {
                             ->GetActiveScene()
                             ->AddPlayer(pInfo);
                     }
+                    else if (static_cast<uint32_t>(pInfo->playerId) == g_localPlayerId)
+                    {
+                        GET_SINGLE(SceneMgr)
+                            ->GetActiveScene()
+                            ->SetLocalPlayerState(pInfo);
+                    }
                     break;
                 }
                 case S2C_P_MOVE: {
