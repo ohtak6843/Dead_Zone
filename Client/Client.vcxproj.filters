@@ -274,6 +274,9 @@
     <ClInclude Include="Stage03.h">
       <Filter>Game\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="BossZombie.h">
+      <Filter>Game\GameObject\Zombie</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc">
@@ -483,6 +486,9 @@
     </ClCompile>
     <ClCompile Include="Stage03.cpp">
       <Filter>Game\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="BossZombie.cpp">
+      <Filter>Game\GameObject\Zombie</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
