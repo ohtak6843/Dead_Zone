@@ -22,7 +22,7 @@ constexpr float ST2_MAX_X = 2800.0f;
 constexpr float ST2_MIN_Z = 400.0f;
 constexpr float ST2_MAX_Z = 3300.0f;
 constexpr float ST2_MIN_Y = 0.0f;
-constexpr float PLAYER_RADIUS = 20.0f;
+constexpr float PLAYER_RADIUS = 30.0f;
 constexpr float ZOMBIE_RADIUS = 20.0f;
 
 constexpr float DETECT_RADIUS = 500.0f;
@@ -276,8 +276,8 @@ void GameRoom::SpawnZombies()
 
     auto now = std::chrono::steady_clock::now();
 
-    int  maxCount = (currentStage == 1) ? 3 : 5;
-    int  batchSize = (currentStage == 1) ? 3 : 5;
+    int  maxCount = (currentStage == 1) ? 10 : 15;
+    int  batchSize = (currentStage == 1) ? 10 : 15;
 
     if ((int)zombies.size() >= maxCount || now - lastSpawn < spawnInterval)
         return;
@@ -313,7 +313,7 @@ void GameRoom::SpawnZombies()
         int pct = rand() % 100;
         ZombieType type;
         if (pct < 50)           type = ZombieType::BASIC;
-        else if (pct < 30)      type = ZombieType::ELITE;
+        else if (pct < 80)      type = ZombieType::ELITE;
         else                    type = ZombieType::POLICE;
 
         Zombie z(type);
