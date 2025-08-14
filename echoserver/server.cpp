@@ -2,7 +2,6 @@
 #include "GameRoom.h"
 #include "GameManager.h"
 #include "Zombie.h"
-//#include "db_authentication.h"
 #include "protocol.h"
 
 #include <winsock2.h>
@@ -449,9 +448,8 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         break;
     }
     case C2S_P_STAGE_LOADED:  
+        printf("로딩완료\n");
         if (auto* room = FindGameRoomForPlayer(pContext)) {
-            room->zombies.clear();
-            room->spawnPaused = (room->currentStage == 3);
             room->killCount = 0;
             room->stageReadyCount++;
             
@@ -477,8 +475,16 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
                     for (auto* peer : room->players)
                         PostSendPacket(peer, &info, info.size);
                 }
-                if (room->currentStage == 3) {
+                room->spawnPaused = true;
+                if (room->currentStage == 2) {
+                    room->spawnPaused = true;
+                    room->spawnResumeTimer = 5.0f;
+                }
+                else if (room->currentStage == 3) {
                     room->QueueStartBossPhase(room->bossSpawnPos);
+                }
+                else {
+                    room->spawnPaused = false;      
                 }
             }
             break;
@@ -498,7 +504,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
     }
 }
 
-constexpr size_t kMaxPlayers = 1;
+constexpr size_t kMaxPlayers = 3;
 
 void MatchmakingCheck() {
     std::lock_guard<std::mutex> lock(g_lobbyMutex);

@@ -15,13 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="data.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="server.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="db_authentication.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="GameRoom.cpp">
@@ -45,9 +39,6 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Zombie.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="db_authentication.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="protocol.h">

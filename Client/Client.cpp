@@ -119,23 +119,7 @@ void ReceiverThread(SOCKET clientSocket) {
                         ->GetActiveScene()
                         ->MovePlayer(pMove);
                     break;
-                }
-                               /*
-                case S2C_P_JUMP: {
-                    auto* pJump = reinterpret_cast<sc_packet_jump*>(packet);
-                    GET_SINGLE(SceneMgr)
-                        ->GetActiveScene()
-                        ->JumpPlayer(pJump);
-                    break;
-                }
-                case S2C_P_LAND: {
-                    auto* pLand = reinterpret_cast<sc_packet_land*>(packet);
-                    GET_SINGLE(SceneMgr)
-                        ->GetActiveScene()
-                        ->LandPlayer(pLand);
-                    break;
-                }
-                */
+                }               
                 case S2C_P_SPAWN_ZOMBIE: {
                     auto * pZombie = reinterpret_cast<sc_packet_spawn_zombie*>(packet);
                     GET_SINGLE(SceneMgr)
@@ -187,12 +171,6 @@ void ReceiverThread(SOCKET clientSocket) {
                     break;
                 }
                 case S2C_P_GAME_START: {
-                    //GET_SINGLE(SceneMgr)
-                    //    ->GetActiveScene()
-                    //    ->ClearPlayers();
-                    //GET_SINGLE(SceneMgr)
-                    //    ->GetActiveScene()
-                    //    ->ClearZombies();
                     g_gameStarted = true;
                     break;
                 }

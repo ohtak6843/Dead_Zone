@@ -31,12 +31,12 @@ const float   DETECT_RADIUS2 = DETECT_RADIUS * DETECT_RADIUS;
 const float   ATTACK_RADIUS2 = ATTACK_RADIUS * ATTACK_RADIUS;
 
 constexpr float BOSS_JUMP_COOLDOWN = 10.0f;  
-constexpr float BOSS_JUMP_RADIUS = 50000.0f; 
+constexpr float BOSS_JUMP_RADIUS = 100.0f; 
 constexpr float BOSS_JUMP_OFFSET = 0.0f; 
 constexpr float BOSS_JUMP_TIME = 2.4f; 
 constexpr float G = 9.8f;
 
-constexpr float BOSS_SCREAM_COOLDOWN = 23.0f;  
+constexpr float BOSS_SCREAM_COOLDOWN = 60.0f;  
 constexpr float BOSS_SCREAM_WINDUP = 1.0f;   
 constexpr float BOSS_SCREAM_RADIUS = 600.0f; 
 constexpr int   BOSS_SCREAM_DAMAGE = 15;    
@@ -64,17 +64,24 @@ GameRoom::~GameRoom()
 
 void GameRoom::Update(float dt)
 {
-    HandlePlayerPhysics(dt);
-    HandlePlayerCollisions();
-	SpawnZombies();
-    UpdateZombies(dt);
-
+    bool loadingBarrier = (currentStage >= 2) && (stageReadyCount < (int)players.size());
     if (stageChangeTimer >= 0.0f) {
         stageChangeTimer -= dt;
         if (stageChangeTimer <= 0.0f) {
             currentStage = nextStage;
             stageReadyCount = 0;   
 
+            if (!zombies.empty()) {
+                sc_packet_zombie_die die{};
+                die.size = sizeof(die);
+                die.type = S2C_P_ZOMBIE_DIE;
+                for (const auto& z : zombies) {
+                    die.zombieId = z.id;
+                    for (auto* p : players) PostSendPacket(p, &die, die.size);
+                }
+                zombies.clear();
+            }
+            spawnPaused = true;
             Vector3 startPos{};
             const char* colliderFile = nullptr;
 
@@ -89,7 +96,7 @@ void GameRoom::Update(float dt)
                 
             }
             else if (currentStage == 3) {
-                startPos = {100.f, 0.f, 100.f };
+                startPos = {1000.f, 0.f, 1000.f };
                 colliderFile = "../Resources/json/Stage03_Collider.json";
                         
             }
@@ -135,6 +142,17 @@ void GameRoom::Update(float dt)
     }
     if (bossPhaseRequested.exchange(false)) {
         StartBossPhase_Internal();
+    }
+    HandlePlayerPhysics(dt);
+    HandlePlayerCollisions();
+    if (!loadingBarrier) {
+        if (spawnResumeTimer >= 0.f) {
+            spawnResumeTimer -= dt;
+            if (spawnResumeTimer <= 0.f) { spawnPaused = false; spawnResumeTimer = -1.f; }
+        }
+
+        if (!spawnPaused) SpawnZombies();
+        UpdateZombies(dt);
     }
 }
 
@@ -283,8 +301,8 @@ void GameRoom::SpawnZombies()
 
     auto now = std::chrono::steady_clock::now();
 
-    int  maxCount = (currentStage == 1) ? 10 : 15;
-    int  batchSize = (currentStage == 1) ? 10 : 15;
+    int  maxCount = (currentStage == 1) ? 10 : 10;
+    int  batchSize = (currentStage == 1) ? 10 : 10;
 
     if ((int)zombies.size() >= maxCount || now - lastSpawn < spawnInterval)
         return;
