@@ -636,7 +636,6 @@ void GameRoom::UpdateZombies(float dt)
             pkt->type = S2C_P_ZOMBIE_SNAPSHOT;
             pkt->count = static_cast<uint8_t>(chunkCount);
 
-            // 복사
             memcpy(pkt->entries, changed.data() + i, chunkCount * entrySz);
 
             for (auto* peer : players)
@@ -750,19 +749,6 @@ void GameRoom::HandleAugmentSelect(PER_SOCKET_CONTEXT* pContext, uint8_t idx) {
         if (pContext->health > newMax)
             pContext->health = newMax;
 
-        /*sc_packet_player_info info{};
-        info.size = sizeof(info);
-        info.type = S2C_P_PLAYER_INFO;
-        info.playerId = pContext->socket;
-        info.position = { pContext->posX, pContext->posY, pContext->posZ };
-        info.health = pContext->health;
-        info.maxHealth = pContext->maxHealth;
-        info.gold = pContext->gold;
-        info.damage = pContext->damage;
-        info.walkSpeed = pContext->walkSpeed;
-        for (auto* peer : players)
-            PostSendPacket(peer, &info, info.size);*/
-
         std::cout << "[서버] Player " << pContext->socket
             << " 최대체력 x1.5 -> " << pContext->maxHealth
             << " (현재HP " << pContext->health << ")\n";
@@ -814,7 +800,7 @@ void GameRoom::SpawnBoss(float x, float y, float z)
     pkt.size = sizeof(pkt);
     pkt.type = S2C_P_SPAWN_ZOMBIE;
     pkt.zombieId = boss.id;
-    pkt.position = { boss.x, boss.y + ((currentStage == 2) ? -10.0f : 0.0f), boss.z };
+    pkt.position = { boss.x, boss.y, boss.z };
     pkt.zombieType = static_cast<unsigned char>(ZombieType::BOSS);
     for (auto* peer : players) PostSendPacket(peer, &pkt, pkt.size);
 }

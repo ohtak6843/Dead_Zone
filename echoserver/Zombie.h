@@ -68,9 +68,6 @@ public:
     }state = IDLE;
     std::string specialSkill;
 
-    // 보스 좀비에만 사용
-    BossState bossState;
-
     // 현재 위치
     float x, y, z;
     std::vector<Vec2f> path;
@@ -81,9 +78,8 @@ public:
         if (t == BASIC) {
             health = 100;
             attack = 10;
-            attackSpeed = 1.0f;
+            attackSpeed = 4.0f;
             walkSpeed = 30.0f;
-            runSpeed = 3.3f;
             attackCooldown = 0.0f;
             specialSkill = "None";
 		}
@@ -92,84 +88,24 @@ public:
 			attack = 15;
 			attackSpeed = 1.0f;
 			walkSpeed = 75.0f;
-			runSpeed = 3.3f;
             attackCooldown = 0.0f;
 			specialSkill = "None";
 		}
-        else if (t == RUNNING) {
-            health = 100;
-            attack = 12;
-            attackSpeed = 1.0f;
-            walkSpeed = 1.0f;
-            runSpeed = 5.0f;
-            attackCooldown = 0.0f;
-            specialSkill = "None";
-        }
         else if (t == ELITE) {
             health = 300;
             attack = 20;
             attackSpeed = 1.1f;
             walkSpeed = 75.0f;
-            runSpeed = 3.7f;
             attackCooldown = 0.0f;
             specialSkill = "None";
         }
-        else if (t == CHARGER) {
-            health = 1500;
-            attack = 30;
-            attackSpeed = 1.0f;
-            // 차저 좀비는 별도로 '돌진' 스킬을 가지며, 이동속도는 3m/s로 고정
-            walkSpeed = 3.0f;
-            runSpeed = 3.0f;
-            attackCooldown = 0.0f;
-            specialSkill = "Charge";
-        }
-        else if (t == BOOMER) {
-            health = 3000;
-            attack = 30;
-            attackSpeed = 0.8f;
-            walkSpeed = 2.0f;
-            runSpeed = 2.0f;
-            attackCooldown = 0.0f;
-            specialSkill = "Breath";
-        }
-        else if (t == HUNTER) {
-            health = 300;
-            attack = 20;
-            attackSpeed = 1.5f;
-            walkSpeed = 4.5f;
-            runSpeed = 4.5f;
-            attackCooldown = 0.0f;
-            specialSkill = "Leap";
-        }
         else if (t == BOSS) {
-            // 보스 좀비는 초기에는 일반 상태로 시작
-            bossState = BOSS_NORMAL;
             health = 500000;
             attack = 50;
             attackSpeed = 0.8f;
-            walkSpeed = 75.0f;
-            runSpeed = 3.0f;
+            walkSpeed = 85.0f;
             attackCooldown = 0.0f;
             specialSkill = "Boss Basic Skill";
-        }
-    }
-
-    // 보스 좀비 전용: 상태 전환 함수 (추후 조건에 따라 호출)
-    void TransitionBossState() {
-        if (type == BOSS) {
-            if (bossState == BOSS_NORMAL) {
-                bossState = BOSS_PREAWAKEN;
-                specialSkill = "Pre-awaken: Shield active (20% max HP)";
-            }
-            else if (bossState == BOSS_PREAWAKEN) {
-                bossState = BOSS_AWAKENED;
-                health = 250000;
-                attack = 100;
-                attackSpeed = 1.6f;
-                runSpeed = 4.5f;
-                specialSkill = "Awakened: Damage reduction 15%";
-            }
         }
     }
 
