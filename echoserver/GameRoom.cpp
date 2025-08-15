@@ -25,13 +25,13 @@ constexpr float ST2_MIN_Y = 0.0f;
 constexpr float PLAYER_RADIUS = 30.0f;
 constexpr float ZOMBIE_RADIUS = 20.0f;
 
-constexpr float DETECT_RADIUS = 500.0f;
+constexpr float DETECT_RADIUS = 2000.0f;
 constexpr float ATTACK_RADIUS = 100.0f;
 const float   DETECT_RADIUS2 = DETECT_RADIUS * DETECT_RADIUS;
 const float   ATTACK_RADIUS2 = ATTACK_RADIUS * ATTACK_RADIUS;
 
 constexpr float BOSS_JUMP_COOLDOWN = 10.0f;  
-constexpr float BOSS_JUMP_RADIUS = 100.0f; 
+constexpr float BOSS_JUMP_RADIUS = 500.0f; 
 constexpr float BOSS_JUMP_OFFSET = 0.0f; 
 constexpr float BOSS_JUMP_TIME = 2.4f; 
 constexpr float G = 9.8f;
@@ -44,7 +44,7 @@ constexpr int   BOSS_SCREAM_SPAWN_N = 5;
 constexpr float BOSS_SCREAM_DURATION = 2.8f;
 
 inline float GetGroundY(int currentStage) {
-    return (currentStage == 2) ? ST2_MIN_Y : MAP_MIN_Y;
+    return (currentStage == 2||currentStage==3) ? ST2_MIN_Y : MAP_MIN_Y;
 }
 
 std::vector<GameRoom*> activeRooms;
@@ -91,7 +91,7 @@ void GameRoom::Update(float dt)
                 
             }
             else if (currentStage == 2) {
-                startPos = { 2025.f, 0.f, 3974.f };
+                startPos = { 1525.f, 0.f, 2974.f };
                 colliderFile = "../Resources/json/Stage02_Collider.json";
                 
             }
@@ -301,8 +301,8 @@ void GameRoom::SpawnZombies()
 
     auto now = std::chrono::steady_clock::now();
 
-    int  maxCount = (currentStage == 1) ? 10 : 10;
-    int  batchSize = (currentStage == 1) ? 10 : 10;
+    int  maxCount = (currentStage == 1) ? 1 : 1;
+    int  batchSize = (currentStage == 1) ? 1 : 1;
 
     if ((int)zombies.size() >= maxCount || now - lastSpawn < spawnInterval)
         return;
@@ -354,7 +354,7 @@ void GameRoom::SpawnZombies()
         pkt.size = sizeof(pkt);
         pkt.type = S2C_P_SPAWN_ZOMBIE;
         pkt.zombieId = z.id;
-        pkt.position = { z.x, z.y + ((currentStage == 2) ? -10.0f : 0.0f), z.z };
+        pkt.position = { z.x, z.y, z.z };
         pkt.zombieType = static_cast<unsigned char>(type);
 
         for (auto* peer : players)
@@ -364,7 +364,9 @@ void GameRoom::SpawnZombies()
 
 void GameRoom::UpdateZombies(float dt)
 {
-    const float ySendOffset = (currentStage == 2 || currentStage==3) ? -15.0f : 0.0f;
+    float ySendOffset = 0.0f;
+    if (currentStage == 2)      ySendOffset = -15.0f;
+    else if (currentStage == 3) ySendOffset = -30.0f;
     HandleZombiePhysics(dt);
     HandleZombieCollisions();
     std::vector<sc_packet_zombie_snapshot::Entry> changed;

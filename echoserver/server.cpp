@@ -315,16 +315,19 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         ev.position = { pContext->posX, pContext->posY, pContext->posZ };
         ev.look = pContext->look;
         if (auto* room = FindGameRoomForPlayer(pContext)) {
+            float ySendOffsetOthers = 0.0f;
+            if (room->currentStage == 2)      ySendOffsetOthers = -10.0f;
+            else if (room->currentStage == 3) ySendOffsetOthers = -30.0f;
             for (auto* peer : room->players) {
                 if (peer == pContext) {
-                    // 자기 자신에게 보낼 때만 Y를 +90
                     sc_packet_move evSelf = ev;
                     evSelf.position.y += 140.0f;
                     PostSendPacket(peer, &evSelf, evSelf.size);
                 }
                 else {
-                    // 다른 플레이어들에겐 원본(ev) 그대로
-                    PostSendPacket(peer, &ev, ev.size);
+                    sc_packet_move evOther = ev;
+                    evOther.position.y += ySendOffsetOthers;
+                    PostSendPacket(peer, &evOther, evOther.size);
                 }
             }
         }
@@ -504,7 +507,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
     }
 }
 
-constexpr size_t kMaxPlayers = 3;
+constexpr size_t kMaxPlayers = 2;
 
 void MatchmakingCheck() {
     std::lock_guard<std::mutex> lock(g_lobbyMutex);
