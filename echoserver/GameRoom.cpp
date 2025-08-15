@@ -498,6 +498,8 @@ void GameRoom::UpdateZombies(float dt)
                 float best2 = std::numeric_limits<float>::infinity();
                 const float R2 = BOSS_JUMP_RADIUS * BOSS_JUMP_RADIUS;
                 for (auto* p : players) {
+                    if (p->health <= 0)
+                        continue;
                     float dx = p->posX - z.x;
                     float dz = p->posZ - z.z;
                     float d2 = dx * dx + dz * dz;
@@ -534,6 +536,8 @@ void GameRoom::UpdateZombies(float dt)
         PER_SOCKET_CONTEXT* nearest = nullptr;
         float bestDist2 = std::numeric_limits<float>::infinity();
         for (auto* p : players) {
+            if (p->health <= 0)
+                continue;
             float dx = p->posX - z.x;
             float dz = p->posZ - z.z;
             float d2 = dx * dx + dz * dz;
