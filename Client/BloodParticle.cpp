@@ -17,7 +17,7 @@ BloodParticle::BloodParticle()
 	SetLifeTime(1.2f, 1.5f);
 	SetSpeed(50.0f, 100.f);
 	SetScale(50.f, 25.f);
-	SetlifeTime(0.5f);
+	SetEmitterLifeTime(0.5f);
 	SetCreateInterval(0.005f);
 	SetParticleType(PARTICLE_TYPE::BLOOD);
 	

@@ -123,7 +123,7 @@ void Framework::RenderEnd()
 {
 	_graphicsCmdQueue->RenderEnd();
 
-	GET_SINGLE(SceneMgr)->RenderUI();
+	GET_SINGLE(UIMgr)->RenderUI();
 
 	_swapChain->Present(1, 0);
 

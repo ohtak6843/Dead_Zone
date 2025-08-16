@@ -60,6 +60,7 @@ public:
 
 public:
 	void SetLocalPlayer(vector<shared_ptr<Player>>& player);
+	void SetLocalPlayerState(struct sc_packet_player_info* packet);
 
 	void AddPlayer(struct sc_packet_player_info* packet);
 	void MovePlayer(struct sc_packet_move* packet);

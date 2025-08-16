@@ -45,6 +45,7 @@ public:
 	void SetPauseDuration();
 	void Move();
 	shared_ptr<class ParticleObject> GetParticle() { return _particle; }
+	//shared_ptr<class ParticleObject> FindInactiveParticle();
 
 protected:
 	ZOMBIE_STATE _state;

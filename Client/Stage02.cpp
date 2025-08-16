@@ -22,6 +22,7 @@
 #include "FmodMgr.h"
 
 #include "Zombie.h"
+#include "UIMgr.h"
 
 Stage02::Stage02()
 {
@@ -340,7 +341,7 @@ void Stage02::Init()
 #pragma endregion
 
 #pragma region Load UI
-	GET_SINGLE(SceneMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
+	GET_SINGLE(UIMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
 #pragma endregion
 
 #pragma region Test Zombie

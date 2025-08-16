@@ -19,6 +19,7 @@ enum class GAMEOBJECT_TYPE
 	PARTICLE,
 	PLAYER,
 	ZOMBIE,
+	UI,
 
 	END
 };

@@ -38,5 +38,12 @@ private:
 private:
 	D3D12_CPU_DESCRIPTOR_HANDLE _srvHeapBegin = {};
 	D3D12_CPU_DESCRIPTOR_HANDLE _uavHeapBegin = {};
+
+public:
+	void Clear(); // 전체 0 채우기
+	void CopyData(uint32 firstElement, uint32 elementCount, const void* src); // 범위 복사
+
+	uint32 GetElementSize() const { return _elementSize; }
+	uint32 GetElementCount() const { return _elementCount; }
 };
 

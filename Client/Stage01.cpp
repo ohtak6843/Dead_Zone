@@ -21,6 +21,7 @@
 #include "JsonMgr.h"
 
 #include "Zombie.h"
+#include "UIMgr.h"
 
 Stage01::Stage01()
 {
@@ -398,7 +399,7 @@ void Stage01::Init()
 #pragma endregion
 
 #pragma region Load UI
-	GET_SINGLE(SceneMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
+	GET_SINGLE(UIMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
 #pragma endregion
 
 #pragma region Test Zombie

@@ -20,6 +20,7 @@
 #include "InputMgr.h"
 #include "JsonMgr.h"
 #include "FmodMgr.h"
+#include "UIMgr.h"
 
 #include "Zombie.h"
 
@@ -359,7 +360,7 @@ void Stage03::Init()
 #pragma endregion
 
 #pragma region Load UI
-	GET_SINGLE(SceneMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
+	GET_SINGLE(UIMgr)->LoadUIImage(GET_SINGLE(SceneMgr)->GetActiveScene());
 #pragma endregion
 
 #pragma region Test Zombie

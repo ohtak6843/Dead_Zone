@@ -275,6 +275,20 @@ void Scene::SetLocalPlayer(vector<shared_ptr<Player>>& player)
 	_localPlayer = std::move(player);
 }
 
+void Scene::SetLocalPlayerState(struct sc_packet_player_info* packet)
+{
+	Vec3 position = Vec3(packet->position.x, packet->position.y, packet->position.z);
+	_localPlayer[0]->GetTransform()->SetLocalPosition(position);
+	_localPlayer[0]->GetTransform()->SetLocalRotation(Vec3(-90.0f, 180.f, 0.0f));
+
+	// 플레이어 정보 설정
+	_localPlayer[0]->SetHp(packet->health);
+	_localPlayer[0]->SetMaxHp(packet->maxHealth);
+	_localPlayer[0]->SetAttackDamage(packet->damage);
+	_localPlayer[0]->SetWalkSpeed(packet->walkSpeed);
+	_localPlayer[0]->SetGold(packet->gold);
+}
+
 void Scene::AddPlayer(sc_packet_player_info* packet)
 {
 	//if (_players.size() >= 2)
@@ -297,6 +311,14 @@ void Scene::AddPlayer(sc_packet_player_info* packet)
 	gameObjects[0]->SetID(static_cast<uint32_t>(packet->playerId));
 	gameObjects[0]->GetTransform()->SetLocalPosition(position);
 	gameObjects[0]->GetTransform()->SetLocalRotation(Vec3(-90.0f, 180.f, 0.0f));
+
+	// 플레이어 정보 설정
+	gameObjects[0]->SetHp(packet->health);
+	gameObjects[0]->SetMaxHp(packet->maxHealth);
+	gameObjects[0]->SetAttackDamage(packet->damage);
+	gameObjects[0]->SetWalkSpeed(packet->walkSpeed);
+	gameObjects[0]->SetGold(packet->gold);
+
 
 	for (int i = 1; i < gameObjects.size(); i++)
 	{
@@ -334,6 +356,18 @@ void Scene::AddPlayer(sc_packet_player_info* packet)
 			return static_pointer_cast<Gun>(mp); // 업캐스팅
 		});
 	gameObjects[0]->AddGun(tempGuns);
+	
+	// UI 패널 활성화
+	auto scene = GET_SINGLE(SceneMgr)->GetActiveScene();
+	int32 index = _players.size() + 1; // 현재 플레이어의 인덱스
+	auto Panel = scene->FindGameObject(L"PlayerPanel_" + to_wstring(index));
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index))->SetActive(true);
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_HP")->SetActive(true);
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Max_HP")->SetActive(true);
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Player_ID")->SetActive(true);
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Attack_LV")->SetActive(true);
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Speed_LV")->SetActive(true);
+	
 }
 
 void Scene::MovePlayer(sc_packet_move* packet)
@@ -428,6 +462,16 @@ void Scene::RemovePlayer(sc_packet_player_leave* packet)
 				RemoveGameObject(part);
 
 			_players.erase(id);
+
+			// UI 패널 비활성화 ( 해당 함수가 불러지지 않아서 확인을 하지 못함. 추후 확인 필요)
+			auto scene = GET_SINGLE(SceneMgr)->GetActiveScene();
+			int32 index = _players.size() + 1; // 현재 플레이어의 인덱스
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index))->SetActive(false);
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_HP")->SetActive(false);
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Max_HP")->SetActive(false);
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Player_ID")->SetActive(false);
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Attack_LV")->SetActive(false);
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Speed_LV")->SetActive(false);
 		}
 	}
 }

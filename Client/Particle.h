@@ -24,7 +24,8 @@ enum PARTICLE_TYPE
 {
 	DEFAULT = 0,
 	MUZZLE_FLASH,    // 머즐 플래시
-	BLOOD,          // 피
+	BLOOD,           // 피
+	DUST,            // 먼지
 };
 
 
@@ -43,19 +44,21 @@ public:
 public:
 	virtual void FinalUpdate();
 	void Render();
+	virtual void Reset();
 
 public:
 
 	void SetMaxParticle(uint32 max) { _maxParticle = max; }
-	void SetLifeTime(float min, float max) { _minLifeTime = min; _maxLifeTime = max; }
+	void SetLifeTime(float min, float max) { _minLifeTime = min; _maxLifeTime = max; } // 입자 개별	수명 시간
 	void SetSpeed(float min, float max) { _minSpeed = min; _maxSpeed = max; }
 	void SetScale(float start, float end) { _startScale = start; _endScale = end; }
 	void SetCreateInterval(float interval) { _createInterval = interval; }
 	void SetTexture(int32 index, shared_ptr<Texture> tex) { _material->SetTexture(index, tex); }
-	void SetlifeTime(float lifeTime) { _lifeTime = lifeTime; }
+	void SetEmitterLifeTime(float lifeTime) { _lifeTime = lifeTime; } // 파티클 전체 수명 시간
 	void SetParticleType(int32 type) { _type = type; }
 
 	void SetActive(bool active) { _isActive = active; _elapsedTime = 0.0f; _accTime = 0.f; }
+	bool GetActive() const { return _isActive; }
 
 public:
 	shared_ptr<GameObject> GetGameObject() { return _gameObject.lock(); }
@@ -84,14 +87,14 @@ protected:
 	// 누적 시간
 	float				_accTime = 0.f;
 	// 지속 시간 
-	float				_lifeTime = 1.0f;
+	float				_lifeTime = 1.0f; // 파티클 전체 수명 시간
 	// 경과 시간
 	float				_elapsedTime = 0.f;
 
 	// 파티클 생성 간격
 	float				_createInterval = 0.005f;
 
-	// 수명
+	// 입자 개별 수명
 	float				_minLifeTime = 0.5f;
 	float				_maxLifeTime = 1.f;
 

@@ -43,9 +43,12 @@ struct BaseInfo
 
 struct PlayerInfo : BaseInfo
 {
-	uint32			hp;
-	float			walkSppeed;	// 걷기 (m/s)
-	float			runSpeed;	// 뛰기 (m/s)
+	uint32			hp;				// 플레이어의 체력
+	uint32			maxHp;			// 플레이어의 최대 체력
+	uint32			attackDamage;	// 플레이어의 공격력
+	uint32			gold;			// 플레이어의 골드
+	float			walkSppeed;		// 걷기 (m/s)
+	float			runSpeed;		// 뛰기 (m/s)
 };
 
 struct ZombieInfo : BaseInfo

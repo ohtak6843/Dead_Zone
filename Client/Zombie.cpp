@@ -32,18 +32,19 @@ Zombie::Zombie(const wstring& infoKey)
 
 
 	// 파티클 생성
+	
+	_blood = make_shared<BloodParticle>();
 	_particle = make_shared<ParticleObject>();
 	_particle->SetTransform(make_shared<Transform>());
-	_blood = make_shared<BloodParticle>();
+	_particle->SetCheckFrustum(false);
+	_blood->SetActive(false);
 	_particle->SetParticle(_blood);
-
-
+	GET_SINGLE(SceneMgr)->GetActiveScene()->AddGameObject(_particle);
+	
+	
 	//_particle->GetTransform()->SetParent(GetTransform());
 	//_particle->GetTransform()->SetLocalPosition(Vec3(0.f, 13.f, 100.f));
-	_particle->SetCheckFrustum(false);
 
-	GET_SINGLE(SceneMgr)->GetActiveScene()->AddGameObject(_particle);
-	_blood->SetActive(false);
 }
 
 Zombie::~Zombie()
