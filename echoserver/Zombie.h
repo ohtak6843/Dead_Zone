@@ -77,32 +77,32 @@ public:
     Zombie(ZombieType t) : type(t), x(0.0f), y(0.0f), z(0.0f) {
         if (t == BASIC) {
             health = 100;
-            attack = 10;
-            attackSpeed = 4.0f;
+            attack = 5;
+            attackSpeed = 2.6f;
             walkSpeed = 30.0f;
             attackCooldown = 0.0f;
             specialSkill = "None";
 		}
 		else if (t == POLICE) {
 			health = 200;
-			attack = 15;
-			attackSpeed = 1.0f;
+			attack = 5;
+			attackSpeed = 2.6f;
 			walkSpeed = 75.0f;
             attackCooldown = 0.0f;
 			specialSkill = "None";
 		}
         else if (t == ELITE) {
             health = 300;
-            attack = 20;
-            attackSpeed = 1.1f;
+            attack = 5;
+            attackSpeed = 2.6f;
             walkSpeed = 75.0f;
             attackCooldown = 0.0f;
             specialSkill = "None";
         }
         else if (t == BOSS) {
-            health = 500000;
-            attack = 50;
-            attackSpeed = 0.8f;
+            health = 1000;
+            attack = 8;
+            attackSpeed = 2.6f;
             walkSpeed = 85.0f;
             attackCooldown = 0.0f;
             specialSkill = "Boss Basic Skill";
