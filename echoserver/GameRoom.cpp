@@ -227,7 +227,7 @@ void GameRoom::HandlePlayerCollisions()
 
 void GameRoom::HandleZombiePhysics(float dt)
 {
-    const float groundY = GetGroundY(currentStage);
+    const float groundY = MAP_MIN_Y;
 
     for (auto& z : zombies) {
         if (z.isJumping) continue; 
@@ -255,7 +255,7 @@ void GameRoom::HandleZombieCollisions()
             PhysicsSystem::ResolveCollision(
                 z.x, z.y, z.z,
                 col,
-                PLAYER_RADIUS
+                ZOMBIE_RADIUS
             );
         }
     }
@@ -268,7 +268,7 @@ void GameRoom::HandleZombieCollisions()
             ResolveSphereCollision(
                 a.x, a.y, a.z,
                 b.x, b.y, b.z,
-                PLAYER_RADIUS
+                ZOMBIE_RADIUS
             );
         }
     }
@@ -325,7 +325,6 @@ void GameRoom::SpawnZombies()
             float xRange = (ST2_MAX_X - PLAYER_RADIUS) - (ST2_MIN_X + PLAYER_RADIUS);
             float zRange = (ST2_MAX_Z - PLAYER_RADIUS) - (ST2_MIN_Z + PLAYER_RADIUS);
             spawnX = ST2_MIN_X + PLAYER_RADIUS + (rand() / (float)RAND_MAX) * xRange;
-            spawnY = ST2_MIN_Y;
             spawnZ = ST2_MIN_Z + PLAYER_RADIUS + (rand() / (float)RAND_MAX) * zRange;
         }
         else {
@@ -714,6 +713,10 @@ void GameRoom::SendAugmentOptions() {
     pkt->type = S2C_P_AUGMENT_OPTIONS;
     pkt->count = cnt;
     memcpy(pkt->options, augmentOptions.data(), cnt);
+
+    std::cout << "Augments: ";
+    for (auto o : augmentOptions) std::cout << int(o) << " ";
+    std::cout << "\n";
 
     for (auto* peer : players)
         PostSendPacket(peer, buf, packetSize);

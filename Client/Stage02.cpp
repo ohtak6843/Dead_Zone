@@ -325,7 +325,7 @@ void Stage02::Init()
 		}
 		{
 			shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"AlphaTexture");
-			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"PLAYER_DMG_UP", L"..\\Resources\\Texture\\Augment\\좀비 이동속도 감소 카드.png");
+			shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"PLAYER_DMG_UP", L"..\\Resources\\Texture\\Augment\\플레이어 공격력 증가 카드.png");
 			shared_ptr<Material> material = make_shared<Material>();
 			material->SetShader(shader);
 			material->SetTexture(0, texture);

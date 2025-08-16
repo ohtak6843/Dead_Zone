@@ -464,6 +464,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
                     PostSendPacket(pl, &gs, gs.size);
 
                 for (auto* pl : room->players) {
+                    pl->health = pl->maxHealth;
                     sc_packet_player_info info{};
                     info.size = sizeof(info);
                     info.type = S2C_P_PLAYER_INFO;
@@ -507,7 +508,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
     }
 }
 
-constexpr size_t kMaxPlayers = 3;
+constexpr size_t kMaxPlayers = 1;
 
 void MatchmakingCheck() {
     std::lock_guard<std::mutex> lock(g_lobbyMutex);
