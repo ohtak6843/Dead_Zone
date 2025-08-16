@@ -295,9 +295,10 @@ void LocalPlayer::ProcessMouseInput()
 					0);
 
 				if (zombie) {
-					shared_ptr<ParticleObject> particleObj = zombie->FindInactiveParticle();
+					shared_ptr<ParticleObject> particleObj = zombie->GetParticle();
 					if (particleObj) {
 						particleObj->GetTransform()->SetLocalPosition(hitPos);
+						particleObj->GetParticle()->Reset();
 						particleObj->GetParticle()->SetActive(true);
 					}
 				}
