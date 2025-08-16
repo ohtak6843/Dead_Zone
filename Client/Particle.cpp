@@ -78,3 +78,21 @@ void Particle::Render()
 
 	_mesh->Render(_maxParticle);
 }
+
+void Particle::Reset()
+{
+	_isActive = false;
+	_elapsedTime = 0.0f;
+	_accTime = 0.f;
+
+	if (_computeSharedBuffer)
+	{
+		ComputeSharedInfo init{};              // 모두 0
+		_computeSharedBuffer->CopyData(0, 1, &init);
+	}
+	// 3) 파티클 배열 초기화 (alive=0)
+	if (_particleBuffer)
+	{
+		_particleBuffer->Clear(); // 전체 0으로: worldPos/dir/curTime/lifeTime/alive 모두 0
+	}
+}

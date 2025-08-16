@@ -135,3 +135,53 @@ void UploadBuffer::CopyInitialData(uint64 bufferSize, void* initialData)
 
 	_resourceState = D3D12_RESOURCE_STATE_COMMON;
 }
+
+void UploadBuffer::Clear()
+{
+	const uint64 size = static_cast<uint64>(_elementSize) * _elementCount;
+	std::vector<uint8_t> zeros(size, 0);
+	CopyInitialData(size, zeros.data());
+}
+
+// firstElement부터 elementCount개 요소를 src로 덮어쓰기
+void UploadBuffer::CopyData(uint32 firstElement, uint32 elementCount, const void* src)
+{
+	if (elementCount == 0) return;
+
+	const uint64 offsetBytes = static_cast<uint64>(firstElement) * _elementSize;
+	const uint64 copyBytes = static_cast<uint64>(elementCount) * _elementSize;
+
+	// 업로드용 staging 버퍼 생성 + 쓰기
+	ComPtr<ID3D12Resource> readBuffer = nullptr;
+	D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(copyBytes, D3D12_RESOURCE_FLAG_NONE);
+	D3D12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	DEVICE->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &desc,
+		D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+		IID_PPV_ARGS(&readBuffer));
+
+	uint8* dataBegin = nullptr;
+	D3D12_RANGE readRange{ 0, 0 };
+	readBuffer->Map(0, &readRange, reinterpret_cast<void**>(&dataBegin));
+	memcpy(dataBegin, src, copyBytes);
+	readBuffer->Unmap(0, nullptr);
+
+	// Common -> Copy
+	{
+		D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+			_buffer.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST);
+		RESOURCE_CMD_LIST->ResourceBarrier(1, &barrier);
+	}
+
+	// 부분 복사 (dst offset 사용)
+	RESOURCE_CMD_LIST->CopyBufferRegion(_buffer.Get(), offsetBytes, readBuffer.Get(), 0, copyBytes);
+
+	// Copy -> Common
+	{
+		D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+			_buffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COMMON);
+		RESOURCE_CMD_LIST->ResourceBarrier(1, &barrier);
+	}
+
+	gameFramework->GetGraphicsCmdQueue()->FlushResourceCommandQueue();
+	_resourceState = D3D12_RESOURCE_STATE_COMMON;
+}
