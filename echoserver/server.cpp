@@ -389,8 +389,16 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
                         PostSendPacket(peer, &stagePkt, stagePkt.size);
 
                     room->SendAugmentOptions();  
+                    break;
                 }
                 else if (room->currentStage == maxStage && room->bossKilled) {
+                    for (const auto& z : room->zombies) {
+                        sc_packet_zombie_die diePkt{};
+                        diePkt.size = sizeof(diePkt);
+                        diePkt.type = S2C_P_ZOMBIE_DIE;
+                        diePkt.zombieId = z.id;
+                        for (auto* peer : room->players) PostSendPacket(peer, &diePkt, diePkt.size);
+                    }
                     room->zombies.clear();
                     room->spawnPaused = true;
                     room->killCount = 0;
@@ -401,6 +409,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
                     clearPkt.type = S2C_P_GAME_CLEAR;
                     for (auto* peer : room->players)
                         PostSendPacket(peer, &clearPkt, clearPkt.size);
+                    break;
                 }
             }
         }

@@ -366,6 +366,8 @@ void GameRoom::UpdateZombies(float dt)
     float ySendOffset = 0.0f;
     if (currentStage == 2)      ySendOffset = -15.0f;
     else if (currentStage == 3) ySendOffset = -30.0f;
+    const float detectR = (currentStage == 2) ? 500.0f : 2000.0f;
+    const float detectR2 = detectR * detectR;
     HandleZombiePhysics(dt);
     HandleZombieCollisions();
     std::vector<sc_packet_zombie_snapshot::Entry> changed;
@@ -570,7 +572,7 @@ void GameRoom::UpdateZombies(float dt)
                 }*/
             }
         }
-        else if (nearest && bestDist2 <= DETECT_RADIUS2) {
+        else if (nearest && bestDist2 <= detectR2) {
             SetZombieState(z, Zombie::WALK);
 
             auto [rawDx, rawDz] = z.UpdatePosition(dt, nearest->posX, nearest->posZ);
