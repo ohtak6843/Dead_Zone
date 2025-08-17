@@ -194,24 +194,44 @@ void CS_Main(int3 threadIndex : SV_DispatchThreadID)
                 2 * r3 - 1
             };
 
-            // [0~1] -> [-1~1]
-            float3 dir = (noise - 0.5f) * 2.f;
-
-            g_particle[threadIndex.x].worldDir = normalize(dir);
-
-            if(type == 0)
-			{
-				g_particle[threadIndex.x].worldPos = (noise.xyz - 0.5f) * 25;
-			}
-            else if(type == 2)
+            if (type == 3)
             {
-            g_particle[threadIndex.x].worldPos = (noise.xyz - 0.5f);
+                float r1b = Rand(float2(x + 17.123f, accTime + 3.7f));
+                r1 = frac(r1 + 0.5f * r1b);
+
+                // 디스크 샘플 (반경을 0.5로 고정: 기존 (noise - 0.5) 범위에 맞춤)
+                float theta = 3.141592f * 4 * r1;
+                float r = sqrt(saturate(r2)) * 0.5f;
+
+                float3 lateralDir = float3(cos(theta), 0.f, sin(theta));
+                g_particle[threadIndex.x].worldDir  = lateralDir;
+                g_particle[threadIndex.x].worldPos  = float3(r*cos(theta), 0.f, r*sin(theta));
+            }
+            else
+            {
+                // [0~1] -> [-1~1]
+                float3 dir = (noise - 0.5f) * 2.f;
+
+                g_particle[threadIndex.x].worldDir = normalize(dir);
+
+                if(type == 0)
+			    {
+				    g_particle[threadIndex.x].worldPos = (noise.xyz - 0.5f) * 25;
+			    }
+                else if(type == 2)
+                {
+                g_particle[threadIndex.x].worldPos = (noise.xyz - 0.5f);
+                }
             }
 
-            g_particle[threadIndex.x].lifeTime = ((maxLifeTime - minLifeTime) * noise.x) + minLifeTime;
-            g_particle[threadIndex.x].curTime = 0.f;
+            if (type == 3) {
+                g_particle[threadIndex.x].lifeTime = lerp(minLifeTime, maxLifeTime, r3);
+            } else {
+                g_particle[threadIndex.x].lifeTime = ((maxLifeTime - minLifeTime) * noise.x) + minLifeTime;
+            }
 
-             g_particle[threadIndex.x].type = type;
+            g_particle[threadIndex.x].curTime = 0.f;
+            g_particle[threadIndex.x].type = type;
         }
     }
     else
@@ -224,8 +244,17 @@ void CS_Main(int3 threadIndex : SV_DispatchThreadID)
         }
 
         float ratio = g_particle[threadIndex.x].curTime / g_particle[threadIndex.x].lifeTime;
-        float speed = (maxSpeed - minSpeed) * ratio + minSpeed;
-        g_particle[threadIndex.x].worldPos += g_particle[threadIndex.x].worldDir * speed * deltaTime;
+
+        if (g_particle[threadIndex.x].type == 3)
+        {
+            float speed = lerp(maxSpeed, minSpeed, ratio);
+            g_particle[threadIndex.x].worldPos += g_particle[threadIndex.x].worldDir * speed * deltaTime;
+        }
+        else
+        {
+            float speed = (maxSpeed - minSpeed) * ratio + minSpeed;
+            g_particle[threadIndex.x].worldPos += g_particle[threadIndex.x].worldDir * speed * deltaTime;
+        }
     }
 }
 
