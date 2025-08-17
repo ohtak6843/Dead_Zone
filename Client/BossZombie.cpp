@@ -48,12 +48,20 @@ void BossZombie::SetState(ZOMBIE_STATE playerState)
 			index = static_cast<uint32>(BOSS_ZOMBIE_ANIMATION::ATTACK2);
 
 		GetAnimator()->Play(index);
+
+		// 사운드 재생
+		bool flag = GET_SINGLE(FmodMgr)->CheckPlaying(SOUND_TYPE::ZOMBIE_ATTACK);
+		if (flag == false)
+			GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::ZOMBIE_ATTACK);
 		break;
 	}
 	case ZOMBIE_STATE::DIE:
 	{
 		uint32 index = static_cast<uint32>(BOSS_ZOMBIE_ANIMATION::DIE);
 		GetAnimator()->Play(index);
+
+		// 사운드 재생
+		GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::ZOMBIE_DIE);
 		break;
 	}
 	case ZOMBIE_STATE::JUMP:
@@ -66,6 +74,10 @@ void BossZombie::SetState(ZOMBIE_STATE playerState)
 	{
 		uint32 index = static_cast<uint32>(BOSS_ZOMBIE_ANIMATION::SCREAM);
 		GetAnimator()->Play(index);
+
+		// 사운드 재생
+		GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::ZOMBIE_SCREAM);
+		break;
 	}
 	default:
 		break;

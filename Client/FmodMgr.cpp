@@ -24,6 +24,7 @@ void FmodMgr::SetVolumeList()
 	_volumeList[static_cast<int32>(SOUND_TYPE::TITLE)] = 0.05f;
 	_volumeList[static_cast<int32>(SOUND_TYPE::STAGE01)] = 0.05f;
 	_volumeList[static_cast<int32>(SOUND_TYPE::STAGE02)] = 0.05f;
+	_volumeList[static_cast<int32>(SOUND_TYPE::STAGE03)] = 0.05f;
 
 	// Player Sound Effect
 	_volumeList[static_cast<int32>(SOUND_TYPE::PLAYER_RUN)] = 0.02f;
@@ -39,6 +40,7 @@ void FmodMgr::SetVolumeList()
 	_volumeList[static_cast<int32>(SOUND_TYPE::ZOMBIE_RUN)] = 0.5f;
 	_volumeList[static_cast<int32>(SOUND_TYPE::ZOMBIE_PAIN)] = 0.2f;
 	_volumeList[static_cast<int32>(SOUND_TYPE::ZOMBIE_DIE)] = 0.5f;
+	_volumeList[static_cast<int32>(SOUND_TYPE::ZOMBIE_SCREAM)] = 0.2f;
 
 	// UI Sound Effect
 	_volumeList[static_cast<int32>(SOUND_TYPE::STAGE_CLEAR)] = 0.5f;
@@ -66,6 +68,7 @@ void FmodMgr::LoadSounds()
 	LoadSound(SOUND_TYPE::TITLE, "..\\Resources\\Sound\\TitleScene_BGM.mp3", true);
 	LoadSound(SOUND_TYPE::STAGE01, "..\\Resources\\Sound\\Stage01_BGM (Area6).mp3", true);
 	LoadSound(SOUND_TYPE::STAGE02, "..\\Resources\\Sound\\Stage02_BGM (CSO_Zombie_Shelter_Night).mp3", true);
+	LoadSound(SOUND_TYPE::STAGE03, "..\\Resources\\Sound\\Stage03_BGM (CSO_Zombie_Shelter_Night).mp3", true);
 
 	// Player Sound Effect
 	LoadSound(SOUND_TYPE::PLAYER_RUN, "..\\Resources\\Sound\\Player_Run.mp3", false);
@@ -81,6 +84,7 @@ void FmodMgr::LoadSounds()
 	//LoadSound(SOUND_TYPE::ZOMBIE_RUN, "..\\Resources\\Sound\\Zombie_Run.mp3", false);
 	LoadSound(SOUND_TYPE::ZOMBIE_PAIN, "..\\Resources\\Sound\\Zombie_Pain.mp3", false);
 	LoadSound(SOUND_TYPE::ZOMBIE_DIE, "..\\Resources\\Sound\\Zombie_Die.mp3", false);
+	LoadSound(SOUND_TYPE::ZOMBIE_SCREAM, "..\\Resources\\Sound\\Zombie_Scream.mp3", false);
 
 	// UI Sound Effect
 	LoadSound(SOUND_TYPE::STAGE_CLEAR, "..\\Resources\\Sound\\Stage_Clear.mp3", false);

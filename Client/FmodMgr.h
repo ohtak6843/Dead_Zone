@@ -10,6 +10,7 @@ enum class SOUND_TYPE
 	TITLE,
 	STAGE01,
 	STAGE02,
+	STAGE03,
 
 	// Player Sound Effect
 	PLAYER_RUN,
@@ -25,6 +26,7 @@ enum class SOUND_TYPE
 	ZOMBIE_RUN,
 	ZOMBIE_PAIN,
 	ZOMBIE_DIE,
+	ZOMBIE_SCREAM,
 
 	// UI Sound Effect
 	STAGE_CLEAR,

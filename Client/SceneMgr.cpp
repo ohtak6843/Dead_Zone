@@ -111,7 +111,7 @@ void SceneMgr::LoadScene(SCENE_TYPE type)
 	case SCENE_TYPE::STAGE03:
 		INPUT->LockCursor(true);
 		gameFramework->ToggleFullScreen(true);
-		//GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE03);
+		GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE03);
 		break;
 	}
 }

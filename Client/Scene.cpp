@@ -490,6 +490,25 @@ void Scene::UpdatePlayerHealth(sc_packet_player_health* packet)
 		if (id == packet->playerId)
 		{
 			group[0]->SetHp(packet->health);
+
+			if (packet->health <= 0.0f) // 플레이어가 죽었을 때
+			{
+				// 총기 비활성화
+				auto& gunObjects = group[0]->GetGuns();
+				
+				for (auto& gunGroup : gunObjects)
+				{
+					for (auto& gunPart : gunGroup)
+					{
+						gunPart->SetActive(false);
+					}
+				}
+
+				// 플레이어 모델 비활성화
+				for (auto& part : group) {
+					part->SetActive(false);
+				}
+			}
 		}
 	}
 }
