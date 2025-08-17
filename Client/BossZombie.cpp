@@ -3,6 +3,29 @@
 #include "Animator.h"
 
 #include "FmodMgr.h"
+#include "DustParticle.h"
+#include "ParticleObject.h"
+#include "SceneMgr.h"
+#include "Scene.h"
+#include "Transform.h"
+
+#include "Timer.h"
+
+BossZombie::BossZombie(const wstring& infoKey) : Zombie(infoKey)
+{
+	_Dust = make_shared<DustParticle>();
+	_dust_particle = make_shared<ParticleObject>();
+	_dust_particle->SetTransform(make_shared<Transform>());
+	_dust_particle->SetCheckFrustum(false);
+	_dust_particle->SetParticle(_Dust);
+	GET_SINGLE(SceneMgr)->GetActiveScene()->AddGameObject(_dust_particle);
+	
+	//_dust_particle->GetTransform()->SetParent(GetTransform());
+	//_dust_particle->GetTransform()->SetLocalPosition(Vec3(0.f, 15.f, 0.f));
+
+	_Dust->SetActive(false);
+	_dust_particle->GetParticle()->SetActive(false);
+}
 
 void BossZombie::SetState(ZOMBIE_STATE playerState)
 {
@@ -53,13 +76,23 @@ void BossZombie::SetState(ZOMBIE_STATE playerState)
 	case ZOMBIE_STATE::DIE:
 	{
 		uint32 index = static_cast<uint32>(BOSS_ZOMBIE_ANIMATION::DIE);
-		GetAnimator()->Play(index);
+		GetAnimator()->Play(index);	
 		break;
 	}
 	case ZOMBIE_STATE::JUMP:
 	{
 		uint32 index = static_cast<uint32>(BOSS_ZOMBIE_ANIMATION::JUMP);
 		GetAnimator()->Play(index);
+		GET_SINGLE(Timer)->SetTimeout(
+			{
+								[&]()
+				{
+					_dust_particle->GetParticle()->Reset();
+					_dust_particle->GetParticle()->SetActive(true);
+					_dust_particle->GetTransform()->SetLocalPosition(GetTransform()->GetLocalPosition() + Vec3(0.f, 15.f, 0.f));
+				}
+			},
+			1.6f);
 		break;
 	}
 	case ZOMBIE_STATE::SCREAM:

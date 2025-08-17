@@ -16,7 +16,7 @@ DustParticle::DustParticle()
 	SetMaxParticle(100);
 	SetLifeTime(2.0f, 2.0f);
 	SetSpeed(100.f, 150.f);
-	SetScale(50.f, 0.f);
+	SetScale(100.f, 50.f);
 	SetEmitterLifeTime(1.5f);
 	SetCreateInterval(0.005f);
 	SetParticleType(PARTICLE_TYPE::DUST);

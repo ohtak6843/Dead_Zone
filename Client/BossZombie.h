@@ -17,7 +17,7 @@ enum class BOSS_ZOMBIE_ANIMATION
 class BossZombie : public Zombie
 {
 public:
-	BossZombie(const wstring& infoKey = L"BossZombie") : Zombie(infoKey) {}
+	BossZombie(const wstring& infoKey = L"BossZombie");
 	virtual ~BossZombie() {}
 
 	virtual void Awake() override {}
@@ -27,5 +27,10 @@ public:
 
 public:
 	virtual void SetState(ZOMBIE_STATE playerState);
+	shared_ptr<class ParticleObject> GetDustParticle() { return _dust_particle; }
+
+public:
+	shared_ptr<class ParticleObject> _dust_particle;
+	shared_ptr<class DustParticle> _Dust;
 };
 

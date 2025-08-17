@@ -201,7 +201,7 @@ void CS_Main(int3 threadIndex : SV_DispatchThreadID)
 
                 // 디스크 샘플 (반경을 0.5로 고정: 기존 (noise - 0.5) 범위에 맞춤)
                 float theta = 3.141592f * 4 * r1;
-                float r = sqrt(saturate(r2)) * 0.5f;
+                float r = sqrt(saturate(r2)) * 2.0f;
 
                 float3 lateralDir = float3(cos(theta), 0.f, sin(theta));
                 g_particle[threadIndex.x].worldDir  = lateralDir;
