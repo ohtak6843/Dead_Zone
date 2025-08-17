@@ -53,9 +53,6 @@
     <Filter Include="Game\Object\Collider">
       <UniqueIdentifier>{bd07acd7-dd53-4f6d-b027-feb7e46d961a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Object\Particle">
-      <UniqueIdentifier>{b930b226-63e2-4209-a757-b243bb4f831f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\GameObject\Camera">
       <UniqueIdentifier>{33fb07b1-a9cd-4ec9-91d8-e112257ab505}</UniqueIdentifier>
     </Filter>
@@ -117,12 +114,6 @@
     </ClInclude>
     <ClInclude Include="Stage01.h">
       <Filter>Game\Scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="BloodParticle.h">
-      <Filter>Game\Object\Particle</Filter>
-    </ClInclude>
-    <ClInclude Include="MuzzleFlashParticle.h">
-      <Filter>Game\Object\Particle</Filter>
     </ClInclude>
     <ClInclude Include="Gun.h">
       <Filter>Game\GameObject\Gun</Filter>
@@ -186,9 +177,6 @@
     </ClInclude>
     <ClInclude Include="TP_AK47.h">
       <Filter>Game\GameObject\Gun</Filter>
-    </ClInclude>
-    <ClInclude Include="Particle.h">
-      <Filter>Game\Object\Particle</Filter>
     </ClInclude>
     <ClInclude Include="RenderPass.h">
       <Filter>Game\Manager</Filter>
@@ -280,6 +268,18 @@
     <ClInclude Include="UIObject.h">
       <Filter>Game\GameObject\UI</Filter>
     </ClInclude>
+    <ClInclude Include="DustParticle.h">
+      <Filter>Game\GameObject\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="BloodParticle.h">
+      <Filter>Game\GameObject\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="MuzzleFlashParticle.h">
+      <Filter>Game\GameObject\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>Game\GameObject\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc">
@@ -340,12 +340,6 @@
     <ClCompile Include="Stage01.cpp">
       <Filter>Game\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="BloodParticle.cpp">
-      <Filter>Game\Object\Particle</Filter>
-    </ClCompile>
-    <ClCompile Include="MuzzleFlashParticle.cpp">
-      <Filter>Game\Object\Particle</Filter>
-    </ClCompile>
     <ClCompile Include="Gun.cpp">
       <Filter>Game\GameObject\Gun</Filter>
     </ClCompile>
@@ -405,9 +399,6 @@
     </ClCompile>
     <ClCompile Include="TP_AK47.cpp">
       <Filter>Game\GameObject\Gun</Filter>
-    </ClCompile>
-    <ClCompile Include="Particle.cpp">
-      <Filter>Game\Object\Particle</Filter>
     </ClCompile>
     <ClCompile Include="RenderPass.cpp">
       <Filter>Game\Manager</Filter>
@@ -495,6 +486,18 @@
     </ClCompile>
     <ClCompile Include="UIObject.cpp">
       <Filter>Game\GameObject\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="DustParticle.cpp">
+      <Filter>Game\GameObject\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="BloodParticle.cpp">
+      <Filter>Game\GameObject\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="MuzzleFlashParticle.cpp">
+      <Filter>Game\GameObject\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Game\GameObject\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

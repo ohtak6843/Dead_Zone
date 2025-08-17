@@ -185,6 +185,7 @@
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="D3D11On12Device.h" />
     <ClInclude Include="d3dx12.h" />
+    <ClInclude Include="DustParticle.h" />
     <ClInclude Include="FmodMgr.h" />
     <ClInclude Include="EliteZombie.h" />
     <ClInclude Include="Framework.h" />
@@ -257,6 +258,7 @@
     <ClCompile Include="CommandQueue.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="D3D11On12Device.cpp" />
+    <ClCompile Include="DustParticle.cpp" />
     <ClCompile Include="FmodMgr.cpp" />
     <ClCompile Include="EliteZombie.cpp" />
     <ClCompile Include="Framework.cpp" />
