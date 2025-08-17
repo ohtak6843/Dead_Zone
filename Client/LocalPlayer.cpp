@@ -268,7 +268,7 @@ void LocalPlayer::ProcessMouseInput()
 
 	auto gun = GET_SINGLE(SceneMgr)->GetActiveScene()->FindGameObject(gunName);
 
-	if (INPUT->GetButton(MOUSE_TYPE::LBUTTON))
+	if (INPUT->GetButton(MOUSE_TYPE::LBUTTON) && _info.hp != 0.f)
 	{
 		bool fireSuccess = false;
 		fireSuccess = static_pointer_cast<Gun>(gun)->Fire();
