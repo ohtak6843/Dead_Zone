@@ -364,7 +364,7 @@ void GameRoom::SpawnZombies()
 void GameRoom::UpdateZombies(float dt)
 {
     float ySendOffset = 0.0f;
-    if (currentStage == 2)      ySendOffset = -15.0f;
+    if (currentStage == 2)      ySendOffset = -10.0f;
     else if (currentStage == 3) ySendOffset = -30.0f;
     const float detectR = (currentStage == 2) ? 500.0f : 2000.0f;
     const float detectR2 = detectR * detectR;

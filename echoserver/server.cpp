@@ -327,7 +327,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
             for (auto* peer : room->players) {
                 if (peer == pContext) {
                     sc_packet_move evSelf = ev;
-                    //evSelf.position.y += 140.0f;
+                    evSelf.position.y += 140.0f;
                     PostSendPacket(peer, &evSelf, evSelf.size);
                 }
                 else {

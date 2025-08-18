@@ -376,14 +376,10 @@ void Scene::MovePlayer(sc_packet_move* packet)
 	//bool flag = GET_SINGLE(FmodMgr)->CheckPlaying(SOUND_TYPE::PLAYER_RUN);
 	//if (flag == false)
 	//	GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::PLAYER_RUN);
-
-	float yOffsetOthers = 0.0f;
-	if (GET_SINGLE(SceneMgr)->GetSceneType()== SCENE_TYPE::STAGE02)      yOffsetOthers = 0.0f;
-	else if (GET_SINGLE(SceneMgr)->GetSceneType() == SCENE_TYPE::STAGE03) yOffsetOthers = 0.0f;
+	Vec3 position = Vec3(packet->position.x, packet->position.y, packet->position.z);
 	Vec3 look = Vec3(packet->look.x, packet->look.y, packet->look.z);
 
 	if (packet->playerId == GWindowInfo.local) {
-		Vec3 position = Vec3(packet->position.x, packet->position.y+140.0f, packet->position.z);
 		auto& root = _localPlayer[0];  
 		if (root) {
 			shared_ptr<Transform> rootTransform = root->GetTransform();
@@ -399,7 +395,6 @@ void Scene::MovePlayer(sc_packet_move* packet)
 	}
 
 	for (auto& [id, group] : _players) {
-		Vec3 position = Vec3(packet->position.x, packet->position.y+ yOffsetOthers, packet->position.z);
 		auto& root = group[0];
 		if (id == packet->playerId) {
 			shared_ptr<Transform> rootTransform = root->GetTransform();

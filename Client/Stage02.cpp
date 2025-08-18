@@ -149,7 +149,7 @@ void Stage02::Init()
 		shared_ptr<LocalPlayer> localPlayer = make_shared<LocalPlayer>();
 		localPlayer->SetName(L"LocalPlayer");
 		localPlayer->SetTransform(make_shared<Transform>());
-		localPlayer->GetTransform()->SetLocalPosition(Vec3(0.f, 140.f, 0.f));
+		localPlayer->GetTransform()->SetLocalPosition(Vec3(1525.f, 140.f, 2974.f));
 		localPlayer->SetCheckFrustum(false);
 
 		localPlayers.push_back(localPlayer);
