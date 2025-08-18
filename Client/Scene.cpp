@@ -277,7 +277,7 @@ void Scene::SetLocalPlayer(vector<shared_ptr<Player>>& player)
 
 void Scene::SetLocalPlayerState(struct sc_packet_player_info* packet)
 {
-	Vec3 position = Vec3(packet->position.x, packet->position.y, packet->position.z);
+	Vec3 position = Vec3(packet->position.x, packet->position.y+140, packet->position.z);
 	_localPlayer[0]->GetTransform()->SetLocalPosition(position);
 	_localPlayer[0]->GetTransform()->SetLocalRotation(Vec3(-90.0f, 180.f, 0.0f));
 
@@ -293,9 +293,10 @@ void Scene::AddPlayer(sc_packet_player_info* packet)
 {
 	//if (_players.size() >= 2)
 		//return;
-
-	Vec3 position = Vec3(packet->position.x, packet->position.y, packet->position.z);
-
+	float ySendOffsetOthers = 0.0f;
+	if (GET_SINGLE(SceneMgr)->GetSceneType() == SCENE_TYPE::STAGE02)      ySendOffsetOthers = 20.0f;
+	else if (GET_SINGLE(SceneMgr)->GetSceneType() == SCENE_TYPE::STAGE03) ySendOffsetOthers = 0.0f;
+	Vec3 position = Vec3(packet->position.x, packet->position.y+ySendOffsetOthers, packet->position.z);
 	shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Soldado.fbx");
 
 	vector<shared_ptr<MultiPlayer>> gameObjects = meshData->InstantiateAs<MultiPlayer>(ColliderType::OBB);

@@ -554,6 +554,7 @@ void MatchmakingCheck() {
         info.size = sizeof(info);
         info.type = S2C_P_PLAYER_INFO;
         for (auto* pl : players) {
+
             info.playerId = pl->socket;
             info.position = { pl->posX, pl->posY, pl->posZ };
             info.health = pl->health;
