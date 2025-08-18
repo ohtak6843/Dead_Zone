@@ -162,8 +162,8 @@ void GameRoom::HandlePlayerPhysics(float dt)
     const float groundY = MAP_MIN_Y;
 
     for (auto* p : players) {
-        p->posX += p->moveX * p->walkSpeed * dt;
-        p->posZ += p->moveZ * p->walkSpeed * dt;
+        /*p->posX += p->moveX * p->walkSpeed * dt;
+        p->posZ += p->moveZ * p->walkSpeed * dt;*/
 
         if (p->isJumping) {
             p->posY += p->verticalVelocity * dt;
@@ -202,13 +202,13 @@ void GameRoom::HandlePlayerCollisions()
         if (p->posY < groundY)
             p->posY = groundY;
 
-        for (const auto& col : mapColliders) {
+        /*for (const auto& col : mapColliders) {
             PhysicsSystem::ResolveCollision(
                 p->posX, p->posY, p->posZ,
                 col,
                 PLAYER_RADIUS
             );
-        }
+        }*/
     }
 
     size_t n = players.size();
@@ -301,8 +301,8 @@ void GameRoom::SpawnZombies()
 
     auto now = std::chrono::steady_clock::now();
 
-    int  maxCount = (currentStage == 1) ? 10 : 10;
-    int  batchSize = (currentStage == 1) ? 10 : 10;
+    int  maxCount = (currentStage == 1) ? 1 : 3;
+    int  batchSize = (currentStage == 1) ? 1 : 3;
 
     if ((int)zombies.size() >= maxCount || now - lastSpawn < spawnInterval)
         return;

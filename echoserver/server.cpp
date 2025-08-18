@@ -2,6 +2,7 @@
 #include "GameRoom.h"
 #include "GameManager.h"
 #include "Zombie.h"
+#include "PhysicsSystem.h"
 #include "protocol.h"
 
 #include <winsock2.h>
@@ -303,11 +304,16 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
         auto* pkt = reinterpret_cast<cs_packet_move*>(pIoData->buffer);
         Vector3 dir = pkt->direction;
 
-        pContext->moveX = dir.x;
-        pContext->moveY = dir.y;
-        pContext->moveZ = dir.z;
+        float x = dir.x, y = dir.y, z = dir.z;
+        for (const auto& col : mapColliders) {
+            PhysicsSystem::ResolveCollision(x, y, z, col, 30);
+        }
+
+        pContext->posX = x;
+        pContext->posY = y;
+        pContext->posZ = z;
         pContext->look = pkt->look;
-       
+
         sc_packet_move ev{};
         ev.size = sizeof(ev);
         ev.type = S2C_P_MOVE;
@@ -321,7 +327,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
             for (auto* peer : room->players) {
                 if (peer == pContext) {
                     sc_packet_move evSelf = ev;
-                    evSelf.position.y += 140.0f;
+                    //evSelf.position.y += 140.0f;
                     PostSendPacket(peer, &evSelf, evSelf.size);
                 }
                 else {
@@ -517,7 +523,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
     }
 }
 
-constexpr size_t kMaxPlayers = 1;
+constexpr size_t kMaxPlayers = 2;
 
 void MatchmakingCheck() {
     std::lock_guard<std::mutex> lock(g_lobbyMutex);

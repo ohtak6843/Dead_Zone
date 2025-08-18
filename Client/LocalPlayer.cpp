@@ -87,9 +87,9 @@ void LocalPlayer::LateUpdate()
 		cs_packet_move pkt;
 		pkt.size = sizeof(cs_packet_move);
 		pkt.type = C2S_P_MOVE;
-		pkt.direction.x = _moveDir.x;
-		pkt.direction.y = _moveDir.y;
-		pkt.direction.z = _moveDir.z;
+		pkt.direction.x = pos.x;
+		pkt.direction.y = 0;
+		pkt.direction.z = pos.z;
 		pkt.look.x = GetTransform()->GetLook().x;
 		pkt.look.y = GetTransform()->GetLook().y;
 		pkt.look.z = GetTransform()->GetLook().z;
@@ -103,9 +103,9 @@ void LocalPlayer::LateUpdate()
 		cs_packet_move stopPkt{};
 		stopPkt.size = sizeof(stopPkt);
 		stopPkt.type = C2S_P_MOVE;
-		stopPkt.direction.x = 0.f;
-		stopPkt.direction.y = 0.f;
-		stopPkt.direction.z = 0.f;
+		stopPkt.direction.x = pos.x;
+		stopPkt.direction.y = 0;
+		stopPkt.direction.z = pos.z;
 		stopPkt.look.x = GetTransform()->GetLook().x;
 		stopPkt.look.y = GetTransform()->GetLook().y;
 		stopPkt.look.z = GetTransform()->GetLook().z;
