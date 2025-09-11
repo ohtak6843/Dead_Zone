@@ -81,8 +81,12 @@ void LocalPlayer::LateUpdate()
 	{
 		_moveDir.Normalize();
 
+		//_moveDeltaPos += _moveDir * _speed * DELTA_TIME;
+		//pos += _moveDeltaPos;
+
 		pos += _moveDir * _speed * DELTA_TIME;
-		GetTransform()->SetLocalPosition(pos); //서버권위 수정
+
+		//GetTransform()->SetLocalPosition(pos); //서버권위 수정
 
 		cs_packet_move pkt;
 		pkt.size = sizeof(cs_packet_move);

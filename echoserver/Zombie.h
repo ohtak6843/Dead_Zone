@@ -100,7 +100,7 @@ public:
             specialSkill = "None";
         }
         else if (t == BOSS) {
-            health = 50;
+            health = 2000;
             attack = 8;
             attackSpeed = 2.6f;
             walkSpeed = 85.0f;

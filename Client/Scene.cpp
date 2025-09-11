@@ -19,6 +19,7 @@
 #include "LightObject.h"
 
 #include "Player.h"
+#include "LocalPlayer.h"
 #include "MultiPlayer.h"
 
 #include "Zombie.h"
@@ -387,10 +388,14 @@ void Scene::MovePlayer(sc_packet_move* packet)
 			rootTransform->SetLocalPosition(position);
 			rootTransform->LookAt(look);
 
-			//Vec3 rotation = rootTransform->GetLocalRotation();
-			//rotation.x = -90.f;
-			//rotation.y += 180.f;
-			//rootTransform->SetLocalRotation(rotation);
+			//shared_ptr<LocalPlayer> player = static_pointer_cast<LocalPlayer>(root);
+			//if (player)
+			//	player->ClearMoveDeltaPos();
+
+			Vec3 rotation = rootTransform->GetLocalRotation();
+			rotation.x = -90.f;
+			rotation.y += 180.f;
+			rootTransform->SetLocalRotation(rotation);
 		}
 		return;
 	}

@@ -180,6 +180,8 @@ void WorkerThread(HANDLE) {
                 continue;
             }
 
+            int flag = 1;
+            setsockopt(acceptedSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(flag));
             PER_SOCKET_CONTEXT* newContext = new PER_SOCKET_CONTEXT;
             newContext->socket = acceptedSocket;
             newContext->state = STATE_LOGIN;
@@ -523,7 +525,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
     }
 }
 
-constexpr size_t kMaxPlayers = 2;
+constexpr size_t kMaxPlayers = 1;
 
 void MatchmakingCheck() {
     std::lock_guard<std::mutex> lock(g_lobbyMutex);
