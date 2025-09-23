@@ -301,8 +301,8 @@ void GameRoom::SpawnZombies()
 
     auto now = std::chrono::steady_clock::now();
 
-    int  maxCount = (currentStage == 1) ? 3 : 3;
-    int  batchSize = (currentStage == 1) ? 3 : 3;
+    int  maxCount = (currentStage == 1) ? 10 : 10;
+    int  batchSize = (currentStage == 1) ? 10 : 10;
 
     if ((int)zombies.size() >= maxCount || now - lastSpawn < spawnInterval)
         return;

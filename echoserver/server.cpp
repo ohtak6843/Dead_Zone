@@ -373,7 +373,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
                     std::cout << "[서버] 보스 처치\n";
                 }
 
-                const int killThreshold = 1;   
+                const int killThreshold = 5;   
                 const int maxStage = 3;       
 
                 if (room->killCount >= killThreshold && room->currentStage < maxStage) {
@@ -525,7 +525,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
     }
 }
 
-constexpr size_t kMaxPlayers = 1;
+constexpr size_t kMaxPlayers = 2;
 
 void MatchmakingCheck() {
     std::lock_guard<std::mutex> lock(g_lobbyMutex);
