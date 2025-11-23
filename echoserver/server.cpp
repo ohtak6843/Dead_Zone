@@ -525,7 +525,7 @@ void ProcessClientMessage(PER_SOCKET_CONTEXT* pContext,
     }
 }
 
-constexpr size_t kMaxPlayers = 2;
+constexpr size_t kMaxPlayers = 3;
 
 void MatchmakingCheck() {
     std::lock_guard<std::mutex> lock(g_lobbyMutex);
