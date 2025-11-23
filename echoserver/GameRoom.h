@@ -1,0 +1,81 @@
+// GameRoom.h
+#pragma once
+
+#include "server.h"
+#include "GameManager.h"
+#include "Zombie.h"
+#include <vector>
+#include "MapColliderLoader.h"
+#include "Pathfinding.h"
+#include <unordered_map>
+
+// 활성 방 목록 전방 선언
+class GameRoom;
+extern std::vector<GameRoom*> activeRooms;
+extern std::vector<Collider> mapColliders;
+
+class GameRoom {
+public:
+    // 생성자: playersInput으로 방 멤버 초기화, activeRooms에 등록
+    GameRoom(const std::vector<PER_SOCKET_CONTEXT*>& playersInput);
+    ~GameRoom();
+
+    // 틱 스케줄러에서 호출할 업데이트 함수
+    void Update(float dt);
+
+    // 이 방에 속한 플레이어들
+    std::vector<PER_SOCKET_CONTEXT*> players;
+
+    GameManager              gameManager;
+    std::chrono::steady_clock::time_point lastSpawn;
+    std::chrono::milliseconds                spawnInterval{ 500 };
+    int stageReadyCount = 0;
+    void RemoveZombieById(long long zombieId);
+    int      killCount = 0;
+    uint8_t  currentStage = 1;
+    float stageChangeTimer = -1.0f;
+    float    gameClearTimer = -1.0f;
+    float spawnResumeTimer = -1.0f;
+    int nextStage = 1;
+    bool     spawnPaused = false;
+    bool      bossSpawned = false;   
+    long long bossId = -1;     
+    float     bossTimer = 0.0f; // 보스 패턴 타이머
+    bool bossKilled = false;
+    std::vector<Zombie>              zombies;
+    std::vector<uint8_t>                          augmentOptions;
+    std::unordered_map<PER_SOCKET_CONTEXT*, bool>  hasSelected;
+    void SendAugmentOptions();
+    void HandleAugmentSelect(PER_SOCKET_CONTEXT * pContext, uint8_t idx);
+    std::atomic<bool> bossPhaseRequested{ false };
+    Vector3 bossSpawnPos{ 0.f, 0.f, 0.f };
+    void SpawnBoss(float x, float y, float z);
+    void QueueStartBossPhase(const Vector3& pos);
+private:
+    
+    uint32_t                          snapshotFrameCount = 0;
+    uint32_t                          snapshotFrameInterval;
+    std::vector<std::vector<bool>> grid;  // 차단 정보(이동 가능/불가)
+    float cellSize = 50.0f;            // 한 그리드 셀의 크기 (world units)
+    Vec2f worldOrigin = { 0, 0 };  // 그리드(0,0)에 대응하는 월드 좌표
+    long long nextZombieId = 1;
+    void HandlePlayerPhysics(float dt);
+    void HandlePlayerCollisions();
+    void ResolveSphereCollision(float& ax, float& ay, float& az,
+        float& bx, float& by, float& bz,
+        float   radius);
+    void SendLandPacket(PER_SOCKET_CONTEXT* p);
+
+    void SpawnZombies();
+    void UpdateZombies(float dt);
+    void SetZombieState(Zombie& z, Zombie::ZOMBIE_STATE newState);
+    void BroadcastZombieMove(const Zombie& z, float dx, float dz);
+    void ClampZombiePosition(Zombie& z);
+    void SpawnMinionsAround(const Zombie& boss, int count,
+        float innerR, float outerR);
+    void HandleZombiePhysics(float dt);
+    void HandleZombieCollisions();
+
+    void BroadcastSnapshots();
+    void StartBossPhase_Internal();
+};

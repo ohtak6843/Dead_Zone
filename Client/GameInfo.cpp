@@ -1,0 +1,153 @@
+#include "pch.h"
+#include "GameInfo.h"
+
+void GameInfo::Init()
+{
+	CreateDefaultPlayerInfo();
+	CreateDefaultZombieInfo();
+	CreateDefaultGunInfo();
+}
+
+void GameInfo::CreateDefaultPlayerInfo()
+{
+	// Default Player Info
+	{
+		shared_ptr<PlayerInfo> info = make_shared<PlayerInfo>(
+			PlayerInfo
+			{
+				INFO_TYPE::PLAYER,
+				L"Player",
+
+				100,		// 현재 체력
+				100,		// 최대 체력
+				0,			// 공격력
+				0,			// 보유 골드
+				3.f,		// 걷는 속도 (m/s)
+				5.f,		// 뛰는 속도 (m/s)
+			});
+		Add<PlayerInfo>(L"Player", info);
+	}
+}
+
+void GameInfo::CreateDefaultZombieInfo()
+{
+	// Normal Zombie Info
+	{
+		shared_ptr<ZombieInfo> info = make_shared<ZombieInfo>(
+			ZombieInfo
+			{
+				INFO_TYPE::ZOMBIE,
+				L"NormalZombie",
+
+				ZOMBIE_TYPE::NORMAL,
+				100,
+				10,
+				1.f,
+				150.f,
+				3.3f,
+			});
+		Add<ZombieInfo>(L"NormalZombie", info);
+	}
+
+	// Police Zombie Info
+	{
+		shared_ptr<ZombieInfo> info = make_shared<ZombieInfo>(
+			ZombieInfo
+			{
+				INFO_TYPE::ZOMBIE,
+				L"PoliceZombie",
+
+				ZOMBIE_TYPE::POLICE,
+				200,
+				15,
+				1.0f,
+				120.f,
+				3.3f,
+			});
+		Add<ZombieInfo>(L"PoliceZombie", info);
+	}
+
+	// Elite Zombie Info
+	{
+		shared_ptr<ZombieInfo> info = make_shared<ZombieInfo>(
+			ZombieInfo
+			{
+				INFO_TYPE::ZOMBIE,
+				L"EliteZombie",
+
+				ZOMBIE_TYPE::ELITE,
+				300,
+				20,
+				1.1f,
+				170.f,
+				3.3f,
+			});
+		Add<ZombieInfo>(L"EliteZombie", info);
+	}
+
+	// Boss Zombie Info
+	{
+		shared_ptr<ZombieInfo> info = make_shared<ZombieInfo>(
+			ZombieInfo
+			{
+				INFO_TYPE::ZOMBIE,
+				L"BossZombie",
+
+				ZOMBIE_TYPE::BOSS,
+				3000,
+				20,
+				1.1f,
+				170.f,
+				3.3f,
+			});
+		Add<ZombieInfo>(L"BossZombie", info);
+	}
+}
+
+void GameInfo::CreateDefaultGunInfo()
+{
+	// M4A1 Info
+	{
+		shared_ptr<GunInfo> info = make_shared<GunInfo>(
+			GunInfo
+			{
+				INFO_TYPE::GUN,
+				L"M4A1",
+				GUN_TYPE::M4A1,
+
+				60,					// 공격력
+				10.f,				// 발사 속도 (발/s)	
+				500.f,				// 사거리 (m)	
+				2.5f,				// 재장전 속도 (s)
+				30,					// 장탄수
+				2880,				// 무게 (g)
+				2.f,				// 반동
+				60.f,				// 정조준 시 시야각
+				1.f,				// 정조준 속도 (s)
+			});
+		Add<GunInfo>(L"M4A1", info);
+	}
+
+	// AK47 Info
+	{
+		shared_ptr<GunInfo> info = make_shared<GunInfo>(
+			GunInfo
+			{
+				INFO_TYPE::GUN,
+				L"AK47",
+				GUN_TYPE::AK47,
+
+				80,					// 공격력
+				8.f,				// 발사 속도 (발/s)	
+				300.f,				// 사거리 (m)	
+				2.5f,				// 재장전 속도 (s)
+				30,					// 장탄수
+				3470,				// 무게 (g)
+				3.f,				// 반동
+				60.f,				// 정조준 시 시야각
+				1.f,				// 정조준 속도 (s)
+			});
+		Add<GunInfo>(L"AK47", info);
+	}
+}
+

@@ -1,0 +1,803 @@
+#include "pch.h"
+#include "Scene.h"
+#include "GameObject.h"
+#include "Camera.h"
+#include "Framework.h"
+#include "ConstantBuffer.h"
+#include "Light.h"
+#include "Resources.h"
+#include "Timer.h"
+
+#include "Transform.h"
+#include "MeshRenderer.h"
+#include "MeshData.h"
+#include "SphereCollider.h"
+#include "Animator.h"
+#include "RenderPass.h"
+
+#include "CameraObject.h"
+#include "LightObject.h"
+
+#include "Player.h"
+#include "LocalPlayer.h"
+#include "MultiPlayer.h"
+
+#include "Zombie.h"
+#include "PoliceZombie.h"
+#include "EliteZombie.h"
+#include "BossZombie.h"
+
+#include "TP_AK47.h"
+
+#include "SceneMgr.h"
+#include "FmodMgr.h"
+
+#include "..//echoserver//protocol.h"
+
+extern WindowInfo GWindowInfo;
+
+Scene::Scene()
+{
+	_renderPass = make_shared<RenderPass>();
+}
+
+Scene::~Scene()
+{
+}
+
+void Scene::Release()
+{
+	_gameObjects.clear();
+	_players.clear();
+	_zombies.clear();
+	_jumpStates.clear();
+	
+	_renderPass.reset();
+}
+
+void Scene::Awake()
+{
+	for (const shared_ptr<GameObject>& gameObject : _gameObjects)
+	{
+		gameObject->Awake();
+	}
+}
+
+void Scene::Start()
+{
+	for (const shared_ptr<GameObject>& gameObject : _gameObjects)
+	{
+		gameObject->Start();
+	}
+}
+
+void Scene::Update()
+{
+	for (const shared_ptr<GameObject>& gameObject : _gameObjects)
+	{
+		if (!gameObject->IsActive()) continue;
+		gameObject->Update();
+	}
+}
+
+void Scene::LateUpdate()
+{
+	/*const float gravity = 9.8f;
+
+	for (auto& [id, group] : _players) {
+		auto & root = group[0];
+		auto itJS = _jumpStates.find(id);
+		if (itJS == _jumpStates.end() || !itJS->second.isJumping)
+			 continue;
+		auto & js = itJS->second;
+		Vec3 pos = root->GetTransform()->GetLocalPosition();
+		pos.y += js.verticalVel * DELTA_TIME;
+		js.verticalVel -= gravity * DELTA_TIME;
+		if (pos.y <= 0.0f) {
+			pos.y = 0.0f;
+			js.isJumping = false;
+			js.verticalVel = 0.0f;
+		}
+		root->GetTransform()->SetLocalPosition(pos);
+	}*/
+
+	for (const shared_ptr<GameObject>& gameObject : _gameObjects)
+	{
+		if (!gameObject->IsActive()) continue;
+		gameObject->LateUpdate();
+	}
+}
+
+void Scene::FinalUpdate()
+{
+	for (const shared_ptr<GameObject>& gameObject : _gameObjects)
+	{
+		if (!gameObject) continue; // 방어 코드, 크러시 원인 찾기 전까지 임시
+		if (!gameObject->IsActive()) continue;
+		gameObject->FinalUpdate();
+	}
+}
+
+shared_ptr<class Camera> Scene::GetMainCamera()
+{
+	return _renderPass->GetMainCamera();
+}
+
+shared_ptr<Camera> Scene::GetPlayerCamera()
+{
+	return _renderPass->GetPlayerCamera();
+}
+
+shared_ptr<class Camera> Scene::GetGunCamera()
+{
+	return _renderPass->GetGunCamera();
+}
+
+void Scene::Render()
+{
+	_renderPass->Render();
+}
+
+void Scene::RenderUI()
+{
+
+}
+
+void Scene::AddGameObject(shared_ptr<GameObject> gameObject)
+{
+	switch (gameObject->GetGameObjectType())
+	{
+	case GAMEOBJECT_TYPE::CAMERA:
+	{
+		auto cameraObject = static_pointer_cast<CameraObject>(gameObject);
+		if (cameraObject->GetCamera() != nullptr)
+		{
+			_renderPass->AddCamera(cameraObject->GetCamera());
+		}
+		break;
+	}
+	case GAMEOBJECT_TYPE::LIGHT:
+	{
+		auto lightObject = static_pointer_cast<LightObject>(gameObject);
+		if (lightObject->GetLight() != nullptr)
+		{
+			_renderPass->AddLight(lightObject->GetLight());
+		}
+		break;
+	}
+	default:
+		break;
+	}
+
+	_gameObjects.push_back(gameObject);
+}
+
+void Scene::RemoveGameObject(shared_ptr<GameObject> gameObject)
+{
+	switch (gameObject->GetGameObjectType())
+	{
+	case GAMEOBJECT_TYPE::CAMERA:
+	{
+		auto cameraObject = static_pointer_cast<CameraObject>(gameObject);
+		if (cameraObject->GetCamera() != nullptr)
+		{
+			_renderPass->RemoveCamera(cameraObject->GetCamera());
+		}
+		break;
+	}
+	case GAMEOBJECT_TYPE::LIGHT:
+	{
+		auto lightObject = static_pointer_cast<LightObject>(gameObject);
+		if (lightObject->GetLight() != nullptr)
+		{
+			_renderPass->RemoveLight(lightObject->GetLight());
+		}
+		break;
+	}
+	default:
+		break;
+	}
+
+	auto findIt = std::find(_gameObjects.begin(), _gameObjects.end(), gameObject);
+	if (findIt != _gameObjects.end())
+		_gameObjects.erase(findIt);
+}
+
+shared_ptr<GameObject> Scene::FindGameObject(const wstring& name)
+{
+	for (const shared_ptr<GameObject>& gameObject : _gameObjects)
+	{
+		if (gameObject->GetName() == name)
+			return gameObject;
+	}
+
+	return nullptr;
+}
+
+void Scene::ActiveGameObject(const wstring& name, bool flag)
+{
+	shared_ptr<GameObject> obj = FindGameObject(name);
+	if(obj)
+		obj->SetActive(flag);
+}
+
+void Scene::SetAugments(bool flag, array<uint8_t, 3> opt)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		wstring name = L"Augment_" + std::to_wstring(i + 1);
+		shared_ptr<GameObject> obj = FindGameObject(name);
+		if (!obj) continue;
+
+		CARD_TYPE cardType = static_cast<CARD_TYPE>(opt[i]);
+		shared_ptr<Texture> texture;
+		switch (cardType)
+		{
+		case CARD_TYPE::PLAYER_DMG_UP:
+			texture = GET_SINGLE(Resources)->Load<Texture>(L"PLAYER_DMG_UP", L"..\\Resources\\Texture\\Augment\\플레이어 공격력 증가 카드.png");
+			break;
+		case CARD_TYPE::ZOMBIE_DMG_DOWN:
+			texture = GET_SINGLE(Resources)->Load<Texture>(L"ZOMBIE_DMG_DOWN", L"..\\Resources\\Texture\\Augment\\좀비 공격력 감소 카드.png"); 
+			break;
+		case CARD_TYPE::PLAYER_HP_UP:
+			texture = GET_SINGLE(Resources)->Load<Texture>(L"PLAYER_HP_UP", L"..\\Resources\\Texture\\Augment\\플레이어 최대체력 증가 카드.png");
+			break;
+		case CARD_TYPE::PLAYER_SPEED_UP:
+			texture = GET_SINGLE(Resources)->Load<Texture>(L"PLAYER_SPEED_UP", L"..\\Resources\\Texture\\Augment\\플레이어 이동속도 증가 카드.png");
+			break;
+		case CARD_TYPE::ZOMBIE_SPEED_DOWN:
+			texture = GET_SINGLE(Resources)->Load<Texture>(L"ZOMBIE_SPEED_DOWN", L"..\\Resources\\Texture\\Augment\\좀비 이동속도 감소 카드.png");
+			break;
+		default:
+			break;
+		}
+
+		if(texture != nullptr)
+			obj->GetMeshRenderer()->GetMaterial()->SetTexture(0, texture);
+
+		obj->SetActive(flag); // Augment 오브젝트 활성화/비활성화
+	}
+}
+
+void Scene::ShowAugments(bool flag)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		wstring name = L"Augment_" + std::to_wstring(i + 1);
+		shared_ptr<GameObject> obj = FindGameObject(name);
+		if (!obj) continue;
+
+		obj->SetActive(flag); // Augment 오브젝트 활성화/비활성화
+	}
+}
+
+void Scene::SetLocalPlayer(vector<shared_ptr<Player>>& player)
+{
+	_localPlayer = std::move(player);
+}
+
+void Scene::SetLocalPlayerState(struct sc_packet_player_info* packet)
+{
+	Vec3 position = Vec3(packet->position.x, packet->position.y+140, packet->position.z);
+	_localPlayer[0]->GetTransform()->SetLocalPosition(position);
+	_localPlayer[0]->GetTransform()->SetLocalRotation(Vec3(-90.0f, 180.f, 0.0f));
+
+	// 플레이어 정보 설정
+	_localPlayer[0]->SetHp(packet->health);
+	_localPlayer[0]->SetMaxHp(packet->maxHealth);
+	_localPlayer[0]->SetAttackDamage(packet->damage);
+	_localPlayer[0]->SetWalkSpeed(packet->walkSpeed);
+	_localPlayer[0]->SetGold(packet->gold);
+}
+
+void Scene::AddPlayer(sc_packet_player_info* packet)
+{
+	//if (_players.size() >= 2)
+		//return;
+	float ySendOffsetOthers = 0.0f;
+	if (GET_SINGLE(SceneMgr)->GetSceneType() == SCENE_TYPE::STAGE02)      ySendOffsetOthers = 20.0f;
+	else if (GET_SINGLE(SceneMgr)->GetSceneType() == SCENE_TYPE::STAGE03) ySendOffsetOthers = 0.0f;
+	Vec3 position = Vec3(packet->position.x, packet->position.y+ySendOffsetOthers, packet->position.z);
+	shared_ptr<MeshData> meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Soldado.fbx");
+
+	vector<shared_ptr<MultiPlayer>> gameObjects = meshData->InstantiateAs<MultiPlayer>(ColliderType::OBB);
+
+	// 플레이어 모델
+	for (auto& gameObject : gameObjects)
+	{
+		gameObject->SetName(L"Player");
+		gameObject->SetState(PLAYER_STATE::IDLE);
+		AddGameObject(gameObject);
+	}
+
+	gameObjects[0]->SetID(static_cast<uint32_t>(packet->playerId));
+	gameObjects[0]->GetTransform()->SetLocalPosition(position);
+	gameObjects[0]->GetTransform()->SetLocalRotation(Vec3(-90.0f, 180.f, 0.0f));
+
+	// 플레이어 정보 설정
+	gameObjects[0]->SetHp(packet->health);
+	gameObjects[0]->SetMaxHp(packet->maxHealth);
+	gameObjects[0]->SetAttackDamage(packet->damage);
+	gameObjects[0]->SetWalkSpeed(packet->walkSpeed);
+	gameObjects[0]->SetGold(packet->gold);
+
+
+	for (int i = 1; i < gameObjects.size(); i++)
+	{
+		gameObjects[i]->GetTransform()->SetParent(gameObjects[0]->GetTransform());
+	}
+
+	// 플레이어 씬에 추가
+	vector<shared_ptr<Player>> players;
+	players.reserve(gameObjects.size());
+
+	std::transform(gameObjects.begin(), gameObjects.end(), std::back_inserter(players),
+		[](const shared_ptr<MultiPlayer>& mp) {
+			return static_pointer_cast<Player>(mp); // 업캐스팅
+		});
+	_players[packet->playerId] = std::move(players);
+
+	// 총 모델
+	shared_ptr<MeshData> guns = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\AK47.fbx");
+	vector<shared_ptr<TP_AK47>> gunObjects = guns->InstantiateAs<TP_AK47>();
+
+	for (auto& gunObject : gunObjects)
+	{
+		gunObject->SetName(L"TP_AK47");
+		gunObject->GetTransform()->SetParent(gameObjects[0]->GetTransform());
+		gunObject->SetParentObject(gameObjects[0]);
+		AddGameObject(gunObject);
+	}
+
+	// 플레이어에 총 추가
+	vector<shared_ptr<Gun>> tempGuns;
+	tempGuns.reserve(gunObjects.size());
+
+	std::transform(gunObjects.begin(), gunObjects.end(), std::back_inserter(tempGuns),
+		[](const shared_ptr<TP_AK47>& mp) {
+			return static_pointer_cast<Gun>(mp); // 업캐스팅
+		});
+	gameObjects[0]->AddGun(tempGuns);
+	
+	// UI 패널 활성화
+	auto scene = GET_SINGLE(SceneMgr)->GetActiveScene();
+	int32 index = _players.size() + 1; // 현재 플레이어의 인덱스
+	auto Panel = scene->FindGameObject(L"PlayerPanel_" + to_wstring(index));
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index))->SetActive(true);
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_HP")->SetActive(true);
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Max_HP")->SetActive(true);
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Player_ID")->SetActive(true);
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Attack_LV")->SetActive(true);
+	scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Speed_LV")->SetActive(true);
+	
+}
+
+void Scene::MovePlayer(sc_packet_move* packet)
+{
+	//// 사운드 재생
+	//bool flag = GET_SINGLE(FmodMgr)->CheckPlaying(SOUND_TYPE::PLAYER_RUN);
+	//if (flag == false)
+	//	GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::PLAYER_RUN);
+	Vec3 position = Vec3(packet->position.x, packet->position.y, packet->position.z);
+	Vec3 look = Vec3(packet->look.x, packet->look.y, packet->look.z);
+
+	if (packet->playerId == GWindowInfo.local) {
+		auto& root = _localPlayer[0];  
+		if (root) {
+			shared_ptr<Transform> rootTransform = root->GetTransform();
+			rootTransform->SetLocalPosition(position);
+			rootTransform->LookAt(look);
+
+			//shared_ptr<LocalPlayer> player = static_pointer_cast<LocalPlayer>(root);
+			//if (player)
+			//	player->ClearMoveDeltaPos();
+
+			Vec3 rotation = rootTransform->GetLocalRotation();
+			rotation.x = -90.f;
+			rotation.y += 180.f;
+			rootTransform->SetLocalRotation(rotation);
+		}
+		return;
+	}
+
+	for (auto& [id, group] : _players) {
+		auto& root = group[0];
+		if (id == packet->playerId) {
+			shared_ptr<Transform> rootTransform = root->GetTransform();
+			rootTransform->SetLocalPosition(position);
+			rootTransform->LookAt(look);
+
+			Vec3 rotation = rootTransform->GetLocalRotation();
+			rotation.x = -90.f;
+			rotation.y += 180.f;
+			rootTransform->SetLocalRotation(rotation);
+			return;
+		}
+	}
+}
+
+void Scene::JumpPlayer(sc_packet_jump* packet)
+{
+	uint32_t id = static_cast<uint32_t>(packet->playerId);
+	auto& js = _jumpStates[id];
+	js.isJumping = true;
+	js.verticalVel = packet->initVelocity;
+}
+
+void Scene::LandPlayer(sc_packet_land* packet)
+{
+	uint32_t id = static_cast<uint32_t>(packet->playerId);
+	auto& js = _jumpStates[id];
+	js.isJumping = false;
+	js.verticalVel = 0.0f;
+}
+
+void Scene::AnimatePlayer(sc_packet_state* packet)
+{
+	PLAYER_STATE state = static_cast<PLAYER_STATE>(packet->state);
+	for (auto& [id, group] : _players) {
+		auto& root = group[0];
+		if (id == packet->playerId) {
+			for (auto& part : group) {
+				part->SetState(state);
+			}
+			return;
+		}
+	}
+}
+
+void Scene::RemovePlayer(sc_packet_player_leave* packet)
+{
+	uint32_t leftId = static_cast<uint32_t>(packet->playerId);
+
+	for (auto& [id, group] : _players)
+	{
+		if (id == packet->playerId)
+		{
+			auto& guns = group[0]->GetGuns();
+			for (auto& gunGroup : guns) {
+				for (auto& gun : gunGroup) {
+					RemoveGameObject(gun);
+				}
+			}
+
+			guns.clear();
+
+			for (auto& part : group)
+				RemoveGameObject(part);
+
+			_players.erase(id);
+
+			// UI 패널 비활성화 ( 해당 함수가 불러지지 않아서 확인을 하지 못함. 추후 확인 필요)
+			auto scene = GET_SINGLE(SceneMgr)->GetActiveScene();
+			int32 index = _players.size() + 1; // 현재 플레이어의 인덱스
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index))->SetActive(false);
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_HP")->SetActive(false);
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Max_HP")->SetActive(false);
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Player_ID")->SetActive(false);
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Attack_LV")->SetActive(false);
+			scene->FindGameObject(L"PlayerPanel_" + to_wstring(index) + L"_Speed_LV")->SetActive(false);
+		}
+	}
+}
+
+void Scene::UpdatePlayerHealth(sc_packet_player_health* packet)
+{
+	if (packet->playerId == GWindowInfo.local) {
+		auto& root = _localPlayer[0];
+		if (root) {
+			root->SetHp(packet->health);
+		}
+		return;
+	}
+	for (auto& [id, group] : _players)
+	{
+		if (id == packet->playerId)
+		{
+			group[0]->SetHp(packet->health);
+
+			if (packet->health <= 0.0f) // 플레이어가 죽었을 때
+			{
+				// 총기 비활성화
+				auto& gunObjects = group[0]->GetGuns();
+				
+				for (auto& gunGroup : gunObjects)
+				{
+					for (auto& gunPart : gunGroup)
+					{
+						gunPart->SetActive(false);
+					}
+				}
+
+				// 플레이어 모델 비활성화
+				for (auto& part : group) {
+					part->SetActive(false);
+				}
+			}
+		}
+	}
+}
+
+void Scene::ClearPlayers()
+{
+	for (auto& [id, group] : _players) {
+		for (auto& obj : group) {
+			RemoveGameObject(obj);
+		}
+	}
+	_players.clear();
+}
+
+void Scene::ClearZombies()
+{
+	// _zombies는 vector< vector< shared_ptr<GameObject> > >
+	for (auto& group : _zombies) {
+		for (auto& part : group) {
+			RemoveGameObject(part);
+		}
+	}
+	_zombies.clear();
+}
+
+void Scene::AddZombie(sc_packet_spawn_zombie* packet)
+{
+	Vec3 position = Vec3(packet->position.x, packet->position.y, packet->position.z);
+	vector<shared_ptr<Zombie>> zombieObjects;
+	switch (static_cast<ZOMBIE_TYPE>(packet->zombieType))
+	{
+	case ZOMBIE_TYPE::NORMAL:
+	{
+		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\Prisoner.fbx");
+		zombieObjects = meshData->InstantiateAs<Zombie>(ColliderType::OBB);
+		break;
+	}
+	case ZOMBIE_TYPE::POLICE:
+	{
+		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\WarZombie.fbx");
+		auto specificZombies = meshData->InstantiateAs<PoliceZombie>(ColliderType::OBB);
+		for (auto& z : specificZombies)
+			zombieObjects.push_back(static_pointer_cast<Zombie>(z));
+		break;
+	}
+	case ZOMBIE_TYPE::ELITE:
+	{
+		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\EliteZombie.fbx");
+		auto specificZombies = meshData->InstantiateAs<EliteZombie>(ColliderType::OBB);
+		for (auto& z : specificZombies)
+			zombieObjects.push_back(static_pointer_cast<Zombie>(z));
+		break;
+	}
+	case ZOMBIE_TYPE::BOSS:
+	{
+		auto meshData = GET_SINGLE(Resources)->LoadFBX(L"..\\Resources\\FBX\\SkeletonZombie.fbx");
+		auto specificZombies = meshData->InstantiateAs<BossZombie>(ColliderType::OBB);
+		for (auto& z : specificZombies)
+		{
+			z->GetTransform()->SetLocalScale(Vec3(1.5f, 1.5f, 1.5f));
+			zombieObjects.push_back(static_pointer_cast<Zombie>(z));
+		}
+		break;
+	}
+	}
+	/*shared_ptr<Zombie> obj = make_shared<Zombie>();
+	obj->SetName(L"OBJ");
+	obj->SetTransform(make_shared<Transform>());
+	obj->GetTransform()->SetLocalScale(Vec3(100.f, 100.f, 100.f));
+	obj->SetStatic(false);
+	shared_ptr<MeshRenderer> meshRenderer = make_shared<MeshRenderer>();
+	{
+		shared_ptr<Mesh> sphereMesh = GET_SINGLE(Resources)->LoadSphereMesh();
+		meshRenderer->SetMesh(sphereMesh);
+	}
+	{
+		shared_ptr<Shader> shader = GET_SINGLE(Resources)->Get<Shader>(L"Deferred");
+		shared_ptr<Texture> texture = GET_SINGLE(Resources)->Load<Texture>(L"Leather", L"..\\Resources\\Texture\\Leather.jpg");
+		shared_ptr<Texture> texture2 = GET_SINGLE(Resources)->Load<Texture>(L"Leather_Normal", L"..\\Resources\\Texture\\Leather_Normal.jpg");
+		shared_ptr<Material> material = make_shared<Material>();
+		material->SetShader(shader);
+		material->SetTexture(0, texture);
+		material->SetTexture(1, texture2);
+		meshRenderer->SetMaterial(material->Clone());
+	}
+	obj->SetMeshRenderer(meshRenderer);
+	zombieObjects.push_back(obj);*/
+
+	for (const auto& zombieObject : zombieObjects)
+	{
+		zombieObject->SetName(L"Zombie");
+		zombieObject->SetState(ZOMBIE_STATE::IDLE);
+	}
+
+	zombieObjects[0]->SetID(static_cast<uint32_t>(packet->zombieId));
+	zombieObjects[0]->GetTransform()->SetLocalPosition(position);
+	zombieObjects[0]->GetTransform()->SetLocalRotation(Vec3(-90.0f, 180.f, 0.0f));
+
+	for (int i = 1; i < zombieObjects.size(); i++)
+	{
+		zombieObjects[i]->GetTransform()->SetParent(zombieObjects[0]->GetTransform());
+	}
+
+	// 씬에 추가
+	for (auto& zombie : zombieObjects) {
+		AddGameObject(zombie);
+	}
+
+	_zombies.push_back(zombieObjects);
+}
+
+void Scene::MoveZombie(sc_packet_zombie_move* packet)
+{
+	Vec3 position = Vec3(packet->position.x, packet->position.y, packet->position.z);
+	Vec3 look = Vec3(packet->dx, 0.f, packet->dz);
+	uint32_t zid = static_cast<uint32_t>(packet->zombieId);
+
+	for (auto& group : _zombies) {
+		auto& root = group[0];
+		if (root->GetID() == zid) {
+			shared_ptr<Transform> rootTransform = root->GetTransform();
+			rootTransform->SetLocalPosition(position);
+			rootTransform->LookAt(look);
+
+			Vec3 rotation = rootTransform->GetLocalRotation();
+			rotation.x = -90.f;
+			rotation.y += 180.f;
+			rootTransform->SetLocalRotation(rotation);
+			return;
+		}
+	}
+}
+
+void Scene::MoveZombies(sc_packet_zombie_snapshot* packet)
+{
+	for (int i = 0; i < packet->count; ++i) {
+		const auto& e = packet->entries[i];
+		uint32_t zid = static_cast<uint32_t>(e.zombieId);
+		Vec3     newPos(e.position.x, e.position.y, e.position.z);
+
+		for (auto& group : _zombies) {
+			auto& root = group[0];
+			if (root->GetID() != zid)
+				continue;
+
+			auto t = root->GetTransform();
+
+			// 1) 이전 위치 가져오기
+			Vec3 prevPos = t->GetLocalPosition();
+
+			// 2) 방향 벡터 계산
+			Vec3 dir = newPos - prevPos;
+			float dist2 = dir.x * dir.x + dir.y * dir.y + dir.z * dir.z;
+			if (dist2 > 1e-6f) {
+				float dist = std::sqrt(dist2);
+				dir.x /= dist;
+				dir.y /= dist;
+				dir.z /= dist;
+
+				// 3) 회전(방향) 적용
+				t->LookAt(dir);
+				Vec3 rotation = t->GetLocalRotation();
+				rotation.x = -90.0f;
+				rotation.y += 180.0f;
+				t->SetLocalRotation(rotation);
+			}
+
+			// 4) 새 위치 세팅
+			t->SetLocalPosition(newPos);
+
+			break;  // 해당 좀비만 처리하고 루프 탈출
+		}
+	}
+}
+
+void Scene::AnimateZombie(sc_packet_zombie_state* packet)
+{
+	ZOMBIE_STATE state = static_cast<ZOMBIE_STATE>(packet->state);
+	for (auto& group : _zombies) {
+		auto& root = group[0];
+		if (root->GetID() == packet->zombieId) {
+			for (auto& part : group) {
+				part->SetState(state);
+			}
+			return;
+		}
+	}
+}
+
+void Scene::DieZombie(sc_packet_zombie_die* pkt)
+{
+	uint32_t id = static_cast<uint32_t>(pkt->zombieId);
+
+	// _zombies: vector< vector< shared_ptr<GameObject> > >
+	for (auto& group : _zombies) {
+		if (group.empty() || group[0]->GetID() != id)
+			continue;
+
+		// 1) 각 파트에 대해 DIE 상태로 전환 → 애니메이션 재생
+		for (auto& part : group) {
+			part->SetState(ZOMBIE_STATE::DIE);
+		}
+
+		auto anim = group[0]->GetAnimator();
+		int32 idx = anim->GetCurrentClipIndex();
+		float deathAnimDuration = anim->GetAnimDuration(idx);
+		GET_SINGLE(Timer)->SetTimeout([this, id]() {
+			RemoveZombieById(id);
+		}, deathAnimDuration);
+		// 한 번 처리했으면 루프 탈출
+		break;
+	}
+}
+
+// 기존 RemoveZombieById는 그대로 사용
+void Scene::RemoveZombieById(uint32_t zombieId)
+{
+	for (auto it = _zombies.begin(); it != _zombies.end(); ++it) {
+		auto& group = *it;
+		if (group.empty() || group[0]->GetID() != zombieId)
+			continue;
+
+		// 씬 오브젝트에서 제거
+		for (auto& part : group) {
+			RemoveGameObject(part);
+		}
+		// 벡터에서 그룹 삭제
+		_zombies.erase(it);
+		return;
+	}
+}
+
+void Scene::ApplySnapshot(sc_packet_snapshot* packet)
+{
+	for (int i = 0; i < packet->count; ++i) {
+		auto& e = packet->entries[i];
+		uint32_t playerId = static_cast<uint32_t>(e.playerId);
+
+		if (playerId == gameFramework->GetWindow().local) {
+			auto cam = GetMainCamera();
+			auto camGO = cam->GetGameObject();
+			auto camTrans = camGO->GetTransform();
+
+			Vec3 predicted = camTrans->GetLocalPosition();
+			Vec3 serverPos{ e.position.x, e.position.y+140.f, e.position.z };
+
+			Vec3 delta = serverPos - predicted;
+			const float snapThreshold = 1.0f;   
+			const float lerpRatio = 0.1f;   
+
+			if (delta.Length() > snapThreshold) {
+				camTrans->SetLocalPosition(serverPos);
+			}
+			else {
+				camTrans->SetLocalPosition(predicted + delta * lerpRatio);
+			}
+			continue;  
+		}
+
+		shared_ptr<GameObject> rootObj;
+		for (auto& [id, group] : _players) {
+			if (id == playerId) {
+				rootObj = group[0];
+				break;
+			}
+		}
+		if (!rootObj) continue;
+
+		auto itJS = _jumpStates.find(playerId);
+		bool remoteJumping = (itJS != _jumpStates.end() && itJS->second.isJumping);
+
+		Vec3 pos = rootObj->GetTransform()->GetLocalPosition();
+
+		pos.x = e.position.x;
+		pos.z = e.position.z;
+
+		if (!remoteJumping) {
+			pos.y = e.position.y;
+		}
+		rootObj->GetTransform()->SetLocalPosition(pos);
+
+		// 3) 회전도 보정
+		/*Vec3 rot = obj->GetTransform()->GetLocalRotation();
+		rot.y = e.yaw;
+		obj->GetTransform()->SetLocalRotation(rot);*/
+	}
+}

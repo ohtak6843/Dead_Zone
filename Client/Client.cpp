@@ -1,117 +1,345 @@
-﻿// Client.cpp : 애플리케이션에 대한 진입점을 정의합니다.
-//
-
-#include "pch.h"
+﻿#include "pch.h"
 #include "framework.h"
 #include "Client.h"
-#include "Game.h"
+#include "../echoserver/protocol.h"     
+#include <iostream>
+#include <memory>
+#include <thread>
+#include <atomic>
+#include <limits>
+#include <sstream>
+#include <iomanip>
+#include <shellapi.h>
+
+#include "Scene.h"
+#include "SceneMgr.h"
+#include "FmodMgr.h"
+
+#pragma comment(lib, "ws2_32.lib")
 
 #define MAX_LOADSTRING 100
 
-// 전역 변수:
 WindowInfo GWindowInfo;
+HINSTANCE hInst;
+WCHAR szTitle[MAX_LOADSTRING];
+WCHAR szWindowClass[MAX_LOADSTRING];
 
-HINSTANCE hInst;                                // 현재 인스턴스입니다.
-WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
-WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
+SOCKET g_clientSocket = INVALID_SOCKET;
 
-// 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
-ATOM                MyRegisterClass(HINSTANCE hInstance);
-BOOL                InitInstance(HINSTANCE, int);
-LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+// 로그인 상태 플래그 (테스트용: 로그인 후 설정)
+std::atomic<bool> g_loggedIn(false);
+
+std::atomic<bool> g_gameStarted(false);
+
+ATOM MyRegisterClass(HINSTANCE hInstance);
+BOOL InitInstance(HINSTANCE, int);
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
+
+uint32_t g_localPlayerId = 0;
+std::atomic<bool>    g_stageChangeRequested{ false };
+std::atomic<uint8_t> g_requestedStage{ 0 };
+
+std::array<uint8_t, 3> g_augmentSlots = { 0,0,0 };
+std::atomic<bool>    g_augmentActive{ false };
+std::atomic<uint8_t> g_augmentCount{ 0 };
+// 네트워크 초기화 함수
+bool InitNetwork(const std::string& serverIp) {
+    WSADATA wsaData;
+    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (result != 0) {
+        std::wcerr << L"WSAStartup 실패: " << result << std::endl;
+        return false;
+    }
+    g_clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (g_clientSocket == INVALID_SOCKET) {
+        std::wcerr << L"소켓 생성 실패: " << WSAGetLastError() << std::endl;
+        WSACleanup();
+        return false;
+    }
+    sockaddr_in serverAddr = {};
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(9000);
+    if (InetPtonA(AF_INET, serverIp.c_str(), &serverAddr.sin_addr) != 1) {
+        std::wcerr << L"IP 주소 변환 실패: " << serverIp.c_str() << std::endl;
+        closesocket(g_clientSocket);
+        WSACleanup();
+        return false;
+    }
+    if (connect(g_clientSocket, reinterpret_cast<sockaddr*>(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR) {
+        std::wcerr << L"서버 연결 실패: " << WSAGetLastError() << std::endl;
+        closesocket(g_clientSocket);
+        WSACleanup();
+        return false;
+    }
+    std::wcout << L"네트워크 초기화 및 서버 연결 성공" << std::endl;
+    return true;
+}
+
+void ReceiverThread(SOCKET clientSocket) {
+    std::vector<char> buf;        
+    char buffer[8192];              
+
+    while (true) {
+        int recvResult = recv(clientSocket, buffer, sizeof(buffer), 0);
+        if (recvResult > 0) {
+            buf.insert(buf.end(), buffer, buffer + recvResult);
+
+            size_t offset = 0;
+            while (offset + 2 <= buf.size()) {
+                uint8_t pktSize = static_cast<uint8_t>(buf[offset]);
+                if (pktSize < 2 || offset + pktSize > buf.size())
+                    break;
+
+                char* packet = buf.data() + offset;
+                uint8_t pktType = static_cast<uint8_t>(packet[1]);
+
+                switch (pktType) {
+                case S2C_P_LOGIN_OK: {
+                    auto* pOk = reinterpret_cast<sc_packet_login_ok*>(packet);
+                    if (!g_loggedIn) {
+                        g_loggedIn = true;
+                        g_localPlayerId = static_cast<uint32_t>(pOk->playerId);
+                        GWindowInfo.local = g_localPlayerId;
+                    }
+                    break;
+                }
+                case S2C_P_PLAYER_INFO: {
+                    auto* pInfo = reinterpret_cast<sc_packet_player_info*>(packet);
+                    if (static_cast<uint32_t>(pInfo->playerId) != g_localPlayerId) {
+                        GET_SINGLE(SceneMgr)
+                            ->GetActiveScene()
+                            ->AddPlayer(pInfo);
+                    }
+                    else if (static_cast<uint32_t>(pInfo->playerId) == g_localPlayerId)
+                    {
+                        GET_SINGLE(SceneMgr)
+                            ->GetActiveScene()
+                            ->SetLocalPlayerState(pInfo);
+                    }
+                    break;
+                }
+                case S2C_P_MOVE: {
+                    auto* pMove = reinterpret_cast<sc_packet_move*>(packet);
+                    GET_SINGLE(SceneMgr)
+                        ->GetActiveScene()
+                        ->MovePlayer(pMove);
+                    break;
+                }               
+                case S2C_P_SPAWN_ZOMBIE: {
+                    auto * pZombie = reinterpret_cast<sc_packet_spawn_zombie*>(packet);
+                    GET_SINGLE(SceneMgr)
+                         ->GetActiveScene()
+                         ->AddZombie(pZombie);
+                    break;
+                    }                
+                case S2C_P_STATE: {
+                    auto* pState = reinterpret_cast<sc_packet_state*>(packet);
+                    
+                    GET_SINGLE(SceneMgr)
+                        ->GetActiveScene()
+                        ->AnimatePlayer(pState);
+                    break;
+                }
+                case S2C_P_ZOMBIE_SNAPSHOT: {
+                    auto* pZSnap = reinterpret_cast<sc_packet_zombie_snapshot*>(packet);
+                    GET_SINGLE(SceneMgr)
+                        ->GetActiveScene()
+                        ->MoveZombies(pZSnap);
+                    break;
+                }
+                case S2C_P_ZOMBIE_MOVE: {
+                    auto* pZmove = reinterpret_cast<sc_packet_zombie_move*>(packet);
+                    GET_SINGLE(SceneMgr)
+                        ->GetActiveScene()
+                        ->MoveZombie(pZmove);
+                    break;
+                }
+                case S2C_P_ZOMBIE_STATE: {
+                    auto* pZstate = reinterpret_cast<sc_packet_zombie_state*>(packet);
+                    GET_SINGLE(SceneMgr)
+                        ->GetActiveScene()
+                        ->AnimateZombie(pZstate);
+                    break;
+                }
+                case S2C_P_ZOMBIE_DIE: {
+                    auto* pZdie = reinterpret_cast<sc_packet_zombie_die*>(packet);
+                    GET_SINGLE(SceneMgr)
+                        ->GetActiveScene()
+                        ->DieZombie(pZdie);
+                    break;
+                }
+                case S2C_P_PLAYER_LEAVE: {
+                    auto* pLeave = reinterpret_cast<sc_packet_player_leave*>(packet);
+                    GET_SINGLE(SceneMgr)
+                        ->GetActiveScene()
+                        ->RemovePlayer(pLeave);
+                    break;
+                }
+                case S2C_P_GAME_START: {
+                    g_gameStarted = true;
+                    break;
+                }
+                case S2C_P_STAGE_CHANGE: {
+                    auto* p = reinterpret_cast<sc_packet_stage_change*>(packet);
+                    GET_SINGLE(SceneMgr)->SetChangeScene(true);
+                    switch (p->newStage)
+                    {
+                    case 1:
+                        GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE01);
+                        break;
+                    case 2:
+						GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE02);
+						break;
+                    case 3:
+						GET_SINGLE(SceneMgr)->SetNextSceneType(SCENE_TYPE::STAGE03);
+                        break;
+                    }
+                    break;
+                }
+                case S2C_P_STAGE_CLEAR:
+                {
+                    GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"StageClear", true);
+                    GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE_CLEAR);
+                    break;
+                }
+                case S2C_P_GAME_CLEAR:
+                {
+                    // 게임 클리어 ui
+					GET_SINGLE(SceneMgr)->GetActiveScene()->ActiveGameObject(L"GameClear", true);
+					GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::STAGE_CLEAR);
+                    break;
+                }
+                case S2C_P_PLAYER_HEALTH: {
+                    auto* p = reinterpret_cast<sc_packet_player_health*>(packet);
+					GET_SINGLE(SceneMgr)
+						->GetActiveScene()
+						->UpdatePlayerHealth(p);
+
+                    // 사운드 재생
+                    bool flag = GET_SINGLE(FmodMgr)->CheckPlaying(SOUND_TYPE::PLAYER_PAIN);
+                    if (flag == false)
+                        GET_SINGLE(FmodMgr)->PlaySound(SOUND_TYPE::PLAYER_PAIN);
+                    break;
+                }
+                case S2C_P_AUGMENT_OPTIONS: {
+                    auto* pOpt = reinterpret_cast<sc_packet_augment_options*>(packet);
+                    g_augmentCount = pOpt->count;
+                    for (uint8_t i = 0; i < pOpt->count && i < g_augmentSlots.size(); ++i)
+                        g_augmentSlots[i] = pOpt->options[i];   
+                    g_augmentActive = true;
+
+					GET_SINGLE(SceneMgr)->GetActiveScene()->SetAugments(true, g_augmentSlots);
+                    break;
+                }
+                default:
+                    std::cout << "[클라이언트] 정의되지 않은 패킷 타입: "
+                        << static_cast<int>(pktType) << std::endl;
+                    break;
+                }
+
+                offset += pktSize;
+            }
+
+            // 5) 파싱한 만큼 버퍼에서 제거
+            if (offset > 0) {
+                buf.erase(buf.begin(), buf.begin() + offset);
+            }
+        }
+        else if (recvResult == 0) {
+            std::cout << "\n서버 연결 종료" << std::endl;
+            break;
+        }
+        else {
+            std::cerr << "\n데이터 수신 실패: " << WSAGetLastError() << std::endl;
+            break;
+        }
+    }
+}
+
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPWSTR    lpCmdLine,
+    _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    // TODO: 여기에 코드를 입력합니다.
-
-    // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_CLIENT, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
-    // 애플리케이션 초기화를 수행합니다:
-    if (!InitInstance (hInstance, nCmdShow))
-    {
+    if (!InitInstance(hInstance, nCmdShow))
         return FALSE;
-    }
 
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_CLIENT));
+    int    argc = 0;
+    LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+
+    std::string serverIp = "127.0.0.1";
+    if (argc >= 2) {
+        int     len = WideCharToMultiByte(CP_ACP, 0, argv[1], -1, nullptr, 0, nullptr, nullptr);
+        std::string tmp(len, '\0');
+        WideCharToMultiByte(CP_ACP, 0, argv[1], -1, &tmp[0], len, nullptr, nullptr);
+        serverIp = tmp;
+    }
+    LocalFree(argv);
+
+    if (!InitNetwork(serverIp))
+        return 1;
+
+    GWindowInfo.width = WINDOW_WIDTH;
+    GWindowInfo.height = WINDOW_HEIGHT;
+    GWindowInfo.windowed = true;
+    GWindowInfo.sock = g_clientSocket;
+
+    // 게임 프레임워크 초기화
+    gameFramework->Init(GWindowInfo);
+    GET_SINGLE(SceneMgr)->LoadScene(SCENE_TYPE::TITLE);
+
+    std::thread recvThread(ReceiverThread, g_clientSocket);
+
 
     MSG msg;
-
-    GWindowInfo.width = 800;
-    GWindowInfo.height = 600;
-    GWindowInfo.windowed = true;
-
-    unique_ptr<Game> game = make_unique<Game>();
-    game->Init(GWindowInfo);
-
-    // 기본 메시지 루프입니다:
-    while (true)
-    {
-        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-        {
-            if (msg.message == WM_QUIT) break;
-
-            if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-            {
+    HACCEL hAccelTable = LoadAccelerators(hInst, MAKEINTRESOURCE(IDC_CLIENT));
+    while (true) {
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            if (msg.message == WM_QUIT)
+                break;
+            if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             }
         }
-
-        // TODO
-        game->Update();
+        gameFramework->Update();
     }
 
-    return (int) msg.wParam;
+    closesocket(g_clientSocket);
+    WSACleanup();
+    if (recvThread.joinable())
+        recvThread.join();
+
+    return (int)msg.wParam;
 }
 
-
-
-//
-//  함수: MyRegisterClass()
-//
-//  용도: 창 클래스를 등록합니다.
-//
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
     WNDCLASSEXW wcex;
-
     wcex.cbSize = sizeof(WNDCLASSEX);
-
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_CLIENT));
-    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = nullptr;
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
-
+    wcex.style = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc = WndProc;
+    wcex.cbClsExtra = 0;
+    wcex.cbWndExtra = 0;
+    wcex.hInstance = hInstance;
+    wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_CLIENT));
+    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.lpszMenuName = nullptr;
+    wcex.lpszClassName = szWindowClass;
+    wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
     return RegisterClassExW(&wcex);
 }
 
-//
-//   함수: InitInstance(HINSTANCE, int)
-//
-//   용도: 인스턴스 핸들을 저장하고 주 창을 만듭니다.
-//
-//   주석:
-//
-//        이 함수를 통해 인스턴스 핸들을 전역 변수에 저장하고
-//        주 프로그램 창을 만든 다음 표시합니다.
-//
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
@@ -127,50 +355,45 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
+   if (GetForegroundWindow() != hWnd)
+   {
+       if (IsIconic(hWnd))
+           ShowWindow(hWnd, SW_RESTORE);
+
+       SetForegroundWindow(hWnd);
+       SetFocus(hWnd);
+   }
+
    GWindowInfo.hwnd = hWnd;
 
    return TRUE;
 }
 
-//
-//  함수: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  용도: 주 창의 메시지를 처리합니다.
-//
-//  WM_COMMAND  - 애플리케이션 메뉴를 처리합니다.
-//  WM_PAINT    - 주 창을 그립니다.
-//  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
-//
-//
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    switch (message)
-    {
+    switch (message) {
     case WM_COMMAND:
-        {
-            int wmId = LOWORD(wParam);
-            // 메뉴 선택을 구문 분석합니다:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
+    {
+        int wmId = LOWORD(wParam);
+        switch (wmId) {
+        case IDM_ABOUT:
+            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+            break;
+        case IDM_EXIT:
+            DestroyWindow(hWnd);
+            break;
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
         }
-        break;
+    }
+    break;
     case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-            EndPaint(hWnd, &ps);
-        }
-        break;
+    {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+        EndPaint(hWnd, &ps);
+    }
+    break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
@@ -180,18 +403,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-// 정보 대화 상자의 메시지 처리기입니다.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
+    switch (message) {
     case WM_INITDIALOG:
         return (INT_PTR)TRUE;
-
     case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
+        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
             EndDialog(hDlg, LOWORD(wParam));
             return (INT_PTR)TRUE;
         }

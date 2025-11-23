@@ -11,7 +11,8 @@ struct Particle
     float3 worldDir;
     float lifeTime;
     int alive;
-    float3 padding;
+    int type;
+    float2 padding;
 };
 
 StructuredBuffer<Particle> g_data : register(t9);
@@ -56,6 +57,7 @@ struct GS_OUT
     float4 position : SV_Position;
     float2 uv : TEXCOORD;
     uint id : SV_InstanceID;
+    int type : TEXCOORD1; // type 전달 추가
 };
 
 [maxvertexcount(6)]
@@ -80,21 +82,19 @@ void GS_Main(point VS_OUT input[1], inout TriangleStream<GS_OUT> outputStream)
     output[2].position = vtx.viewPos + float4(scale, -scale, 0.f, 0.f);
     output[3].position = vtx.viewPos + float4(-scale, -scale, 0.f, 0.f);
 
-    // Projection Space
-    output[0].position = mul(output[0].position, g_matProjection);
-    output[1].position = mul(output[1].position, g_matProjection);
-    output[2].position = mul(output[2].position, g_matProjection);
-    output[3].position = mul(output[3].position, g_matProjection);
-
+    
+    for (int i = 0; i < 4; ++i)
+    {
+        // Projection Space
+        output[i].position = mul(output[i].position, g_matProjection);
+        output[i].id = id;
+        output[i].type = g_data[id].type;
+    }
     output[0].uv = float2(0.f, 0.f);
     output[1].uv = float2(1.f, 0.f);
     output[2].uv = float2(1.f, 1.f);
     output[3].uv = float2(0.f, 1.f);
 
-    output[0].id = id;
-    output[1].id = id;
-    output[2].id = id;
-    output[3].id = id;
 
     outputStream.Append(output[0]);
     outputStream.Append(output[1]);
@@ -109,7 +109,20 @@ void GS_Main(point VS_OUT input[1], inout TriangleStream<GS_OUT> outputStream)
 
 float4 PS_Main(GS_OUT input) : SV_Target
 {
-    return g_tex_0.Sample(g_sam_0, input.uv);
+    int type = input.type;
+
+    if (type == 0)
+        return g_tex_0.Sample(g_sam_0, input.uv);
+    else if (type == 1)
+        return g_tex_1.Sample(g_sam_0, input.uv);
+    else if (type == 2)
+        return g_tex_2.Sample(g_sam_0, input.uv);
+    else if (type == 3)
+        return g_tex_3.Sample(g_sam_0, input.uv);
+    else if (type == 4)
+        return g_tex_4.Sample(g_sam_0, input.uv);
+    else
+        return g_tex_0.Sample(g_sam_0, input.uv);
 }
 
 struct ComputeShared
@@ -134,7 +147,7 @@ void CS_Main(int3 threadIndex : SV_DispatchThreadID)
 
     int maxCount = g_int_0;
     int addCount = g_int_1;
-    int frameNumber = g_int_2;
+    int type = g_int_2;
     float deltaTime = g_vec2_1.x;
     float accTime = g_vec2_1.y;
     float minLifeTime = g_vec4_0.x;
@@ -181,13 +194,44 @@ void CS_Main(int3 threadIndex : SV_DispatchThreadID)
                 2 * r3 - 1
             };
 
-            // [0~1] -> [-1~1]
-            float3 dir = (noise - 0.5f) * 2.f;
+            if (type == 3)
+            {
+                float r1b = Rand(float2(x + 17.123f, accTime + 3.7f));
+                r1 = frac(r1 + 0.5f * r1b);
 
-            g_particle[threadIndex.x].worldDir = normalize(dir);
-            g_particle[threadIndex.x].worldPos = (noise.xyz - 0.5f) * 25;
-            g_particle[threadIndex.x].lifeTime = ((maxLifeTime - minLifeTime) * noise.x) + minLifeTime;
+                // 디스크 샘플 (반경을 0.5로 고정: 기존 (noise - 0.5) 범위에 맞춤)
+                float theta = 3.141592f * 4 * r1;
+                float r = sqrt(saturate(r2)) * 2.0f;
+
+                float3 lateralDir = float3(cos(theta), 0.f, sin(theta));
+                g_particle[threadIndex.x].worldDir  = lateralDir;
+                g_particle[threadIndex.x].worldPos  = float3(r*cos(theta), 0.f, r*sin(theta));
+            }
+            else
+            {
+                // [0~1] -> [-1~1]
+                float3 dir = (noise - 0.5f) * 2.f;
+
+                g_particle[threadIndex.x].worldDir = normalize(dir);
+
+                if(type == 0)
+			    {
+				    g_particle[threadIndex.x].worldPos = (noise.xyz - 0.5f) * 25;
+			    }
+                else if(type == 2)
+                {
+                g_particle[threadIndex.x].worldPos = (noise.xyz - 0.5f);
+                }
+            }
+
+            if (type == 3) {
+                g_particle[threadIndex.x].lifeTime = lerp(minLifeTime, maxLifeTime, r3);
+            } else {
+                g_particle[threadIndex.x].lifeTime = ((maxLifeTime - minLifeTime) * noise.x) + minLifeTime;
+            }
+
             g_particle[threadIndex.x].curTime = 0.f;
+            g_particle[threadIndex.x].type = type;
         }
     }
     else
@@ -200,8 +244,17 @@ void CS_Main(int3 threadIndex : SV_DispatchThreadID)
         }
 
         float ratio = g_particle[threadIndex.x].curTime / g_particle[threadIndex.x].lifeTime;
-        float speed = (maxSpeed - minSpeed) * ratio + minSpeed;
-        g_particle[threadIndex.x].worldPos += g_particle[threadIndex.x].worldDir * speed * deltaTime;
+
+        if (g_particle[threadIndex.x].type == 3)
+        {
+            float speed = lerp(maxSpeed, minSpeed, ratio);
+            g_particle[threadIndex.x].worldPos += g_particle[threadIndex.x].worldDir * speed * deltaTime;
+        }
+        else
+        {
+            float speed = (maxSpeed - minSpeed) * ratio + minSpeed;
+            g_particle[threadIndex.x].worldPos += g_particle[threadIndex.x].worldDir * speed * deltaTime;
+        }
     }
 }
 

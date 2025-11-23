@@ -102,6 +102,8 @@ float4 PS_Tex(VS_TEX_OUT input) : SV_Target
     if (g_tex_on_0)
         color = g_tex_0.Sample(g_sam_0, input.uv);
 
+    color *= g_vec4_0;
+
     return color;
 }
 

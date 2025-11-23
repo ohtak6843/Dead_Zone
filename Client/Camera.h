@@ -1,0 +1,88 @@
+#pragma once
+#include "GameObject.h"
+
+enum class PROJECTION_TYPE
+{
+	PERSPECTIVE, // 원근 투영
+	ORTHOGRAPHIC, // 직교 투영
+};
+
+class Camera
+{
+public:
+	Camera();
+	virtual ~Camera();
+
+public:
+	void FinalUpdate();
+
+	void SetProjectionType(PROJECTION_TYPE type) { _type = type; }
+	PROJECTION_TYPE GetProjectionType() { return _type; }
+
+	void SetCullingMaskLayerOnOff(uint8 layer, bool on)
+	{
+		if (on)
+			_cullingMask |= (1 << layer);
+		else
+			_cullingMask &= ~(1 << layer);
+	}
+
+	void SetCullingMaskAll() { SetCullingMask(UINT32_MAX); }
+	void SetCullingMask(uint32 mask) { _cullingMask = mask; }
+	bool IsCulled(uint8 layer) { return (_cullingMask & (1 << layer)) != 0; }
+
+	void SetNear(float value) { _near = value; }
+	void SetFar(float value) { _far = value; }
+	void SetFOV(float value) { _fov = value; }
+	void SetNormalFOV(float value) { _normalFov = value; } // fov 기본값 설정
+	void SetScale(float value) { _scale = value; }
+	void SetWidth(float value) { _width = value; }
+	void SetHeight(float value) { _height = value; }
+	
+
+	float GetFOV() { return _fov; }
+	float GetNormalFOV() { return _normalFov; } // fov 기본값 가져오기
+	
+
+	Matrix& GetViewMatrix() { return _matView; }
+	Matrix& GetProjectionMatrix() { return _matProjection; }
+
+	ContainmentType FrustumCulling(shared_ptr<class GameObject> gameObject); // 오브젝트가 프러스텀 안에 있는지 검사
+
+public:
+	shared_ptr<GameObject> GetGameObject() { return _gameObject.lock(); }
+	shared_ptr<Transform> GetTransform() { return _gameObject.lock()->GetTransform(); }
+
+private:
+	friend class CameraObject;
+	void SetGameObject(shared_ptr<GameObject> gameObject) { _gameObject = gameObject; }
+	weak_ptr<GameObject> _gameObject;
+
+private:
+	PROJECTION_TYPE _type = PROJECTION_TYPE::PERSPECTIVE;
+
+	float _near = 1.f;
+	float _far = 1000.f;
+	float _fov = 90.f;
+	float _normalFov = 90.f; // fov 기본값
+	float _scale = 1.f;
+	float _width = 0.f;
+	float _height = 0.f;
+
+	Matrix _matView = {};
+	Matrix _matProjection = {};
+
+	BoundingFrustum _frustum;
+	uint32 _cullingMask = 0;
+
+private:
+	vector<shared_ptr<GameObject>> _vecDeferred;
+	vector<shared_ptr<GameObject>> _vecForward;
+	vector<shared_ptr<GameObject>> _vecParticle;
+	vector<shared_ptr<GameObject>> _vecShadow;
+
+public:
+	static Matrix S_MatView;
+	static Matrix S_MatProjection;
+};
+
